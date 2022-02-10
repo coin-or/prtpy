@@ -1,0 +1,5 @@
+include pyproject.toml
+include requirements.txt
+include LICENSE
+global-include *.md
+global-include VERSION

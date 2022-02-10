@@ -1,2 +1,3 @@
 # prtpy
-Number partitioning in Python
+
+Number partitioning in Python.
