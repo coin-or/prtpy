@@ -43,7 +43,7 @@ class SmallestSum(Sums):
         return min(bins.sums)
 
 
-class Bins(OutputFormat):
+class EntirePartition(OutputFormat):
     # Output the set of all bins.
     def get_output(bins: Bins) -> list:
         return bins.bins
