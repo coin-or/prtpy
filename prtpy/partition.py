@@ -2,51 +2,47 @@
 The generic partition function.
 """
 
-from outputs import (
-    OutputFormat,
-    Sums,
-    LargestSum,
-    SmallestSum,
-    EntirePartition,
-)
-from typing import Callable
+from prtpy.outputtypes import *
+from prtpy.objectives import *
+from typing import Callable, List, Any
+
 
 
 def partition(
     algorithm: Callable,
-    num_of_bins: int,
-    items: any = None,
-    values: list[int] = None,
-    output: OutputFormat = EntirePartition,
-) -> list[list[int]]:
+    numbins: int,
+    items: Any,
+    map_item_to_value: Callable[[Any], float] = None,
+    objective: Objective = MinimizeDifference,
+    outputtype: OutputType = Partition,
+) -> List[List[int]]:
     """
-    Partition the numbers using the greedy number partitioning algorithm.
+    A generic partition routine.
+
     >>> from greedy import greedy
     >>> import numpy as np
-    >>> partition(algorithm=greedy, num_of_bins=2, values=[1,2,3,3,5,9,9])
+    >>> partition(algorithm=greedy, numbins=2, items=[1,2,3,3,5,9,9])
     [[9, 5, 2], [9, 3, 3, 1]]
-    >>> partition(algorithm=greedy, num_of_bins=3, values=[1,2,3,3,5,9,9])
+    >>> partition(algorithm=greedy, numbins=3, items=[1,2,3,3,5,9,9])
     [[9, 2], [9, 1], [5, 3, 3]]
-    >>> partition(algorithm=greedy, num_of_bins=3, values=[1,2,3,3,5,9,9], output=LargestSum)
-    11.0
-    >>> partition(algorithm=greedy, num_of_bins=2, values=np.array([1,2,3,3,5,9,9]), output=Sums)
+    >>> partition(algorithm=greedy, numbins=2, items=np.array([1,2,3,3,5,9,9]), outputtype=Sums)
     array([16., 16.])
-    >>> partition(algorithm=greedy, num_of_bins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    >>> partition(algorithm=greedy, numbins=3, items=[1,2,3,3,5,9,9], outputtype=LargestSum)
+    11.0
+    >>> partition(algorithm=greedy, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['f', 'e', 'b'], ['g', 'c', 'd', 'a']]
-    >>> partition(algorithm=greedy, num_of_bins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    >>> partition(algorithm=greedy, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
     """
-    if values is not None:
-        map_item_to_value = lambda item: item
-        item_names = values
-    elif items is not None:
-        map_item_to_value = lambda item: items[item]
+    if isinstance(items, dict):  # items is a dict mapping an item to its value.
         item_names = items.keys()
-    else:
-        raise ValueError("Either items or sizes must be given as an input")
-    bins = output.get_empty_bins(num_of_bins)
-    algorithm(bins, item_names, map_item_to_value)
-    return output.get_output(bins)
+        if map_item_to_value is None:
+            map_item_to_value = lambda item: items[item]
+    else:  # items is a
+        item_names = items
+        if map_item_to_value is None:
+            map_item_to_value = lambda item: item
+    return algorithm(numbins, item_names, map_item_to_value, objective, outputtype)
 
 
 if __name__ == "__main__":
