@@ -1,14 +1,14 @@
-name: tox
+name: pytest
 
 on:
   push:
     branches:
-      - xmain
-      - xmaster
+      - main
+      - master
   pull_request:
     branches:
-      - xmain
-      - xmaster
+      - main
+      - master
 
 jobs:
   build:
@@ -24,21 +24,19 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - name: Install tox
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install tox tox-gh-actions
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+      - name: Install pytest
+        run: python -m pip install pytest
       - name: Update apt
         run: sudo apt-get update
       - name: Install COIN
         run: sudo apt-get install coinor-libcbc-dev
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
       - name: Install numpy
         run: python -m pip install numpy
       - name: Install requirements
         run: python -m pip install -r requirements.txt
       - name: Install cylp
         run: python -m pip install cylp
-      - name: Run tox
-        run: python -m tox
+      - name: Run pytest
+        run: python -m pytest
