@@ -1,6 +1,6 @@
 # prtpy 
 
-![Tox result](https://github.com/erelsgl/prtpy/workflows/tox/badge.svg)
+![Pytest result](https://github.com/erelsgl/prtpy/workflows/pytest/badge.svg)
 [![PyPI version](https://badge.fury.io/py/prtpy.svg)](https://badge.fury.io/py/prtpy)
 
 Python code for multiway number partitioning.
