@@ -10,15 +10,16 @@ Supports several exact and approximate algorithms, with several input formats, o
 
     pip install prtpy
 
-To use the integer-programming functions, you also need an ILP solver. 
-The [CBC solver](https://projects.coin-or.org/Cbc) is installed by default through the [CyLP](https://github.com/coin-or/CyLP) package:
+To use the integer-programming functions, you also need an ILP solver. On Windows, the simplest one to install is the [CBC solver](https://projects.coin-or.org/Cbc), which you can install by:
 
     pip install cylp
 
+On Linux and Mac, you need to install the CBC binaries before that; see the [CyLP](https://github.com/coin-or/CyLP) documentation.
+
 If you want a more efficient ILP solver, you need to manually install one.
 The supported solvers are the ones supported by `cvxpy`, which are:
-XPRESS, SCIP, GUROBI and MOSEK. 
-GLPK_MI is also supported, but it is very slow.
+XPRESS, SCIP, GUROBI and MOSEK. GLPK_MI is also supported, but it is very slow.
+See the [CVXPY documentation](https://www.cvxpy.org/tutorial/advanced/index.html#mixed-integer-programs) for more information.
 
 
 
