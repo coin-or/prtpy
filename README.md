@@ -21,17 +21,10 @@ XPRESS, SCIP, GUROBI and MOSEK.
 GLPK_MI is also supported, but it is very slow.
 
 
-## Usage
-
-
-
 
 ## Examples
 
-1. [Various input formats](examples/input_formats.md), to easily use by both researchers and end-users.
-
-1. [Various output formats](examples/output_formats.md).
-
-
-
-## More examples
+1. [Algorithms](examples/algorithms.md).
+1. [Input formats](examples/input_formats.md).
+1. [Optimization objectives](examples/objectives.md).
+2. [Output formats](examples/output_formats.md).
