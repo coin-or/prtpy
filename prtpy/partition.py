@@ -19,7 +19,7 @@ def partition(
     """
     A generic partition routine.
 
-    >>> from greedy import greedy
+    >>> from prtpy.greedy import greedy
     >>> import numpy as np
     >>> partition(algorithm=greedy, numbins=2, items=[1,2,3,3,5,9,9])
     [[9, 5, 2], [9, 3, 3, 1]]

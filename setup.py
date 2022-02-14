@@ -31,7 +31,7 @@ setuptools.setup(
     include_package_data=True,
     classifiers=[
         # see https://pypi.org/classifiers/
-        "Development Status :: 1 - Planning",
+        "Development Status :: 2 - Pre-Alpha",
     ],
 )
 
