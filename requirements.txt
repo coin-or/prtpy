@@ -1,5 +1,4 @@
-cylp>=0.91.4
 numpy>=1.21.3
 scipy>=1.6.1
 cvxpy_base>=1.1.17
-
+cylp>=0.91.4
