@@ -2,9 +2,9 @@
 Define the various available output formats for a partition algorithm.
 """
 
-from abc import ABC, abstractmethod
-from bins import *
+from abc import ABC
 from typing import Any, List
+from prtpy.bins import Bins, BinsKeepingEntireContents, BinsKeepingOnlySums
 
 
 class OutputType(ABC):

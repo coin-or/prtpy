@@ -16,8 +16,7 @@ Define various optimization objectives for a partition algorithm.
 4
 """
 
-from abc import ABC, abstractmethod
-from typing import List, Any, Callable
+from typing import List, Callable
 from dataclasses import dataclass
 
 @dataclass

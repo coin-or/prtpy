@@ -17,8 +17,7 @@ Credit: Rob Pratt, https://or.stackexchange.com/a/6115/2576
 
 from typing import List, Callable, Any
 from numbers import Number
-from objectives import *
-from outputtypes import *
+from prtpy import objectives as obj, outputtypes as out
 
 import cvxpy
 from cvxpy.reductions.solvers import defines as slv_def
@@ -30,8 +29,8 @@ def optimal(
     numbins: int,
     items: List[Any],
     map_item_to_value: Callable[[Any], float] = lambda x: x,
-    objective: Objective = MinimizeDifference,
-    outputtype: OutputType = Partition,
+    objective: obj.Objective = obj.MinimizeDifference,
+    outputtype: out.OutputType = out.Partition,
     copies=1,
     solver=DEFAULT_ILP_SOLVER,
 ):
@@ -51,19 +50,19 @@ def optimal(
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> optimal(3, walter_numbers, objective=MinimizeDifference, outputtype=PartitionAndSums)
+    >>> optimal(3, walter_numbers, objective=obj.MinimizeDifference, outputtype=out.PartitionAndSums)
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
-    >>> optimal(3, walter_numbers, objective=MinimizeLargestSum, outputtype=PartitionAndSums)
+    >>> optimal(3, walter_numbers, objective=obj.MinimizeLargestSum, outputtype=out.PartitionAndSums)
     Bin #0: [27, 26], sum=53.0
     Bin #1: [39, 13, 10], sum=62.0
     Bin #2: [46, 16], sum=62.0
-    >>> optimal(3, walter_numbers, objective=MaximizeSmallestSum, outputtype=PartitionAndSums)
+    >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.PartitionAndSums)
     Bin #0: [27, 16, 13], sum=56.0
     Bin #1: [46, 10], sum=56.0
     Bin #2: [39, 26], sum=65.0
-    >>> optimal(3, walter_numbers, objective=MaximizeSmallestSum, outputtype=SmallestSum)
+    >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.SmallestSum)
     56.0
     >>> optimal(3, walter_numbers, solver="XYZ")
     Traceback (most recent call last):
@@ -73,7 +72,7 @@ def optimal(
     >>> from partition import partition
     >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['a', 'g'], ['c', 'd', 'e'], ['b', 'f']]
-    >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=Sums)
+    >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     array([16., 16.])
     """
     if solver not in slv_def.INSTALLED_SOLVERS:
@@ -116,7 +115,7 @@ def optimal(
 
 
     # Construct the output:
-    bins: Bins = outputtype.create_empty_bins(numbins)
+    bins = outputtype.create_empty_bins(numbins)
     for ibin in ibins:
         for item in items:
             count_item_in_bin = int(counts[item][ibin].value)
@@ -127,9 +126,6 @@ def optimal(
 
 if __name__ == "__main__":
     import doctest, logging
-
-    # solve.logger.addHandler(logging.StreamHandler())
-    # solve.logger.setLevel(logging.INFO)
 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))

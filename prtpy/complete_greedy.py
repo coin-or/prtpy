@@ -6,12 +6,10 @@
            https://github.com/fuglede/numberpartitioning/blob/master/src/numberpartitioning/greedy.py
 """
 
-from typing import List, Tuple, Callable, Iterator
-from bins import Bins
-from objectives import *
-from outputtypes import *
+from typing import List, Tuple, Callable, Iterator, Any
 import numpy as np
 import logging
+from prtpy import outputtypes as out, objectives as obj
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +18,8 @@ def optimal(
     numbins: int,
     items: List[any],
     map_item_to_value: Callable[[Any], float] = lambda x: x,
-    objective: Objective = MinimizeDifference,
-    outputtype: OutputType = Partition,
+    objective: obj.Objective = obj.MinimizeDifference,
+    outputtype: out.OutputType = out.Partition,
 ):
     """
     Returns the optimal partition - the partition that minimizes the objective.
@@ -31,25 +29,25 @@ def optimal(
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> optimal(3, walter_numbers, objective=MinimizeDifference, outputtype=PartitionAndSums)
+    >>> optimal(3, walter_numbers, objective=obj.MinimizeDifference, outputtype=out.PartitionAndSums)
     Bin #0: [27, 26, 10], sum=63.0
     Bin #1: [39, 16], sum=55.0
     Bin #2: [46, 13], sum=59.0
-    >>> optimal(3, walter_numbers, objective=MinimizeLargestSum, outputtype=PartitionAndSums)
+    >>> optimal(3, walter_numbers, objective=obj.MinimizeLargestSum, outputtype=out.PartitionAndSums)
     Bin #0: [27, 26], sum=53.0
     Bin #1: [39, 13, 10], sum=62.0
     Bin #2: [46, 16], sum=62.0
-    >>> optimal(3, walter_numbers, objective=MaximizeSmallestSum, outputtype=PartitionAndSums)
+    >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.PartitionAndSums)
     Bin #0: [27, 16, 13], sum=56.0
     Bin #1: [39, 26], sum=65.0
     Bin #2: [46, 10], sum=56.0
-    >>> optimal(3, walter_numbers, objective=MaximizeSmallestSum, outputtype=SmallestSum)
+    >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.SmallestSum)
     56.0
 
     >>> from partition import partition
     >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['e', 'c', 'd'], ['g', 'a'], ['f', 'b']]
-    >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=Sums)
+    >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     array([16., 16.])
     """
     for result in generator(numbins, items, map_item_to_value, objective, outputtype):
@@ -61,8 +59,8 @@ def generator(
     numbins: int,
     items: List[any],
     map_item_to_value: Callable[[Any], float] = lambda x: x,
-    objective: Objective = MinimizeDifference,
-    outputtype: OutputType = Partition,
+    objective: obj.Objective = obj.MinimizeDifference,
+    outputtype: out.OutputType = out.Partition,
 ) -> Iterator:
     """
     Generate partitions using the order from the greedy algorithm.

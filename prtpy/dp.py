@@ -5,11 +5,9 @@ Author: Erel Segal-Halevi
 Since: 2022-02
 """
 
-import outputtypes
-from objectives import *
+from prtpy import outputtypes as out, objectives as obj
 from typing import Callable, List, Any, Tuple
 from dataclasses import dataclass
-import dynprog
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,23 +17,23 @@ def optimal(
     numbins: int,
     items: List[Any],
     map_item_to_value: Callable[[Any], float] = lambda x: x,
-    objective: Objective = MinimizeDifference,
-    outputtype: outputtypes.OutputType = outputtypes.Partition,
+    objective: obj.Objective = obj.MinimizeDifference,
+    outputtype: out.OutputType = out.Partition,
 ):
 
     """
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> optimal(3, walter_numbers, objective=MinimizeDifference, outputtype=outputtypes.Partition)
+    >>> optimal(3, walter_numbers, objective=obj.MinimizeDifference, outputtype=out.Partition)
     [[39, 16], [46, 13], [27, 26, 10]]
-    >>> optimal(3, walter_numbers, objective=MinimizeLargestSum, outputtype=outputtypes.PartitionAndSums)
+    >>> optimal(3, walter_numbers, objective=obj.MinimizeLargestSum, outputtype=out.PartitionAndSums)
     Bin #0: [46, 16], sum=62.0
     Bin #1: [39, 13, 10], sum=62.0
     Bin #2: [27, 26], sum=53.0
-    >>> optimal(3, walter_numbers, objective=MaximizeSmallestSum, outputtype=outputtypes.Sums)
+    >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.Sums)
     (56, 56, 65)
-    >>> optimal(3, walter_numbers, objective=MaximizeSmallestSum, outputtype=outputtypes.SmallestSum)
+    >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.SmallestSum)
     56
     """
     if hasattr(outputtype, 'extract_output_from_sums'):
@@ -52,8 +50,8 @@ def _optimal_sums(
     numbins: int,
     items: List[Any],
     map_item_to_value: Callable[[Any], float] = lambda x: x,
-    objective: Objective = MinimizeDifference,
-    outputtype: outputtypes.Sums = outputtypes.Sums,
+    objective: obj.Objective = obj.MinimizeDifference,
+    outputtype: out.OutputType = out.Sums,
 ):
     """
     A DP that computes only the optimal sums in the bins (not the optimal partition itself).
@@ -104,8 +102,8 @@ def _optimal_partition(
     numbins: int,
     items: List[Any],
     map_item_to_value: Callable[[Any], float] = lambda x: x,
-    objective: Objective = MinimizeDifference,
-    outputtype: outputtypes.OutputType = outputtypes.Partition,
+    objective: obj.Objective = obj.MinimizeDifference,
+    outputtype: out.OutputType = out.Partition,
 ):
     """
     A DP that computes both the optimal sums and the optimal partition.
@@ -183,9 +181,6 @@ def _optimal_partition(
 
 if __name__ == "__main__":
     import doctest, logging
-
-    dynprog.logger.addHandler(logging.StreamHandler())
-    dynprog.logger.setLevel(logging.INFO)
 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))

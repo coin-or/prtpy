@@ -2,8 +2,7 @@
 The generic partition function.
 """
 
-from prtpy.outputtypes import *
-from prtpy.objectives import *
+from prtpy import outputtypes as out, objectives as obj
 from typing import Callable, List, Any
 
 
@@ -13,8 +12,8 @@ def partition(
     numbins: int,
     items: Any,
     map_item_to_value: Callable[[Any], float] = None,
-    objective: Objective = MinimizeDifference,
-    outputtype: OutputType = Partition,
+    objective: obj.Objective = obj.MinimizeDifference,
+    outputtype: out.OutputType = out.Partition,
 ) -> List[List[int]]:
     """
     A generic partition routine.
@@ -25,9 +24,9 @@ def partition(
     [[9, 5, 2], [9, 3, 3, 1]]
     >>> partition(algorithm=greedy, numbins=3, items=[1,2,3,3,5,9,9])
     [[9, 2], [9, 1], [5, 3, 3]]
-    >>> partition(algorithm=greedy, numbins=2, items=np.array([1,2,3,3,5,9,9]), outputtype=Sums)
+    >>> partition(algorithm=greedy, numbins=2, items=np.array([1,2,3,3,5,9,9]), outputtype=out.Sums)
     array([16., 16.])
-    >>> partition(algorithm=greedy, numbins=3, items=[1,2,3,3,5,9,9], outputtype=LargestSum)
+    >>> partition(algorithm=greedy, numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.LargestSum)
     11.0
     >>> partition(algorithm=greedy, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['f', 'e', 'b'], ['g', 'c', 'd', 'a']]
@@ -38,7 +37,7 @@ def partition(
         item_names = items.keys()
         if map_item_to_value is None:
             map_item_to_value = lambda item: items[item]
-    else:  # items is a
+    else:  # items is a list
         item_names = items
         if map_item_to_value is None:
             map_item_to_value = lambda item: item
