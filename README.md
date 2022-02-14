@@ -14,7 +14,11 @@ To use the integer-programming functions, you also need an ILP solver. On Window
 
     pip install cylp
 
-On Linux and Mac, you need to install the CBC binaries before that; see the [CyLP](https://github.com/coin-or/CyLP) documentation.
+On Linux and Mac, you need to install the CBC binaries before that; see the [CyLP](https://github.com/coin-or/CyLP) documentation. For example, on Ubuntu 20.04 with Python 3.8 or 3.9, you can run:
+
+    sudo apt-get update
+    sudo apt-get install coinor-libcbc-dev
+    pip install cylp
 
 If you want a more efficient ILP solver, you need to manually install one.
 The supported solvers are the ones supported by `cvxpy`, which are:
