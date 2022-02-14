@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from partition_random import partition_random_items
 
 algorithm = prtpy.exact.ilp
-numbins = 5
+numbins = 4
 
 benchmark.logger.setLevel(logging.INFO)
 benchmark.logger.addHandler(logging.StreamHandler())
@@ -12,7 +12,7 @@ benchmark.logger.addHandler(logging.StreamHandler())
 results = benchmark.find_max_solvable_size(
     partition_random_items,
     "numitems",
-    range(2, 100),
+    range(1, 101, 10),
     max_time_in_seconds=10,
     algorithm=algorithm,
     numbins=numbins,

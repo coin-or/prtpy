@@ -14,6 +14,7 @@ def partition(
     map_item_to_value: Callable[[Any], float] = None,
     objective: obj.Objective = obj.MinimizeDifference,
     outputtype: out.OutputType = out.Partition,
+    **kwargs
 ) -> List[List[int]]:
     """
     A generic partition routine.
@@ -41,7 +42,7 @@ def partition(
         item_names = items
         if map_item_to_value is None:
             map_item_to_value = lambda item: item
-    return algorithm(numbins, item_names, map_item_to_value, objective, outputtype)
+    return algorithm(numbins, item_names, map_item_to_value, objective, outputtype, **kwargs)
 
 
 if __name__ == "__main__":

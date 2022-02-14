@@ -3,7 +3,8 @@
 ![Tox result](https://github.com/erelsgl/prtpy/workflows/tox/badge.svg)
 [![PyPI version](https://badge.fury.io/py/prtpy.svg)](https://badge.fury.io/py/prtpy)
 
-Implements various algorithms for multiway number partitioning.
+Python code for multiway number partitioning.
+Supports several exact and approximate algorithms, with several input formats, optimization objectives and output formats.
 
 ## Installation
 
@@ -23,7 +24,14 @@ GLPK_MI is also supported, but it is very slow.
 ## Usage
 
 
-## Example
+
+
+## Examples
+
+1. [Various input formats](examples/input_formats.md), to easily use by both researchers and end-users.
+
+1. [Various output formats](examples/output_formats.md).
+
 
 
 ## More examples
