@@ -1,62 +1,184 @@
 """
-    Partition numbers using dynamic programming.
+Optimal number partitioning using dynamic programming.
 
-    >>> from partition import partition
-    >>> partition(algorithm=dynamic_programming, numbins=2, values=[1,2,3,3,5,9,9])
-    [[9, 5, 2], [9, 3, 3, 1]]
-    >>> #partition(algorithm=dynamic_programming, numbins=3, values=[1,2,3,3,5,9,9])
-    [[9, 2], [9, 1], [5, 3, 3]]
-    >>> #partition(algorithm=dynamic_programming, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['f', 'e', 'b'], ['g', 'c', 'd', 'a']]
-    >>> #partition(algorithm=dynamic_programming, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
+Author: Erel Segal-Halevi
+Since: 2022-02
 """
 
-from bins import Bins, add_input_to_bin_sum, add_input_to_bin
-from outputtypes import *
-from typing import Callable, List, Any
-from dynprog.sequential import SequentialDynamicProgram
+import outputtypes
+from objectives import *
+from typing import Callable, List, Any, Tuple
+from dataclasses import dataclass
 import dynprog
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-def dynamic_programming(
-    bins: Bins,
+def optimal(
+    numbins: int,
     items: List[Any],
-    map_item_to_value: Callable[[Any], float],
+    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    objective: Objective = MinimizeDifference,
+    outputtype: outputtypes.OutputType = outputtypes.Partition,
 ):
-    numbins = bins.num
 
-    class PartitionDP(SequentialDynamicProgram):
-        # The states are of the form  (v1, v2, ..., vn) where n is the number of bins.
-        # The "vi" is the current sum in bin i.
-        def initial_states(self):
-            zero_values = numbins * (0,)
-            return {zero_values}
+    """
+    The following examples are based on:
+        Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
+    >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    >>> optimal(3, walter_numbers, objective=MinimizeDifference, outputtype=outputtypes.Partition)
+    [[39, 16], [46, 13], [27, 26, 10]]
+    >>> optimal(3, walter_numbers, objective=MinimizeLargestSum, outputtype=outputtypes.PartitionAndSums)
+    Bin #0: [46, 16], sum=62.0
+    Bin #1: [39, 13, 10], sum=62.0
+    Bin #2: [27, 26], sum=53.0
+    >>> optimal(3, walter_numbers, objective=MaximizeSmallestSum, outputtype=outputtypes.Sums)
+    (56, 56, 65)
+    >>> optimal(3, walter_numbers, objective=MaximizeSmallestSum, outputtype=outputtypes.SmallestSum)
+    56
+    """
+    if hasattr(outputtype, 'extract_output_from_sums'):
+        # We need only the sums - not the entire partition.
+        return _optimal_sums(numbins, items, map_item_to_value, objective, outputtype)
+    else:
+        # We need the entire partition.
+        return _optimal_partition(numbins, items, map_item_to_value, objective, outputtype)
 
-        def initial_solution(self):
-            empty_bundles = [[] for _ in range(numbins)]
-            return empty_bundles
 
-        def transition_functions(self):
-            return [
-                lambda state, input, bin_index=bin_index: add_input_to_bin_sum(
-                    state, bin_index, map_item_to_value(input)
-                )
-                for bin_index in range(numbins)
-            ]
 
-        def construction_functions(self):
-            return [
-                lambda solution, input, bin_index=bin_index: add_input_to_bin(
-                    solution, bin_index, input
-                )
-                for bin_index in range(numbins)
-            ]
 
-        def value_function(self):
-            return lambda state: min(state)
+def _optimal_sums(
+    numbins: int,
+    items: List[Any],
+    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    objective: Objective = MinimizeDifference,
+    outputtype: outputtypes.Sums = outputtypes.Sums,
+):
+    """
+    A DP that computes only the optimal sums in the bins (not the optimal partition itself).
 
-    return PartitionDP().max_value(items)
+    The states are of the form  (v1, v2, ..., vn) where n is the number of bins.
+    The "vi" is the current sum in bin i.
+    """
+
+    # Construct initial states:
+    zero_values = numbins * (0,)
+    current_states = {zero_values}
+    num_of_processed_states = len(current_states)
+
+    for item in items:
+        value = map_item_to_value(item)
+
+        # Construct next states:
+        next_states = set()
+        for state in current_states:
+            for ibin in range(numbins):
+                next_state = list(state)
+                next_state[ibin] += value
+                next_states.add(tuple(next_state))
+        logger.info(
+            "  Processed item %s and added %d states.",
+            input,
+            len(next_states),
+        )
+        num_of_processed_states += len(next_states)
+        current_states = next_states
+
+    logger.info("Processed %d states.", num_of_processed_states)
+    if len(current_states) == 0:
+        raise ValueError("No final states!")
+    best_final_state = min(
+        current_states, key=objective.get_value_to_minimize
+    )
+    best_final_state_value = objective.get_value_to_minimize(best_final_state)
+    logger.info(
+        "Best final state: %s, value: %s",
+        best_final_state,
+        best_final_state_value,
+    )
+    return outputtype.extract_output_from_sums(best_final_state)
+
+
+def _optimal_partition(
+    numbins: int,
+    items: List[Any],
+    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    objective: Objective = MinimizeDifference,
+    outputtype: outputtypes.OutputType = outputtypes.Partition,
+):
+    """
+    A DP that computes both the optimal sums and the optimal partition.
+
+    The states are of the form  (v1, v2, ..., vn) where n is the number of bins.
+    The "vi" is the current sum in bin i.
+    """
+    items = list(items)
+    # allow to iterate twice. See https://stackoverflow.com/q/70381559/827927
+    State = Tuple[float]
+
+    @dataclass
+    class StateRecord:
+        state: State
+        prev: Any  # StateRecord
+        ibin: int  # the index of the bin to which the last item was added in order to get to this state.
+
+        def __hash__(self):
+            return hash(self.state)
+
+        def __eq__(self, other):
+            return self.state == other.state
+
+
+    # Construct initial states:
+    zero_values = numbins * (0,)
+    current_state_records = {StateRecord(zero_values, None, None)}
+    num_of_processed_states = len(current_state_records)
+
+    for item in items:
+        value = map_item_to_value(item)
+
+        # Construct next state records:
+        next_state_records = set()
+        for record in current_state_records:
+            for ibin in range(numbins):
+                next_state = list(record.state)
+                next_state[ibin] += value
+                next_state_record = StateRecord(tuple(next_state), record, ibin)
+                next_state_records.add(next_state_record)
+        logger.info(
+            "  Processed item %s and added %d state reccords.",
+            input,
+            len(next_state_records),
+        )
+        num_of_processed_states += len(next_state_records)
+        current_state_records = next_state_records
+
+    logger.info("Processed %d states.", num_of_processed_states)
+    if len(current_state_records) == 0:
+        raise ValueError("No final states!")
+    best_final_record = min(
+        current_state_records, key=lambda record: objective.get_value_to_minimize(record.state)
+    )
+    best_final_state = best_final_record.state
+    best_final_state_value = objective.get_value_to_minimize(best_final_state)
+
+    # construct path to solution
+    path = []
+    record = best_final_record
+    while record.prev is not None:
+        path.insert(0, record.ibin)
+        record = record.prev
+    logger.info("Path to best solution: %s", path)
+
+    # construct solution
+    bins = outputtype.create_empty_bins(numbins)
+    for item_index, item in enumerate(items):
+        ibin = path[item_index]
+        logger.info("  Item %d (%s): bin %d", item_index, item, ibin,)
+        bins.add_item_to_bin(item, map_item_to_value(item), ibin, inplace=True)
+    return outputtype.extract_output_from_bins(bins)
+
 
 
 if __name__ == "__main__":

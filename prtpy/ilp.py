@@ -21,10 +21,9 @@ from objectives import *
 from outputtypes import *
 
 import cvxpy
-from solve import solve
 from cvxpy.reductions.solvers import defines as slv_def
 
-ILP_SOLVERS = [(cvxpy.CBC, {})]
+DEFAULT_ILP_SOLVER = cvxpy.CBC
 
 
 def optimal(
@@ -34,6 +33,7 @@ def optimal(
     objective: Objective = MinimizeDifference,
     outputtype: OutputType = Partition,
     copies=1,
+    solver=DEFAULT_ILP_SOLVER,
 ):
     """
     Produce a partition that minimizes the given objective,
@@ -65,6 +65,10 @@ def optimal(
     Bin #2: [39, 26], sum=65.0
     >>> optimal(3, walter_numbers, objective=MaximizeSmallestSum, outputtype=SmallestSum)
     56.0
+    >>> optimal(3, walter_numbers, solver="XYZ")
+    Traceback (most recent call last):
+     ...
+    cvxpy.error.SolverError: Solver XYZ is not installed!
 
     >>> from partition import partition
     >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
@@ -72,6 +76,9 @@ def optimal(
     >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=Sums)
     array([16., 16.])
     """
+    if solver not in slv_def.INSTALLED_SOLVERS:
+        raise cvxpy.SolverError(f"Solver {solver} is not installed!")
+
     ibins = range(numbins)
     if isinstance(copies, Number):
         copies = {item: copies for item in items}
@@ -101,7 +108,12 @@ def optimal(
         constraints=constraints,
     )
     # CVXPY requires you to specify the solver for mixed-integer programs.
-    solve(problem, solvers=ILP_SOLVERS)
+    problem.solve(solver)
+    if problem.status == "infeasible":
+        raise ValueError("Problem is infeasible")
+    elif problem.status == "unbounded":
+        raise ValueError("Problem is unbounded")
+
 
     # Construct the output:
     bins: Bins = outputtype.create_empty_bins(numbins)

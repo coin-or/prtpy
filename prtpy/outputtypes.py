@@ -8,52 +8,64 @@ from typing import Any, List
 
 
 class OutputType(ABC):
-    @abstractmethod
-    def create_empty_bins(numbins: int) -> Bins:
+    @classmethod
+    def create_empty_bins(cls, numbins: int) -> Bins:
         """
         Construct and return a Bins structure. Used at the initialization phase of an algorithm.
         """
-        pass
+        raise NotImplementedError("Choose a specific output type")
 
-    @abstractmethod
-    def extract_output_from_bins(bins: Bins) -> Any:
+    @classmethod
+    def extract_output_from_bins(cls, bins: Bins) -> Any:
         """
         Return the required output from the given list of filled bins.
         """
-        pass
+        raise NotImplementedError("Choose a specific output type")
 
 
 class Sums(OutputType):
-    def create_empty_bins(numbins: int) -> List:
+    @classmethod
+    def create_empty_bins(cls, numbins: int) -> List:
         return BinsKeepingOnlySums(numbins)
 
     # Output the sums of all the bins (but not the bins contents).
-    def extract_output_from_bins(bins: Bins) -> List:
-        return bins.sums
+    @classmethod
+    def extract_output_from_sums(cls, sums: List[float]) -> List:
+        return sums
+
+    # Output the sums of all the bins (but not the bins contents).
+    @classmethod
+    def extract_output_from_bins(cls, bins: Bins) -> List:
+        return cls.extract_output_from_sums(bins.sums)
 
 
 class LargestSum(Sums):
     # Output the largest bin sum.
-    def extract_output_from_bins(bins: Bins) -> List:
-        return max(bins.sums)
+    @classmethod
+    def extract_output_from_sums(cls, sums: List[float]) -> List:
+        return max(sums)
 
 
 class SmallestSum(Sums):
     # Output the smallest bin sum.
-    def extract_output_from_bins(bins: Bins) -> List:
-        return min(bins.sums)
+    @classmethod
+    def extract_output_from_sums(cls, sums: List[float]) -> List:
+        return min(sums)
 
 
 class Partition(OutputType):
-    def create_empty_bins(numbins: int) -> List:
+    @classmethod
+    def create_empty_bins(cls, numbins: int) -> List:
         return BinsKeepingEntireContents(numbins)
 
     # Output the set of all bins.
-    def extract_output_from_bins(bins: Bins) -> List:
+    @classmethod
+    def extract_output_from_bins(cls, bins: Bins) -> List:
         return bins.bins
 
 
 class PartitionAndSums(Partition):
     # Output the set of all bins.
-    def extract_output_from_bins(bins: Bins) -> List:
+    @classmethod
+    def extract_output_from_bins(cls, bins: Bins) -> List:
         return bins
