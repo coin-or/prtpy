@@ -1,15 +1,15 @@
 #' # Optimization objectives
 
-import prtpy
-from prtpy.outputtypes import PartitionAndSums
-from prtpy.objectives import MaximizeSmallestSum, MinimizeLargestSum, MinimizeDifference
-dp = prtpy.exact.dynamic_programming
-
 #' Most algorithms allow you to choose the optimization objective.
 #' The following example is based on:
 #'     Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
 #' With these numbers, each objective yields a different partition.
 items = [46, 39, 27, 26, 16, 13, 10]
+
+import prtpy
+from prtpy.outputtypes import PartitionAndSums
+from prtpy.objectives import MaximizeSmallestSum, MinimizeLargestSum, MinimizeDifference
+dp = prtpy.exact.dynamic_programming
 
 #' MinimizeLargestSum:
 print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=PartitionAndSums, objective=MinimizeLargestSum))

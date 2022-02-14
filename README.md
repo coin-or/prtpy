@@ -25,11 +25,23 @@ The supported solvers are the ones supported by `cvxpy`, which are:
 XPRESS, SCIP, GUROBI and MOSEK. GLPK_MI is also supported, but it is very slow.
 See the [CVXPY documentation](https://www.cvxpy.org/tutorial/advanced/index.html#mixed-integer-programs) for more information.
 
+## Usage
 
+The function `prtpy.partition` can be used to activate all algorithms. For example, to partition the values [1,2,3,4,5] into two bins using the greedy algorithm, do:
 
-## Examples
+    import prtpy
+    prtpy.partition(algorithm=prtpy.approx.greedy, numbins=2, items=[1,2,3,4,5])
 
-1. [Algorithms](examples/algorithms.md).
-1. [Input formats](examples/input_formats.md).
-1. [Optimization objectives](examples/objectives.md).
+For more features and examples, see:
+
+1. [Algorithms](examples/algorithms.md);
+1. [Input formats](examples/input_formats.md);
+1. [Optimization objectives](examples/objectives.md);
 2. [Output formats](examples/output_formats.md).
+
+
+## Limitations
+
+The package is tested only on Python 3.8 and 3.9. Earlier versions, as well as 3.10, are not supported.
+
+

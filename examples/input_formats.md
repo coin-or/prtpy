@@ -1,14 +1,9 @@
 # Input formats
 
-```python
-import prtpy
-```
-
-
-
 You can send the input as a list of values:
 
 ```python
+import prtpy
 values = [4, 5, 5, 6, 7, 8, 8]
 print(prtpy.partition(algorithm=prtpy.approx.greedy, numbins=2, items=values))
 ```
@@ -19,7 +14,7 @@ print(prtpy.partition(algorithm=prtpy.approx.greedy, numbins=2, items=values))
 
 
 
-You can send the input as a dict mapping items to values; in this case, the partition will show the items:
+You can also send the input as a dict mapping items to values; in this case, the partition will show the items:
 
 ```python
 map_items_to_values = {"a": 4, "b": 5, "b2": 5, "c": 6, "d": 7, "e": 8, "e2": 8}
@@ -43,9 +38,9 @@ print(prtpy.partition(algorithm=prtpy.approx.greedy, numbins=3, items=values))
 ```
 
 ```
-[39 15 82 98 30 96 61 75 80 72 46 91 97 67 45  8 73 44 19 80]
-[[98, 80, 80, 67, 45, 30, 8], [97, 82, 75, 72, 44, 19, 15], [96, 91,
-73, 61, 46, 39]]
+[ 6 75 38 74 65 80 42 50 23  6 99 95 40  9 13 91 66 20 53 44]
+[[99, 74, 53, 50, 40, 13], [95, 75, 66, 44, 23, 20, 6], [91, 80, 65,
+42, 38, 9, 6]]
 ```
 
 

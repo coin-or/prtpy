@@ -1,18 +1,15 @@
 # Algorithms
 
-```python
-import prtpy
-import numpy as np
-from time import perf_counter
-```
-
-
-
 ## Approximate algorithms
 Currently, `prtpy` supports a single approximate algorithm - `greedy` - based on [Greedy number partitioning](https://en.wikipedia.org/wiki/Greedy_number_partitioning).
 It is very fast, and attains very good result on random instances with many items and bins.
 
+
 ```python
+import prtpy
+import numpy as np
+from time import perf_counter
+
 values = np.random.randint(1,10, 100000)
 start = perf_counter()
 print(prtpy.partition(algorithm=prtpy.approx.greedy, numbins=9, items=values, outputtype=prtpy.out.Sums))
@@ -20,15 +17,15 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[55566. 55566. 55566. 55566. 55566. 55565. 55565. 55565. 55565.]
-         0.2700902999999997 seconds
+[55551. 55551. 55551. 55551. 55551. 55550. 55550. 55550. 55550.]
+         0.28302570000000005 seconds
 ```
 
 
 
 ## Exact algorithms
-Currently, `prtpy` supports several exact algorithms. By far, the fastest of them uses integer linear programming.
-It can handle a relatively large number of items when there are at most 3 bins.
+`prtpy` supports several exact algorithms. By far, the fastest of them uses integer linear programming.
+It can handle a relatively large number of items when there are at most 4 bins.
 
 ```python
 values = np.random.randint(1,10, 100)
@@ -38,13 +35,14 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[114. 118. 123. 126.]
-         1.1145717 seconds
+[132. 133. 116. 144.]
+         0.6141641999999998 seconds
 ```
 
 
 
-You can choose another solver. For example, if you install the XPRESS solver, you can try the following (it will return an error if XPRESS is not installed):
+The default solver is CBC. You can choose another, potentially faster solver. 
+For example, if you install the XPRESS solver, you can try the following (it will return an error if XPRESS is not installed):
 
 ```python
 # import cvxpy
@@ -63,8 +61,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-(27, 26, 27)
-         0.034918799999999806 seconds
+(35, 35, 36)
+         0.05837340000000024 seconds
 ```
 
 
@@ -79,8 +77,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[25. 26.]
-         0.01448740000000015 seconds
+[28. 28.]
+         0.009200299999999828 seconds
 ```
 
 

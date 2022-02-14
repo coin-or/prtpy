@@ -1,11 +1,13 @@
 #' # Algorithms
-import prtpy
-import numpy as np
-from time import perf_counter
 
 #' ## Approximate algorithms
 #' Currently, `prtpy` supports a single approximate algorithm - `greedy` - based on [Greedy number partitioning](https://en.wikipedia.org/wiki/Greedy_number_partitioning).
 #' It is very fast, and attains very good result on random instances with many items and bins.
+
+import prtpy
+import numpy as np
+from time import perf_counter
+
 values = np.random.randint(1,10, 100000)
 start = perf_counter()
 print(prtpy.partition(algorithm=prtpy.approx.greedy, numbins=9, items=values, outputtype=prtpy.out.Sums))

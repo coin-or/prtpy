@@ -1,9 +1,8 @@
 #' # Output formats
-import prtpy
-
-greedy = prtpy.approx.greedy
-
 #' By default, a partition algorithm returns an entire partition.
+
+import prtpy
+greedy = prtpy.approx.greedy
 values = [4, 5, 5, 6, 7, 8, 8]
 print(prtpy.partition(algorithm=greedy, numbins=2, items=values))
 
