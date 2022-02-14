@@ -27,10 +27,14 @@ See the [CVXPY documentation](https://www.cvxpy.org/tutorial/advanced/index.html
 
 ## Usage
 
-The function `prtpy.partition` can be used to activate all algorithms. For example, to partition the values [1,2,3,4,5] into two bins using the greedy algorithm, do:
+The function `prtpy.partition` can be used to activate all algorithms. For example, to partition the values [1,2,3,4,5] into two bins using the greedy approximation algorithm, do:
 
     import prtpy
     prtpy.partition(algorithm=prtpy.approx.greedy, numbins=2, items=[1,2,3,4,5])
+
+To use the exact algorithm based on ILP, and maximize the smallest sum:
+
+    prtpy.partition(algorithm=prtpy.exact.ilp, numbins=2, items=[1,2,3,4,5], objective=prtpy.obj.MaximizeSmallestSum)
 
 For more features and examples, see:
 
