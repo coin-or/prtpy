@@ -1,4 +1,4 @@
-#' # Algorithms
+#' # Number-partitioning algorithms
 
 #' ## Approximate algorithms
 #' Currently, `prtpy` supports a single approximate algorithm - `greedy` - based on [Greedy number partitioning](https://en.wikipedia.org/wiki/Greedy_number_partitioning).

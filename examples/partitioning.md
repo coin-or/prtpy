@@ -1,4 +1,4 @@
-# Algorithms
+# Number-partitioning algorithms
 
 ## Approximate algorithms
 Currently, `prtpy` supports a single approximate algorithm - `greedy` - based on [Greedy number partitioning](https://en.wikipedia.org/wiki/Greedy_number_partitioning).
@@ -17,8 +17,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[55551. 55551. 55551. 55551. 55551. 55550. 55550. 55550. 55550.]
-         0.28302570000000005 seconds
+[55552. 55552. 55552. 55552. 55552. 55552. 55552. 55552. 55552.]
+         0.27391250000000067 seconds
 ```
 
 
@@ -35,8 +35,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[132. 133. 116. 144.]
-         0.6141641999999998 seconds
+[108. 117.  84. 135.]
+         1.4157478000000001 seconds
 ```
 
 
@@ -61,8 +61,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-(35, 35, 36)
-         0.05837340000000024 seconds
+(34, 35, 34)
+         0.09854679999999938 seconds
 ```
 
 
@@ -77,10 +77,10 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[28. 28.]
-         0.009200299999999828 seconds
+[23. 24.]
+         0.013438899999999698 seconds
 ```
 
 
 ---
-Markdown generated automatically from [algorithms.py](algorithms.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-02-14.
+Markdown generated automatically from [partitioning.py](partitioning.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-02-16.
