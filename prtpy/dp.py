@@ -120,10 +120,8 @@ def _optimal_partition(
         state: State
         prev: Any  # StateRecord
         ibin: int  # the index of the bin to which the last item was added in order to get to this state.
-
         def __hash__(self):
             return hash(self.state)
-
         def __eq__(self, other):
             return self.state == other.state
 
@@ -158,8 +156,6 @@ def _optimal_partition(
     best_final_record = min(
         current_state_records, key=lambda record: objective.get_value_to_minimize(record.state)
     )
-    best_final_state = best_final_record.state
-    best_final_state_value = objective.get_value_to_minimize(best_final_state)
 
     # construct path to solution
     path = []
