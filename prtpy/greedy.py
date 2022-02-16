@@ -29,7 +29,7 @@ def greedy(
     >>> greedy(numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.LargestSum)
     11.0
 
-    >>> from prtpy.partition import partition
+    >>> from prtpy.partitioning import partition
     >>> partition(algorithm=greedy, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
     >>> partition(algorithm=greedy, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)

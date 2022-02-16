@@ -43,6 +43,10 @@ For more features and examples, see:
 1. [Optimization objectives](examples/objectives.md);
 2. [Output formats](examples/output_formats.md).
 
+## Related libraries
+
+* [numberpartitioning](https://github.com/fuglede/numberpartitioning) by Søren Fuglede Jørgensen - the code for [complete_greedy](prtpy/complete_greedy.py) is adapted from there.
+* [binpacking](https://github.com/benmaier/binpacking) by Ben Maier.
 
 ## Limitations
 

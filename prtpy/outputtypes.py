@@ -52,6 +52,12 @@ class SmallestSum(Sums):
     def extract_output_from_sums(cls, sums: List[float]) -> List:
         return min(sums)
 
+class BinCount(Sums):
+    # Output the total number of bins.
+    @classmethod
+    def extract_output_from_sums(cls, sums: List[float]) -> List:
+        return len(sums)
+
 
 class Partition(OutputType):
     @classmethod

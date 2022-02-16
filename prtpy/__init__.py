@@ -5,7 +5,8 @@ __version__ = (HERE / "VERSION").read_text().strip()
 
 import prtpy.outputtypes as out
 import prtpy.objectives as obj
-from prtpy.partition import partition
+from prtpy.partitioning import partition
+from prtpy.packing import pack
 
 
 class exact:  # Algorithms that return the exact optimal partition
@@ -19,3 +20,5 @@ class exact:  # Algorithms that return the exact optimal partition
 
 class approx:  # Algorithms that return an approximately-optimal partition
     from prtpy.greedy import greedy
+    from prtpy.first_fit import online as first_fit, decreasing as first_fit_decreasing
+    from prtpy.first_fit import online as ff, decreasing as ffd
