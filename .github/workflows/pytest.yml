@@ -28,15 +28,7 @@ jobs:
         run: python -m pip install --upgrade pip
       - name: Install pytest
         run: python -m pip install pytest
-      - name: Update apt
-        run: sudo apt-get update
-      - name: Install COIN
-        run: sudo apt-get install coinor-libcbc-dev
-      - name: Install numpy
-        run: python -m pip install numpy
       - name: Install requirements
         run: python -m pip install -r requirements.txt
-      - name: Install cylp
-        run: python -m pip install cylp
       - name: Run pytest
         run: python -m pytest
