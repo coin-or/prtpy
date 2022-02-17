@@ -43,6 +43,13 @@ class Bins(ABC):
     def bin_to_str(self, bin_index: int) -> str:
         pass
 
+    @abstractmethod
+    def sort(self):
+        """
+        Sort the bins by ascending order of sum. For consistency and testing.
+        """
+        return self
+
     def __repr__(self) -> str:
         bins_str = [f"Bin #{i}: {self.bin_to_str(i)}" for i in range(self.num)]
         return "\n".join(bins_str)
@@ -107,6 +114,10 @@ class BinsKeepingOnlySums(Bins):
     def bin_to_str(self, bin_index: int) -> str:
         return f"sum={self.sums[bin_index]}"
 
+    def sort(self):
+        self.sums.sort()
+        return self
+
 
 class BinsKeepingEntireContents(BinsKeepingOnlySums):
     """
@@ -170,6 +181,11 @@ class BinsKeepingEntireContents(BinsKeepingOnlySums):
 
     def bin_to_str(self, bin_index: int) -> str:
         return f"{self.bins[bin_index]}, sum={self.sums[bin_index]}"
+
+    def sort(self):
+        self.sums.sort()
+        self.bins.sort(key=lambda bin: (sum(bin), len(bin)))
+        return self
 
 
 if __name__ == "__main__":

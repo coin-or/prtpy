@@ -38,11 +38,11 @@ print(prtpy.partition(algorithm=prtpy.approx.greedy, numbins=3, items=values))
 ```
 
 ```
-[83 48 81 38 26 96 83 17 57 64 70 61 93 97 18 75 41 47 71 91]
-[[97, 83, 75, 70, 47, 38, 17], [96, 83, 81, 61, 48, 41], [93, 91, 71,
-64, 57, 26, 18]]
+[31 18 49 44 55 21 57  5 71 89  9 85 92 54 54 16 38 24  1 29]
+[[92, 55, 54, 38, 24, 18], [89, 57, 54, 44, 21, 16], [85, 71, 49, 31,
+29, 9, 5, 1]]
 ```
 
 
 ---
-Markdown generated automatically from [input_formats.py](input_formats.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-02-16.
+Markdown generated automatically from [input_formats.py](input_formats.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-02-18.

@@ -22,11 +22,6 @@ start = perf_counter()
 print(prtpy.partition(algorithm=prtpy.exact.integer_programming, numbins=4, items=values, outputtype=prtpy.out.Sums))
 print(f"\t {perf_counter()-start} seconds")
 
-#' The default solver is CBC. You can choose another, potentially faster solver. 
-#' For example, if you install the XPRESS solver, you can try the following (it will return an error if XPRESS is not installed):
-# import cvxpy
-# print(prtpy.partition(algorithm=prtpy.exact.integer_programming, numbins=4, items=values, outputtype=prtpy.out.Sums, solver=cvxpy.XPRESS))
-
 #' Another algorithm is dynamic programming. It is fast when there are few bins and the numbers are small, but quite slow otherwise.
 values = np.random.randint(1,10, 20)
 start = perf_counter()

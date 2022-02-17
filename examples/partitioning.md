@@ -17,8 +17,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[55552. 55552. 55552. 55552. 55552. 55552. 55552. 55552. 55552.]
-         0.27391250000000067 seconds
+[55486. 55486. 55486. 55486. 55486. 55486. 55486. 55486. 55486.]
+         0.30543930000000064 seconds
 ```
 
 
@@ -35,18 +35,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[108. 117.  84. 135.]
-         1.4157478000000001 seconds
-```
-
-
-
-The default solver is CBC. You can choose another, potentially faster solver. 
-For example, if you install the XPRESS solver, you can try the following (it will return an error if XPRESS is not installed):
-
-```python
-# import cvxpy
-# print(prtpy.partition(algorithm=prtpy.exact.integer_programming, numbins=4, items=values, outputtype=prtpy.out.Sums, solver=cvxpy.XPRESS))
+[138. 140. 140. 144.]
+         0.5218447999999993 seconds
 ```
 
 
@@ -61,8 +51,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-(34, 35, 34)
-         0.09854679999999938 seconds
+(35, 35, 36)
+         0.057838499999999904 seconds
 ```
 
 
@@ -77,10 +67,10 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[23. 24.]
-         0.013438899999999698 seconds
+[30. 30.]
+         0.016537800000000047 seconds
 ```
 
 
 ---
-Markdown generated automatically from [partitioning.py](partitioning.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-02-16.
+Markdown generated automatically from [partitioning.py](partitioning.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-02-18.
