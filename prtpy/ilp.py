@@ -23,19 +23,19 @@ def optimal(
     outputtype: out.OutputType = out.Partition,
     copies=1,
     max_seconds=inf,
+    additional_constraints:Callable=lambda sums:[],
 ):
     """
-    Produce a partition that minimizes the given objective,
-    by solving an integer linear program (ILP).
+    Produce a partition that minimizes the given objective, by solving an integer linear program (ILP).
 
-    Parameters
-    ----------
-    copies
-        how many copies are there from each number.
-        Can be either a single integer (the same #copies for all numbers),
-        or a dict mapping an item to the number of copies of that item.
-        Default: 1
-
+    :param numbins: number of bins.
+    :param items: list of items.
+    :param map_item_to_value: a function that maps an item from the list `items` to a number representing its value.
+    :param objective: whether to maximize the smallest sum, minimize the largest sum, etc.
+    :param outputtype: whether to return the entire partition, or just the sums, etc.
+    :param copies: how many copies there are of each item. Default: 1.
+    :param max_seconds: stop the computation after this number of seconds have passed.
+    :param additional_constraints: a function that accepts the list of sums in ascending order, and returns a list of possible additional constraints on the sums.
 
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
@@ -52,6 +52,10 @@ def optimal(
     Bin #0: [46, 10], sum=56.0
     Bin #1: [27, 16, 13], sum=56.0
     Bin #2: [39, 26], sum=65.0
+    >>> optimal(3, walter_numbers, objective=obj.MinimizeLargestSum, outputtype=out.PartitionAndSums, additional_constraints=lambda sums: [sums[0]==0]).sort()
+    Bin #0: [], sum=0.0
+    Bin #1: [39, 26, 13, 10], sum=88.0
+    Bin #2: [46, 27, 16], sum=89.0
     >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.SmallestSum)
     56.0
 
@@ -86,7 +90,7 @@ def optimal(
     bin_sums_in_ascending_order = [  # a symmetry-breaker
         bin_sums[ibin + 1] >= bin_sums[ibin] for ibin in range(numbins - 1)
     ]
-    constraints = counts_are_non_negative + each_item_in_one_bin + bin_sums_in_ascending_order
+    constraints = counts_are_non_negative + each_item_in_one_bin + bin_sums_in_ascending_order + additional_constraints(bin_sums)
     for constraint in constraints: model += constraint
 
     # Solve the ILP:
