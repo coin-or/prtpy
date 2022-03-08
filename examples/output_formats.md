@@ -4,7 +4,7 @@ By default, a partition algorithm returns an entire partition.
 
 ```python
 import prtpy
-greedy = prtpy.approx.greedy
+greedy = prtpy.partitioning.greedy
 values = [4, 5, 5, 6, 7, 8, 8]
 print(prtpy.partition(algorithm=greedy, numbins=2, items=values))
 ```
@@ -66,4 +66,4 @@ Bin #1: [8, 6, 5, 4], sum=23.0
 
 
 ---
-Markdown generated automatically from [output_formats.py](output_formats.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-02-18.
+Markdown generated automatically from [output_formats.py](output_formats.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.

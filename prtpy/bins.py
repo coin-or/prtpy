@@ -40,6 +40,14 @@ class Bins(ABC):
         pass
 
     @abstractmethod
+    def remove_bins(self, numbins: int=1):
+        """
+        Remove bins from the end.
+        """
+        self.num -= numbins
+        pass
+
+    @abstractmethod
     def bin_to_str(self, bin_index: int) -> str:
         pass
 
@@ -89,6 +97,12 @@ class BinsKeepingOnlySums(Bins):
     Bin #3: sum=0.0
     >>> bins.num
     4
+    >>> bins.remove_bins()
+    Bin #0: sum=3.0
+    Bin #1: sum=9.0
+    Bin #2: sum=0.0
+    >>> bins.num
+    3
     """
 
     def __init__(self, numbins: int, sums=None):
@@ -100,6 +114,11 @@ class BinsKeepingOnlySums(Bins):
     def add_empty_bins(self, numbins: int=1):
         super().add_empty_bins(numbins)
         self.sums = np.concatenate((self.sums, np.zeros(numbins)))
+        return self
+
+    def remove_bins(self, numbins: int=1):
+        super().remove_bins(numbins)
+        self.sums = self.sums[:-numbins]
         return self
 
     def add_item_to_bin(self, item: Any, value: float, bin_index: int, inplace=True)->Bins:
@@ -153,6 +172,12 @@ class BinsKeepingEntireContents(BinsKeepingOnlySums):
     Bin #3: [], sum=0.0
     >>> bins.num
     4
+    >>> bins.remove_bins()
+    Bin #0: ['a'], sum=3.0
+    Bin #1: ['b', 'c'], sum=9.0
+    Bin #2: [], sum=0.0
+    >>> bins.num
+    3
     """
 
     def __init__(self, numbins: int, sums=None, bins=None):
@@ -165,6 +190,11 @@ class BinsKeepingEntireContents(BinsKeepingOnlySums):
         super().add_empty_bins(numbins)
         for _ in range(numbins):
             self.bins.append([])
+        return self
+
+    def remove_bins(self, numbins: int=1):
+        super().remove_bins(numbins)
+        self.bins = self.bins[:-numbins]
         return self
 
     def add_item_to_bin(self, item: Any, value: float, bin_index: int, inplace=True)->Bins:

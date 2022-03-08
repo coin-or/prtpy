@@ -46,7 +46,7 @@ def partition(
     :return: a partition, or a list of sums - depending on outputtype.
 
     >>> import prtpy
-    >>> dp = prtpy.exact.dynamic_programming
+    >>> dp = prtpy.partitioning.dynamic_programming
     >>> import numpy as np
     >>> partition(algorithm=dp, numbins=2, items=[1,2,3,3,5,9,9])
     [[2, 5, 9], [1, 3, 3, 9]]

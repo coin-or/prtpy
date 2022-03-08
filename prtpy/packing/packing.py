@@ -42,7 +42,7 @@ def pack(
     :return: a partition, or a list of sums - depending on outputtype.
 
     >>> import prtpy
-    >>> ffd = prtpy.approx.first_fit_decreasing
+    >>> from first_fit import decreasing as ffd
     >>> import numpy as np
     >>> pack(algorithm=ffd, binsize=60, items=[44, 24, 24, 22, 21, 17, 8, 8, 6, 6])
     [[44, 8, 8], [24, 24, 6, 6], [22, 21, 17]]

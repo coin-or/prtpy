@@ -1,3 +1,4 @@
+```python
 """ 
 Demonstrates maximin-share computation.
 
@@ -103,4 +104,23 @@ mms_demo(3, [29, 29, 28, 16, 2])
 # check_example([5,5,5,7,8,11], c=3, verbose=False)
 # # check_example([7,7,7,10,11,16], c=3, verbose=True)
 # # find_example()
+```
 
+```
+
+Valuation:  [5, 5, 5, 7, 7, 7, 11, 17, 23, 23, 23, 31, 31, 31, 65]
+1-out-of-3 partition = [[11, 14], [2, 3, 4, 5, 7, 8, 12], [0, 1, 6, 9,
+10, 13]], values = [96.0, 97.0, 98.0], min-value = 96.0
+2-out-of-3 partition = [[11, 14], [0, 2, 3, 6, 8, 9, 10], [1, 4, 5, 7,
+12, 13]], values = [96.0, 97.0, 98.0], min-value = 193.0
+
+Valuation:  [29, 29, 28, 16, 2]
+1-out-of-3 partition = [[0], [2, 4], [1, 3]], values = [29.0, 30.0,
+45.0], min-value = 29.0
+2-out-of-3 partition = [[1], [0, 4], [2, 3]], values = [29.0, 31.0,
+44.0], min-value = 60.0
+```
+
+
+---
+Markdown generated automatically from [maximin_share_demo.py](maximin_share_demo.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.

@@ -59,7 +59,7 @@ def optimal(
     >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.SmallestSum)
     56.0
 
-    >>> from prtpy.partitioning import partition
+    >>> from prtpy import partition
     >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['a', 'g'], ['c', 'd', 'e'], ['b', 'f']]
     >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)

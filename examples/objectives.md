@@ -11,7 +11,7 @@ items = [46, 39, 27, 26, 16, 13, 10]
 import prtpy
 from prtpy.outputtypes import PartitionAndSums
 from prtpy.objectives import MaximizeSmallestSum, MinimizeLargestSum, MinimizeDifference
-dp = prtpy.exact.dynamic_programming
+dp = prtpy.partitioning.dynamic_programming
 ```
 
 
@@ -113,4 +113,4 @@ Bin #2: [39, 26], sum=65.0
 
 
 ---
-Markdown generated automatically from [objectives.py](objectives.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-02-18.
+Markdown generated automatically from [objectives.py](objectives.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.

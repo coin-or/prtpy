@@ -6,7 +6,7 @@ Currently, `prtpy` supports only two simple approximate bin-packing algorithms.
 ```python
 import prtpy
 items = [44, 6, 24, 6, 24, 8, 22, 8, 17, 21]
-print(prtpy.pack(algorithm=prtpy.approx.first_fit, binsize=60, items=items))
+print(prtpy.pack(algorithm=prtpy.packing.first_fit, binsize=60, items=items))
 ```
 
 ```
@@ -19,7 +19,7 @@ print(prtpy.pack(algorithm=prtpy.approx.first_fit, binsize=60, items=items))
 
 
 ```python
-print(prtpy.pack(algorithm=prtpy.approx.first_fit_decreasing, binsize=60, items=items))
+print(prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=60, items=items))
 ```
 
 ```
@@ -32,7 +32,7 @@ This example is interesting since it shows that the FFD algorithm is not monoton
 
 
 ```python
-print(prtpy.pack(algorithm=prtpy.approx.first_fit_decreasing, binsize=61, items=items))
+print(prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=61, items=items))
 ```
 
 ```
@@ -41,4 +41,4 @@ print(prtpy.pack(algorithm=prtpy.approx.first_fit_decreasing, binsize=61, items=
 
 
 ---
-Markdown generated automatically from [packing.py](packing.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-02-18.
+Markdown generated automatically from [packing.py](packing.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.

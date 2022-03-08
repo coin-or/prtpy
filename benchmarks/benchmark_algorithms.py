@@ -2,7 +2,7 @@ import prtpy, benchmark, logging
 from matplotlib import pyplot as plt
 from partition_random import partition_random_items
 
-algorithm = prtpy.exact.ilp
+algorithm = prtpy.partitioning.ilp
 numbins = 4
 
 benchmark.logger.setLevel(logging.INFO)

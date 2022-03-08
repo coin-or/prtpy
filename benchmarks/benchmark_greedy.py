@@ -10,7 +10,7 @@ results = benchmark.find_max_solvable_size(
     "numbins",
     range(1, 100),
     max_time_in_seconds=1,
-    algorithm=prtpy.approx.greedy,
+    algorithm=prtpy.partitioning.greedy,
     numitems=100000,
     minvalue=1,
     maxvalue=100,

@@ -16,7 +16,7 @@ def bidirectional_balanced(
     >>> bidirectional_balanced(numbins=3, items=[1,2,3,4,5,9])
     [[9, 1], [5, 2], [4, 3]]
 
-    >>> from prtpy.partitioning import partition
+    >>> from partitioning import partition
     >>> partition(algorithm=bidirectional_balanced, numbins=3, items={"a":1, "b":2, "c":3, "d":4, "e":5, "f":9})
     [['f', 'a'], ['e', 'b'], ['d', 'c']]
     >>> partition(algorithm=bidirectional_balanced, numbins=2, items={"a":1, "b":2, "c":3, "d":4, "e":5, "f":9}, outputtype=out.Sums)
