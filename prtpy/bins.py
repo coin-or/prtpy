@@ -63,11 +63,11 @@ class Bins(ABC):
         return "\n".join(bins_str)
 
 
-class BinsKeepingOnlySums(Bins):
+class BinsKeepingSums(Bins):
     """
     A bins structure that keeps track only of the total sum in each bin.
 
-    >>> bins = BinsKeepingOnlySums(3)
+    >>> bins = BinsKeepingSums(3)
     >>> bins.add_item_to_bin(item="a", value=3, bin_index=0)
     Bin #0: sum=3.0
     Bin #1: sum=0.0
@@ -128,7 +128,7 @@ class BinsKeepingOnlySums(Bins):
         else:
             new_sums = np.copy(self.sums)
             new_sums[bin_index] += value
-            return BinsKeepingOnlySums(self.num, new_sums)
+            return BinsKeepingSums(self.num, new_sums)
 
     def bin_to_str(self, bin_index: int) -> str:
         return f"sum={self.sums[bin_index]}"
@@ -138,11 +138,11 @@ class BinsKeepingOnlySums(Bins):
         return self
 
 
-class BinsKeepingEntireContents(BinsKeepingOnlySums):
+class BinsKeepingContents(BinsKeepingSums):
     """
     A bins structure that keeps track of the entire contents of each bin.
 
-    >>> bins = BinsKeepingEntireContents(3)
+    >>> bins = BinsKeepingContents(3)
     >>> bins.add_item_to_bin(item="a", value=3, bin_index=0)
     Bin #0: ['a'], sum=3.0
     Bin #1: [], sum=0.0
@@ -207,7 +207,7 @@ class BinsKeepingEntireContents(BinsKeepingOnlySums):
             new_sums[bin_index] += value
             new_bins = list(self.bins)
             new_bins[bin_index] = new_bins[bin_index] + [item]
-            return BinsKeepingEntireContents(self.num, new_sums, new_bins)
+            return BinsKeepingContents(self.num, new_sums, new_bins)
 
     def bin_to_str(self, bin_index: int) -> str:
         return f"{self.bins[bin_index]}, sum={self.sums[bin_index]}"

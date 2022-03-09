@@ -4,7 +4,7 @@ Define the various available output formats for a partition algorithm.
 
 from abc import ABC
 from typing import Any, List
-from prtpy.bins import Bins, BinsKeepingEntireContents, BinsKeepingOnlySums
+from prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
 
 
 class OutputType(ABC):
@@ -26,7 +26,7 @@ class OutputType(ABC):
 class Sums(OutputType):
     @classmethod
     def create_empty_bins(cls, numbins: int) -> List:
-        return BinsKeepingOnlySums(numbins)
+        return BinsKeepingSums(numbins)
 
     # Output the sums of all the bins (but not the bins contents).
     @classmethod
@@ -62,7 +62,7 @@ class BinCount(Sums):
 class Partition(OutputType):
     @classmethod
     def create_empty_bins(cls, numbins: int) -> List:
-        return BinsKeepingEntireContents(numbins)
+        return BinsKeepingContents(numbins)
 
     # Output the set of all bins.
     @classmethod
