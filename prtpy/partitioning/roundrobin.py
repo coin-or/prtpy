@@ -1,5 +1,8 @@
 """
-    Partition the numbers using a very simple round-robin algorithm.
+Partition the numbers using a very simple round-robin algorithm.
+
+Programmer: Erel Segal-Halevi
+Since: 2022-02
 """
 
 from typing import Callable, List, Any

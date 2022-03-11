@@ -1,3 +1,11 @@
+"""
+Partition the numbers using "bidirectional balanced partition" (ABCCBA order).
+
+Programmer: Erel Segal-Halevi
+Since: 2022-02
+"""
+
+
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj
 
