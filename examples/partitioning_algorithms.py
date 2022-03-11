@@ -1,7 +1,9 @@
 #' # Number-partitioning algorithms
 
 #' ## Approximate algorithms
-#' Currently, `prtpy` supports a single approximate algorithm - `greedy` - based on [Greedy number partitioning](https://en.wikipedia.org/wiki/Greedy_number_partitioning).
+#' `prtpy` supports single approximate algorithms. 
+#' The simplest one is `greedy` - based on [Greedy number partitioning](https://en.wikipedia.org/wiki/Greedy_number_partitioning).
+#' (also called: Longest Processing Time First).
 #' It is very fast, and attains very good result on random instances with many items and bins.
 
 import prtpy
@@ -11,6 +13,12 @@ from time import perf_counter
 values = np.random.randint(1,10, 100000)
 start = perf_counter()
 print(prtpy.partition(algorithm=prtpy.partitioning.greedy, numbins=9, items=values, outputtype=prtpy.out.Sums))
+print(f"\t {perf_counter()-start} seconds")
+
+#' The *multifit* algorithm (Coffman et al, 1978) has a better asymptotic approximation ratio:
+start = perf_counter()
+values = np.random.randint(1,10, 10000)
+print(prtpy.partition(algorithm=prtpy.partitioning.multifit, numbins=9, items=values, outputtype=prtpy.out.Sums))
 print(f"\t {perf_counter()-start} seconds")
 
 

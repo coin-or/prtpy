@@ -25,6 +25,8 @@ class partitioning:
     from prtpy.partitioning.greedy import greedy as longest_processing_time
 
     from prtpy.partitioning.roundrobin import roundrobin
+    from prtpy.partitioning.multifit import multifit as multifit
+
 
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing
