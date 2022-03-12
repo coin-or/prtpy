@@ -53,7 +53,9 @@ def multifit(
     sorted_items = sorted(items, key=map_item_to_value, reverse=True)
     for _ in range(iterations):
         binsize = (lower_bound+upper_bound)/2
-        ffd_bins = first_fit.online(BinsKeepingSums(), binsize, sorted_items, map_item_to_value)
+        ffd_bins = BinsKeepingSums()
+        ffd_bins.set_map_item_to_value(map_item_to_value)
+        ffd_bins = first_fit.online(ffd_bins, binsize, sorted_items, map_item_to_value)
         ffd_num_of_bins = ffd_bins.num
         logger.info("FFD with bin size %f needs %d bins", binsize, ffd_num_of_bins)
         if ffd_num_of_bins <= bins.num:

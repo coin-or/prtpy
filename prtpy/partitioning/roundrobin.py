@@ -33,7 +33,7 @@ def roundrobin(
     """
     ibin = 0
     for item in sorted(items, key=map_item_to_value, reverse=True):
-        bins.add_item_to_bin(item, map_item_to_value(item), ibin)
+        bins.add_item_to_bin(item, ibin)
         ibin = (ibin+1) % bins.num
     return bins
 

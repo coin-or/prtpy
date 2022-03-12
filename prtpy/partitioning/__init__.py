@@ -69,6 +69,7 @@ def partition(
         if map_item_to_value is None:
             map_item_to_value = lambda item: item
     bins = outputtype.create_empty_bins(numbins)
+    bins.set_map_item_to_value(map_item_to_value)
     bins = algorithm(bins, item_names, map_item_to_value, **kwargs)
     return outputtype.extract_output_from_bins(bins)
 

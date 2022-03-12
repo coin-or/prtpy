@@ -175,7 +175,7 @@ def _optimal_partition(
     for item_index, item in enumerate(items):
         ibin = path[item_index]
         logger.info("  Item %d (%s): bin %d", item_index, item, ibin,)
-        bins.add_item_to_bin(item, map_item_to_value(item), ibin)
+        bins.add_item_to_bin(item, ibin)
 
 
 if __name__ == "__main__":

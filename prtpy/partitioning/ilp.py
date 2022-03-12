@@ -105,7 +105,7 @@ def optimal(
         for item in items:
             count_item_in_bin = int(counts[item][ibin].x)
             for _ in range(count_item_in_bin):
-                bins.add_item_to_bin(item, map_item_to_value(item), ibin, inplace=True)
+                bins.add_item_to_bin(item, ibin)
     return bins
 
 

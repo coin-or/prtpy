@@ -34,12 +34,12 @@ def online(
         ibin = 0
         while ibin  < bins.num:
             if bins.sums[ibin] + value <= binsize:
-                bins.add_item_to_bin(item, value, ibin)
+                bins.add_item_to_bin(item, ibin)
                 break
             ibin += 1
         else:  # if not added to any bin
             bins.add_empty_bins(1)
-            bins.add_item_to_bin(item, value, ibin)
+            bins.add_item_to_bin(item, ibin)
     return bins
 
 

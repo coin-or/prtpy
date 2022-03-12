@@ -90,7 +90,7 @@ def generator(
             for bin_index in sorted(range(bins.num), key=lambda i: bins.sums[i], reverse=True):
                 # Create the next vertex.
                 new_bins = bins.add_item_to_bin(
-                    item, map_item_to_value(item), bin_index, inplace=False
+                    item, bin_index, inplace=False
                 )
                 new_depth = depth + 1
                 to_visit.append((new_bins, new_depth))

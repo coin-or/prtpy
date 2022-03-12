@@ -7,7 +7,7 @@ Since:  2022-02
 
 from abc import ABC, abstractmethod
 import numpy as np
-from typing import List, Any
+from typing import List, Any, Callable
 
 
 
@@ -19,10 +19,15 @@ class Bins(ABC):
     @abstractmethod
     def __init__(self, numbins: int=0):
         self.num = numbins
+        self.map_item_to_value = lambda x:x
         pass
 
+    def set_map_item_to_value(self, map_item_to_value:Callable):
+        self.map_item_to_value = map_item_to_value
+        return self
+
     @abstractmethod
-    def add_item_to_bin(self, item: Any, value: float, bin_index: int, inplace=True):
+    def add_item_to_bin(self, item: Any, bin_index: int, inplace=True):
         """
         Add the given item, with the given value, to the bin with the given index.
 
@@ -68,23 +73,25 @@ class BinsKeepingSums(Bins):
     A bins structure that keeps track only of the total sum in each bin.
 
     >>> bins = BinsKeepingSums(3)
-    >>> bins.add_item_to_bin(item="a", value=3, bin_index=0)
+    >>> values = {"a":3, "b":4, "c":5, "d":5, "e":5}
+    >>> bins.map_item_to_value = lambda x: values[x]
+    >>> bins.add_item_to_bin(item="a", bin_index=0)
     Bin #0: sum=3.0
     Bin #1: sum=0.0
     Bin #2: sum=0.0
-    >>> bins.add_item_to_bin(item="", value=4, bin_index=1)
+    >>> bins.add_item_to_bin(item="b", bin_index=1)
     Bin #0: sum=3.0
     Bin #1: sum=4.0
     Bin #2: sum=0.0
-    >>> bins.add_item_to_bin(item="", value=5, bin_index=1)
+    >>> bins.add_item_to_bin(item="c", bin_index=1)
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=0.0
-    >>> bins.add_item_to_bin(item="", value=5, bin_index=1, inplace=False)
+    >>> bins.add_item_to_bin(item="d", bin_index=1, inplace=False)
     Bin #0: sum=3.0
     Bin #1: sum=14.0
     Bin #2: sum=0.0
-    >>> bins.add_item_to_bin(item="", value=5, bin_index=2, inplace=False)
+    >>> bins.add_item_to_bin(item="e", bin_index=2, inplace=False)
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=5.0
@@ -121,14 +128,15 @@ class BinsKeepingSums(Bins):
         self.sums = self.sums[:-numbins]
         return self
 
-    def add_item_to_bin(self, item: Any, value: float, bin_index: int, inplace=True)->Bins:
+    def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
+        value = self.map_item_to_value(item)
         if inplace:
             self.sums[bin_index] += value
             return self
         else:
             new_sums = np.copy(self.sums)
             new_sums[bin_index] += value
-            return BinsKeepingSums(self.num, new_sums)
+            return BinsKeepingSums(self.num, new_sums).set_map_item_to_value(self.map_item_to_value)
 
     def bin_to_str(self, bin_index: int) -> str:
         return f"sum={self.sums[bin_index]}"
@@ -143,23 +151,25 @@ class BinsKeepingContents(BinsKeepingSums):
     A bins structure that keeps track of the entire contents of each bin.
 
     >>> bins = BinsKeepingContents(3)
-    >>> bins.add_item_to_bin(item="a", value=3, bin_index=0)
+    >>> values = {"a":3, "b":4, "c":5, "d":5, "e":5}
+    >>> bins.map_item_to_value = lambda x: values[x]
+    >>> bins.add_item_to_bin(item="a", bin_index=0)
     Bin #0: ['a'], sum=3.0
     Bin #1: [], sum=0.0
     Bin #2: [], sum=0.0
-    >>> bins.add_item_to_bin(item="b", value=4, bin_index=1)
+    >>> bins.add_item_to_bin(item="b", bin_index=1)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b'], sum=4.0
     Bin #2: [], sum=0.0
-    >>> bins.add_item_to_bin(item="c", value=5, bin_index=1)
+    >>> bins.add_item_to_bin(item="c", bin_index=1)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: [], sum=0.0
-    >>> bins.add_item_to_bin(item="d", value=5, bin_index=1, inplace=False)
+    >>> bins.add_item_to_bin(item="d", bin_index=1, inplace=False)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c', 'd'], sum=14.0
     Bin #2: [], sum=0.0
-    >>> bins.add_item_to_bin(item="d", value=5, bin_index=2, inplace=False)
+    >>> bins.add_item_to_bin(item="d", bin_index=2, inplace=False)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: ['d'], sum=5.0
@@ -197,7 +207,8 @@ class BinsKeepingContents(BinsKeepingSums):
         self.bins = self.bins[:-numbins]
         return self
 
-    def add_item_to_bin(self, item: Any, value: float, bin_index: int, inplace=True)->Bins:
+    def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
+        value = self.map_item_to_value(item)
         if inplace:
             self.sums[bin_index] += value
             self.bins[bin_index].append(item)
@@ -207,7 +218,7 @@ class BinsKeepingContents(BinsKeepingSums):
             new_sums[bin_index] += value
             new_bins = list(self.bins)
             new_bins[bin_index] = new_bins[bin_index] + [item]
-            return BinsKeepingContents(self.num, new_sums, new_bins)
+            return BinsKeepingContents(self.num, new_sums, new_bins).set_map_item_to_value(self.map_item_to_value)
 
     def bin_to_str(self, bin_index: int) -> str:
         return f"{self.bins[bin_index]}, sum={self.sums[bin_index]}"

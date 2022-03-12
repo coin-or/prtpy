@@ -32,7 +32,7 @@ def bidirectional_balanced(
     current_bin = 0
     current_direction = +1
     for item in sorted(items, key=map_item_to_value, reverse=True):
-        bins.add_item_to_bin(item=item, value=map_item_to_value(item), bin_index=current_bin, inplace=True)
+        bins.add_item_to_bin(item, current_bin)
         current_bin += current_direction
         if current_bin > bins.num-1:
             current_bin = bins.num-1

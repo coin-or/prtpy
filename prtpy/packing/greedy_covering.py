@@ -61,8 +61,7 @@ def decreasing_subroutine(
     This is a subroutine that accepts an already-initialized Bins structure, and already-sorted items list.
     """
     for item in sorted_items:
-        value = map_item_to_value(item)
-        bins.add_item_to_bin(item, value, -1)
+        bins.add_item_to_bin(item, -1)
         if bins.sums[-1] >= binsize: # the last bin is full - open a new one
             bins.add_empty_bins(1)
 
