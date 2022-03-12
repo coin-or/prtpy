@@ -17,7 +17,7 @@ class Bins(ABC):
     """
 
     @abstractmethod
-    def __init__(self, numbins: int):
+    def __init__(self, numbins: int=0):
         self.num = numbins
         pass
 
@@ -105,7 +105,7 @@ class BinsKeepingSums(Bins):
     3
     """
 
-    def __init__(self, numbins: int, sums=None):
+    def __init__(self, numbins: int=0, sums=None):
         super().__init__(numbins)
         if sums is None:
             sums = np.zeros(numbins)
@@ -180,7 +180,7 @@ class BinsKeepingContents(BinsKeepingSums):
     3
     """
 
-    def __init__(self, numbins: int, sums=None, bins=None):
+    def __init__(self, numbins: int=0, sums=None, bins=None):
         super().__init__(numbins, sums)
         if bins is None:
             bins = [[] for _ in range(numbins)]

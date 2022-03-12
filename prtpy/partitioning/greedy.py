@@ -7,27 +7,24 @@
 """
 
 from typing import Callable, List, Any
-from prtpy import outputtypes as out, objectives as obj
+from prtpy import outputtypes as out, objectives as obj, Bins
 
 
 def greedy(
-    numbins: int,
+    bins: Bins,
     items: List[any],
     map_item_to_value: Callable[[Any], float] = lambda x: x,
-    objective: obj.Objective = None,  # Not used
-    outputtype: out.OutputType = out.Partition,
 ):
     """
     Partition the given items using the greedy number partitioning algorithm.
 
-    >>> greedy(numbins=2, items=[1,2,3,3,5,9,9], outputtype=out.Partition)
+    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    >>> greedy(BinsKeepingContents(2), items=[1,2,3,3,5,9,9]).bins
     [[9, 5, 2], [9, 3, 3, 1]]
-    >>> greedy(numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.Partition)
+    >>> greedy(BinsKeepingContents(3), items=[1,2,3,3,5,9,9]).bins
     [[9, 2], [9, 1], [5, 3, 3]]
-    >>> list(greedy(numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.Sums))
+    >>> list(greedy(BinsKeepingContents(3), items=[1,2,3,3,5,9,9]).sums)
     [11.0, 10.0, 11.0]
-    >>> greedy(numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.LargestSum)
-    11.0
 
     >>> from prtpy import partition
     >>> partition(algorithm=greedy, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
@@ -35,7 +32,6 @@ def greedy(
     >>> partition(algorithm=greedy, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     array([16., 16.])
     """
-    bins = outputtype.create_empty_bins(numbins)
     for item in sorted(items, key=map_item_to_value, reverse=True):
         index_of_least_full_bin = min(range(bins.num), key=lambda i: bins.sums[i])
         bins.add_item_to_bin(
@@ -44,7 +40,7 @@ def greedy(
             bin_index=index_of_least_full_bin,
             inplace=True,
         )
-    return outputtype.extract_output_from_bins(bins)
+    return bins
 
 
 if __name__ == "__main__":

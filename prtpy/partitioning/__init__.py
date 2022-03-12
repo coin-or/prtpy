@@ -18,7 +18,6 @@ def partition(
     numbins: int,
     items: Any,
     map_item_to_value: Callable[[Any], float] = None,
-    objective: obj.Objective = obj.MinimizeDifference,
     outputtype: out.OutputType = out.Partition,
     **kwargs
 ) -> List[List[int]]:
@@ -69,7 +68,9 @@ def partition(
         item_names = items
         if map_item_to_value is None:
             map_item_to_value = lambda item: item
-    return algorithm(numbins, item_names, map_item_to_value, objective, outputtype, **kwargs)
+    bins = outputtype.create_empty_bins(numbins)
+    bins = algorithm(bins, item_names, map_item_to_value, **kwargs)
+    return outputtype.extract_output_from_bins(bins)
 
 
 if __name__ == "__main__":

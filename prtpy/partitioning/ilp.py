@@ -9,14 +9,14 @@ Credit: Rob Pratt, https://or.stackexchange.com/a/6115/2576
 
 from typing import List, Callable, Any
 from numbers import Number
-from prtpy import objectives as obj, outputtypes as out
+from prtpy import objectives as obj, outputtypes as out, Bins
 from math import inf
 
 import mip
 
 
 def optimal(
-    numbins: int,
+    bins: Bins,
     items: List[Any],
     map_item_to_value: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
@@ -40,24 +40,25 @@ def optimal(
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> optimal(3, walter_numbers, objective=obj.MinimizeDifference, outputtype=out.PartitionAndSums).sort()
+    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference).sort()
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
-    >>> optimal(3, walter_numbers, objective=obj.MinimizeLargestSum, outputtype=out.PartitionAndSums).sort()
+    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum).sort()
     Bin #0: [27, 26], sum=53.0
     Bin #1: [46, 16], sum=62.0
     Bin #2: [39, 13, 10], sum=62.0
-    >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.PartitionAndSums).sort()
+    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum).sort()
     Bin #0: [46, 10], sum=56.0
     Bin #1: [27, 16, 13], sum=56.0
     Bin #2: [39, 26], sum=65.0
-    >>> optimal(3, walter_numbers, objective=obj.MinimizeLargestSum, outputtype=out.PartitionAndSums, additional_constraints=lambda sums: [sums[0]==0]).sort()
+    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum, additional_constraints=lambda sums: [sums[0]==0]).sort()
     Bin #0: [], sum=0.0
     Bin #1: [39, 26, 13, 10], sum=88.0
     Bin #2: [46, 27, 16], sum=89.0
-    >>> optimal(3, walter_numbers, objective=obj.MaximizeSmallestSum, outputtype=out.SmallestSum)
-    56.0
+    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum).sums
+    array([56., 56., 65.])
 
     >>> from prtpy import partition
     >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
@@ -66,7 +67,7 @@ def optimal(
     array([16., 16.])
     """
 
-    ibins = range(numbins)
+    ibins = range(bins.num)
     if isinstance(copies, Number):
         copies = {item: copies for item in items}
 
@@ -88,7 +89,7 @@ def optimal(
         sum([counts[item][ibin] for ibin in ibins]) == copies[item] for item in items
     ]
     bin_sums_in_ascending_order = [  # a symmetry-breaker
-        bin_sums[ibin + 1] >= bin_sums[ibin] for ibin in range(numbins - 1)
+        bin_sums[ibin + 1] >= bin_sums[ibin] for ibin in range(bins.num - 1)
     ]
     constraints = counts_are_non_negative + each_item_in_one_bin + bin_sums_in_ascending_order + additional_constraints(bin_sums)
     for constraint in constraints: model += constraint
@@ -100,13 +101,12 @@ def optimal(
         raise ValueError(f"Problem status is not optimal - it is {status}.")
 
     # Construct the output:
-    bins = outputtype.create_empty_bins(numbins)
     for ibin in ibins:
         for item in items:
             count_item_in_bin = int(counts[item][ibin].x)
             for _ in range(count_item_in_bin):
                 bins.add_item_to_bin(item, map_item_to_value(item), ibin, inplace=True)
-    return outputtype.extract_output_from_bins(bins)
+    return bins
 
 
 if __name__ == "__main__":

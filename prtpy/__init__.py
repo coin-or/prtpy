@@ -5,10 +5,10 @@ __version__ = (HERE / "VERSION").read_text().strip()
 
 import prtpy.outputtypes as out
 import prtpy.objectives as obj
-from prtpy.bins import Bins
+from prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
 
-from prtpy.packing.packing import pack
-from prtpy.partitioning.partitioning import partition
+from prtpy.packing import pack
+from prtpy.partitioning import partition
 
 class partitioning:
     from prtpy.partitioning.complete_greedy import optimal as cg

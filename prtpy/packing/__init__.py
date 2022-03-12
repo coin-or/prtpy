@@ -42,7 +42,7 @@ def pack(
     :return: a partition, or a list of sums - depending on outputtype.
 
     >>> import prtpy
-    >>> from first_fit import decreasing as ffd
+    >>> from prtpy.packing.first_fit import decreasing as ffd
     >>> import numpy as np
     >>> pack(algorithm=ffd, binsize=60, items=[44, 24, 24, 22, 21, 17, 8, 8, 6, 6])
     [[44, 8, 8], [24, 24, 6, 6], [22, 21, 17]]
@@ -63,7 +63,9 @@ def pack(
         item_names = items
         if map_item_to_value is None:
             map_item_to_value = lambda item: item
-    return algorithm(binsize, item_names, map_item_to_value, outputtype, **kwargs)
+    bins = outputtype.create_empty_bins(0)
+    bins = algorithm(bins, binsize, item_names, map_item_to_value, **kwargs)
+    return outputtype.extract_output_from_bins(bins)
 
 
 if __name__ == "__main__":

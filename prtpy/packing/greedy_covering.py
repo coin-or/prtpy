@@ -15,31 +15,38 @@ from typing import Callable, List, Any
 
 
 def decreasing(
+    bins: Bins,
     binsize: float,
     items: List[any],
     map_item_to_value: Callable[[Any], float] = lambda x: x,
-    outputtype: out.OutputType = out.Partition,
 ):
     """
     Run a simple bin-covering algorithm:
     it orders the items in descending order, and puts them into a bin until it is filled.
 
-    >>> decreasing(10, [11,12,13])   # large items
+    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    >>> decreasing(BinsKeepingContents(), 10, [11,12,13]).bins  # large items
     [[13], [12], [11]]
-    >>> decreasing(10, [3,3,3,3, 3,3,3,3, 3,3,3])   # identical items
+    >>> decreasing(BinsKeepingContents(), 10, [3,3,3,3, 3,3,3,3, 3,3,3]).bins   # identical items
     [[3, 3, 3, 3], [3, 3, 3, 3]]
-    >>> decreasing(10, [1,2,3,4,5,6,7,8,9,10])   # different items
+    >>> decreasing(BinsKeepingContents(), 10, [1,2,3,4,5,6,7,8,9,10]).bins   # different items
     [[10], [9, 8], [7, 6], [5, 4, 3]]
-    >>> decreasing(1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1])   # worst-case example (k=1)
+    >>> decreasing(BinsKeepingContents(), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]).bins   # worst-case example (k=1)
     [[994, 499], [499, 499, 499], [499, 499, 1, 1]]
-    >>> decreasing(1000, [988] + 12*[499] + 12*[1])   # worst-case example (k=2)
+    >>> decreasing(BinsKeepingContents(), 1000, [988] + 12*[499] + 12*[1]).bins   # worst-case example (k=2)
     [[988, 499], [499, 499, 499], [499, 499, 499], [499, 499, 499], [499, 499, 1, 1]]
+
+    >>> from prtpy import pack
+    >>> pack(algorithm=decreasing, binsize=60, items={"a":44, "b":24, "c":24, "d":22, "e":21, "f":17, "g":8, "h":8, "i":6, "j":6})
+    [['a', 'b'], ['c', 'd', 'e']]
+    >>> pack(algorithm=decreasing, binsize=60, items={"a":44, "b":24, "c":24, "d":22, "e":21, "f":17, "g":8, "h":8, "i":6, "j":6}, outputtype=out.Sums)
+    array([68., 67.])
     """
-    bins = outputtype.create_empty_bins(1)
+    bins.add_empty_bins(1)
     items = sorted(items, key=map_item_to_value, reverse=True)
     decreasing_subroutine(bins, binsize, sorted_items=items, map_item_to_value=map_item_to_value)
     bins.remove_bins(1)  # the last bin is not full - remove it
-    return outputtype.extract_output_from_bins(bins)
+    return bins
 
 
 def decreasing_subroutine(

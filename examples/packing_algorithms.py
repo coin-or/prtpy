@@ -1,6 +1,6 @@
 #' # Bin-packing algorithms
 
-#' Currently, `prtpy` supports only two simple approximate bin-packing algorithms.
+#' Currently, `prtpy` supports the following approximate bin-packing algorithms.
 #' [First Fit](https://en.wikipedia.org/wiki/First-fit_bin_packing):
 import prtpy
 items = [44, 6, 24, 6, 24, 8, 22, 8, 17, 21]
