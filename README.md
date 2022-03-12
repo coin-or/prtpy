@@ -34,7 +34,30 @@ For more features and examples, see:
 1. [Bin-covering algorithms](examples/covering_algorithms.md);
 1. [Input formats](examples/input_formats.md);
 1. [Optimization objectives](examples/objectives.md);
-2. [Output formats](examples/output_formats.md).
+1. [Output formats](examples/output_formats.md).
+
+## Adding new algorithms
+
+To add a new algorithm for number partitioning, write a function that accepts the following parameters:
+
+* bins - a [Bins](prtpy/bins.py) structure. It is already initialized with the right number of empty bins (bins.num). It contains a function for adding items to bins.
+* items - a list of item-names.
+* map_item_to_value - a function that accepts an item and returns its value.
+* Any other parameters that are required by your algorithm.
+
+For an example, see the implementation of existing algorithms, e.g. [greedy](prtpy/partitioning/greedy.py).
+
+To add a new algorithm for bin packing or bin covering, write a function that accepts the following parameters:
+
+* bins - a [Bins](prtpy/bins.py) structure. It is initialized with no bins at all. It contains a function for adding new empty bins.
+* binsize - the capacity of a bin (maximum sum in bin-packing; minimum sum in bin-covering).
+* items - a list of item-names.
+* map_item_to_value - a function that accepts an item and returns its value.
+* Any other parameters that are required by your algorithm.
+
+For an example, see the implementation of existing algorithms, e.g. [first_fit](prtpy/packing/first_fit.py).
+
+
 
 ## Related libraries
 
