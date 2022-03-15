@@ -88,9 +88,9 @@ def threequarters(
     bins.add_empty_bins(1)
     items = sorted(items, key=map_item_to_value, reverse=True)
 
-    big_items = [item for item in items if binsize/2 <= item]  # X
-    medium_items = [item for item in items if binsize/3 <= item < binsize/2]  # Y
-    small_items = [item for item in items if item < binsize/3]  # Z
+    big_items = [item for item in items if binsize/2 <= map_item_to_value(item)]  # X
+    medium_items = [item for item in items if binsize/3 <= map_item_to_value(item) < binsize/2]  # Y
+    small_items = [item for item in items if map_item_to_value(item) < binsize/3]  # Z
 
     while True:
         if len(small_items)==0:

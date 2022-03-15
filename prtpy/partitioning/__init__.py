@@ -63,7 +63,7 @@ def partition(
     if isinstance(items, dict):  # items is a dict mapping an item to its value.
         item_names = items.keys()
         if map_item_to_value is None:
-            map_item_to_value = lambda item: items[item]
+            map_item_to_value = items.__getitem__
     else:  # items is a list
         item_names = items
         if map_item_to_value is None:
