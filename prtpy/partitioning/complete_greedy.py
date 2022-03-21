@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def optimal(
     bins: Bins,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
 ):
     """
@@ -48,7 +48,7 @@ def optimal(
     >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     array([16., 16.])
     """
-    for result in generator(bins, items, map_item_to_value, objective):
+    for result in generator(bins, items, valueof, objective):
         logger.info("Improved result: %s", result.sums)
     return result
 
@@ -56,7 +56,7 @@ def optimal(
 def generator(
     bins: Bins,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
 ) -> Iterator:
     """
@@ -69,7 +69,7 @@ def generator(
     New partitions are yielded whenever an improvement is found, according to an
     optional objective function.
     """
-    sorted_items = sorted(items, key=map_item_to_value, reverse=True)
+    sorted_items = sorted(items, key=valueof, reverse=True)
     max_depth = len(items)
 
     # Create a stack whose elements are bins and the current depth.

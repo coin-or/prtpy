@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 def multifit(
     bins: Bins,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
     iterations = 10,
 ):
     """
@@ -44,18 +44,18 @@ def multifit(
     >>> partition(algorithm=multifit, numbins=2, items={"a":1, "b":2, "c":3, "d":4})
     [['d', 'a'], ['c', 'b']]
     """
-    sum_values = sum(map(map_item_to_value, items))
-    max_values = max(map(map_item_to_value, items))
+    sum_values = sum(map(valueof, items))
+    max_values = max(map(valueof, items))
     lower_bound = max(sum_values/bins.num, max_values)  # With bin-capacity smaller than this, every packing must use more than `numbins` bins.
     upper_bound = max(2*sum_values/bins.num, max_values) # With this bin-capacity, FFD always uses at most `numbins` bins.
     logger.info("sum=%f, max=%f, lower-bound=%f, upper-bound=%f", sum_values, max_values, lower_bound, upper_bound)
 
-    sorted_items = sorted(items, key=map_item_to_value, reverse=True)
+    sorted_items = sorted(items, key=valueof, reverse=True)
     for _ in range(iterations):
         binsize = (lower_bound+upper_bound)/2
         ffd_bins = BinsKeepingSums()
-        ffd_bins.set_map_item_to_value(map_item_to_value)
-        ffd_bins = first_fit.online(ffd_bins, binsize, sorted_items, map_item_to_value)
+        ffd_bins.set_valueof(valueof)
+        ffd_bins = first_fit.online(ffd_bins, binsize, sorted_items, valueof)
         ffd_num_of_bins = ffd_bins.num
         logger.info("FFD with bin size %f needs %d bins", binsize, ffd_num_of_bins)
         if ffd_num_of_bins <= bins.num:
@@ -63,7 +63,7 @@ def multifit(
         else:
             lower_bound = binsize
     bins.remove_bins(bins.num)
-    return first_fit.online(bins, upper_bound, sorted_items, map_item_to_value)
+    return first_fit.online(bins, upper_bound, sorted_items, valueof)
 
 
 if __name__ == "__main__":

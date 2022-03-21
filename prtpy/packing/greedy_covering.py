@@ -18,7 +18,7 @@ def decreasing(
     bins: Bins,
     binsize: float,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
 ):
     """
     Run a simple bin-covering algorithm:
@@ -43,8 +43,8 @@ def decreasing(
     array([68., 67.])
     """
     bins.add_empty_bins(1)
-    items = sorted(items, key=map_item_to_value, reverse=True)
-    decreasing_subroutine(bins, binsize, sorted_items=items, map_item_to_value=map_item_to_value)
+    items = sorted(items, key=valueof, reverse=True)
+    decreasing_subroutine(bins, binsize, sorted_items=items, valueof=valueof)
     bins.remove_bins(1)  # the last bin is not full - remove it
     return bins
 
@@ -53,7 +53,7 @@ def decreasing_subroutine(
     bins: Bins, 
     binsize: float,
     sorted_items: List[any],
-    map_item_to_value: Callable[[Any], float]
+    valueof: Callable[[Any], float]
 ):
     """
     Run a simple bin-covering algorithm:

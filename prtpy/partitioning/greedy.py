@@ -10,7 +10,7 @@ from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins
 
 
-def greedy(bins: Bins, items: List[any], map_item_to_value: Callable=lambda x: x):
+def greedy(bins: Bins, items: List[any], valueof: Callable=lambda x: x):
     """
     Partition the given items using the greedy number partitioning algorithm.
 
@@ -28,7 +28,7 @@ def greedy(bins: Bins, items: List[any], map_item_to_value: Callable=lambda x: x
     >>> partition(algorithm=greedy, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     array([16., 16.])
     """
-    for item in sorted(items, key=map_item_to_value, reverse=True):
+    for item in sorted(items, key=valueof, reverse=True):
         index_of_least_full_bin = min(range(bins.num), key=bins.sums.__getitem__)
         bins.add_item_to_bin(item, index_of_least_full_bin)
     return bins

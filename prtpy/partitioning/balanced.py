@@ -12,7 +12,7 @@ from prtpy import outputtypes as out, objectives as obj, Bins
 def bidirectional_balanced(
     bins: Bins,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
 ):
     """
     Partition the numbers using "bidirectional balanced partition" (ABCCBA order).
@@ -31,7 +31,7 @@ def bidirectional_balanced(
     """
     current_bin = 0
     current_direction = +1
-    for item in sorted(items, key=map_item_to_value, reverse=True):
+    for item in sorted(items, key=valueof, reverse=True):
         bins.add_item_to_bin(item, current_bin)
         current_bin += current_direction
         if current_bin > bins.num-1:

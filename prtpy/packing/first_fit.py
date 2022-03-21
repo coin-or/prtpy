@@ -12,7 +12,7 @@ def online(
     bins: Bins,
     binsize: float,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
 ):
     """
     Pack the given items into bins using the online first-fit algorithm.
@@ -28,7 +28,7 @@ def online(
     """
     bins.add_empty_bins(1) 
     for item in items:
-        value = map_item_to_value(item)
+        value = valueof(item)
         if value>binsize:
             raise ValueError(f"Item {item} has size {value} which is larger than the bin size {binsize}.")
         ibin = 0
@@ -47,7 +47,7 @@ def decreasing(
     bins: Bins,
     binsize: float,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
 ):
     """
     Pack the given items into bins using the first-fit-decreasing algorithm.
@@ -82,8 +82,8 @@ def decreasing(
     return online(
         bins,
         binsize, 
-        sorted(items, key=map_item_to_value, reverse=True),
-        map_item_to_value,
+        sorted(items, key=valueof, reverse=True),
+        valueof,
     )
 
 

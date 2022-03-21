@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def optimal(
     bins: Bins,
     items: List[Any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
 ):
 
@@ -45,10 +45,10 @@ def optimal(
     """
     if hasattr(bins, 'bins'):
         # We need the entire partition.
-        _optimal_partition(bins, items, map_item_to_value, objective)
+        _optimal_partition(bins, items, valueof, objective)
     else:
         # We need only the sums - not the entire partition.
-        _optimal_sums(bins, items, map_item_to_value, objective)
+        _optimal_sums(bins, items, valueof, objective)
     return bins
 
 
@@ -57,7 +57,7 @@ def optimal(
 def _optimal_sums(
     bins: Bins,
     items: List[Any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
 ):
     """
@@ -73,7 +73,7 @@ def _optimal_sums(
     num_of_processed_states = len(current_states)
 
     for item in items:
-        value = map_item_to_value(item)
+        value = valueof(item)
 
         # Construct next states:
         next_states = set()
@@ -108,7 +108,7 @@ def _optimal_sums(
 def _optimal_partition(
     bins: Bins,
     items: List[Any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
 ):
     """
@@ -138,7 +138,7 @@ def _optimal_partition(
     num_of_processed_states = len(current_state_records)
 
     for item in items:
-        value = map_item_to_value(item)
+        value = valueof(item)
 
         # Construct next state records:
         next_state_records = set()

@@ -17,7 +17,7 @@ def pack(
     algorithm: Callable,
     binsize: float,
     items: Any,
-    map_item_to_value: Callable[[Any], float] = None,
+    valueof: Callable[[Any], float] = None,
     outputtype: out.OutputType = out.Partition,
     **kwargs
 ) -> List[List[int]]:
@@ -27,15 +27,15 @@ def pack(
     :param algorithm: a specific bin-packing algorithm. Should accept the following parameters: 
         binsize (float), 
         items (list), 
-        map_item_to_value (callable), 
+        valueof (callable), 
         outputtype (OutputType).
 
     :param items: can be one of the following:
        * A list of item-values (so that each item is equal to its value);
-       * A list of item-names  (in this case, map_item_to_value should also be defined);
+       * A list of item-names  (in this case, valueof should also be defined);
        * A dict (where the keys are the items and the values are their values).
 
-    :param map_item_to_value: optional; required only if `items` is a list of item-names.
+    :param valueof: optional; required only if `items` is a list of item-names.
 
     :param outputtype: defines the output format. See `outputtypes.py'.
 
@@ -57,15 +57,15 @@ def pack(
     """
     if isinstance(items, dict):  # items is a dict mapping an item to its value.
         item_names = items.keys()
-        if map_item_to_value is None:
-            map_item_to_value = items.__getitem__
+        if valueof is None:
+            valueof = items.__getitem__
     else:  # items is a list
         item_names = items
-        if map_item_to_value is None:
-            map_item_to_value = lambda item: item
+        if valueof is None:
+            valueof = lambda item: item
     bins = outputtype.create_empty_bins(0)
-    bins.set_map_item_to_value(map_item_to_value)
-    bins = algorithm(bins, binsize, item_names, map_item_to_value, **kwargs)
+    bins.set_valueof(valueof)
+    bins = algorithm(bins, binsize, item_names, valueof, **kwargs)
     return outputtype.extract_output_from_bins(bins)
 
 

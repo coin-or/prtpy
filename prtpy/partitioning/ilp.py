@@ -18,7 +18,7 @@ import mip
 def optimal(
     bins: Bins,
     items: List[Any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
     outputtype: out.OutputType = out.Partition,
     copies=1,
@@ -30,7 +30,7 @@ def optimal(
 
     :param numbins: number of bins.
     :param items: list of items.
-    :param map_item_to_value: a function that maps an item from the list `items` to a number representing its value.
+    :param valueof: a function that maps an item from the list `items` to a number representing its value.
     :param objective: whether to maximize the smallest sum, minimize the largest sum, etc.
     :param outputtype: whether to return the entire partition, or just the sums, etc.
     :param copies: how many copies there are of each item. Default: 1.
@@ -76,7 +76,7 @@ def optimal(
         item: [model.add_var(var_type=mip.INTEGER) for ibin in ibins] for item in items
     }  # counts[i][j] determines how many times item i appears in bin j.
     bin_sums = [
-        sum([counts[item][ibin] * map_item_to_value(item) for item in items]) for ibin in ibins
+        sum([counts[item][ibin] * valueof(item) for item in items]) for ibin in ibins
     ]
 
     model.objective = mip.minimize(

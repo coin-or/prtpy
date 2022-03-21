@@ -12,7 +12,7 @@ from prtpy import outputtypes as out, objectives as obj, Bins
 def roundrobin(
     bins: Bins,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
 ):
     """
     Partition the given items using the roundrobin number partitioning algorithm.
@@ -32,7 +32,7 @@ def roundrobin(
     array([18., 14.])
     """
     ibin = 0
-    for item in sorted(items, key=map_item_to_value, reverse=True):
+    for item in sorted(items, key=valueof, reverse=True):
         bins.add_item_to_bin(item, ibin)
         ibin = (ibin+1) % bins.num
     return bins

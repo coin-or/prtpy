@@ -18,7 +18,7 @@ def twothirds(
     bins: Bins,
     binsize: float,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
 ):
     """
     Run the 2/3-approximation algorithm for bin covering.
@@ -39,7 +39,7 @@ def twothirds(
     [[594, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 399, 399], [594, 399, 399], [399, 399, 399, 399], [399, 399, 399, 399]]
     """
     bins.add_empty_bins(1)
-    items = sorted(items, key=map_item_to_value, reverse=True)
+    items = sorted(items, key=valueof, reverse=True)
     while len(items)>0:
         # Initialize with a single biggest item:
         biggest_item = items[0]
@@ -63,7 +63,7 @@ def threequarters(
     bins: Bins,
     binsize: float,
     items: List[any],
-    map_item_to_value: Callable[[Any], float] = lambda x: x,
+    valueof: Callable[[Any], float] = lambda x: x,
 ):
     """
     Run the 3/4-approximation algorithm for bin covering.
@@ -86,21 +86,21 @@ def threequarters(
     [[499, 499, 1, 1], [499, 499, 1, 1], [994, 1, 1, 1, 1, 1, 1], [501, 1, 1, 501]]
     """
     bins.add_empty_bins(1)
-    items = sorted(items, key=map_item_to_value, reverse=True)
+    items = sorted(items, key=valueof, reverse=True)
 
-    big_items = [item for item in items if binsize/2 <= map_item_to_value(item)]  # X
-    medium_items = [item for item in items if binsize/3 <= map_item_to_value(item) < binsize/2]  # Y
-    small_items = [item for item in items if map_item_to_value(item) < binsize/3]  # Z
+    big_items = [item for item in items if binsize/2 <= valueof(item)]  # X
+    medium_items = [item for item in items if binsize/3 <= valueof(item) < binsize/2]  # Y
+    small_items = [item for item in items if valueof(item) < binsize/3]  # Z
 
     while True:
         if len(small_items)==0:
             # NOTE: We re-use the items remaining in the last bin.
-            decreasing_subroutine(bins, binsize, big_items, map_item_to_value)
-            decreasing_subroutine(bins, binsize, medium_items, map_item_to_value)
+            decreasing_subroutine(bins, binsize, big_items, valueof)
+            decreasing_subroutine(bins, binsize, medium_items, valueof)
             break
 
         elif len(big_items)==0 and len(medium_items)==0:
-            decreasing_subroutine(bins, binsize, small_items, map_item_to_value)
+            decreasing_subroutine(bins, binsize, small_items, valueof)
             break
 
         else:

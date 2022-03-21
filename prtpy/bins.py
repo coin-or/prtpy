@@ -19,11 +19,11 @@ class Bins(ABC):
     @abstractmethod
     def __init__(self, numbins: int=0):
         self.num = numbins
-        self.map_item_to_value = lambda x:x
+        self.valueof = lambda x:x
         pass
 
-    def set_map_item_to_value(self, map_item_to_value:Callable):
-        self.map_item_to_value = map_item_to_value
+    def set_valueof(self, valueof:Callable):
+        self.valueof = valueof
         return self
 
     @abstractmethod
@@ -74,7 +74,7 @@ class BinsKeepingSums(Bins):
 
     >>> bins = BinsKeepingSums(3)
     >>> values = {"a":3, "b":4, "c":5, "d":5, "e":5}
-    >>> bins.map_item_to_value = lambda x: values[x]
+    >>> bins.valueof = lambda x: values[x]
     >>> bins.add_item_to_bin(item="a", bin_index=0)
     Bin #0: sum=3.0
     Bin #1: sum=0.0
@@ -129,14 +129,14 @@ class BinsKeepingSums(Bins):
         return self
 
     def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
-        value = self.map_item_to_value(item)
+        value = self.valueof(item)
         if inplace:
             self.sums[bin_index] += value
             return self
         else:
             new_sums = np.copy(self.sums)
             new_sums[bin_index] += value
-            return BinsKeepingSums(self.num, new_sums).set_map_item_to_value(self.map_item_to_value)
+            return BinsKeepingSums(self.num, new_sums).set_valueof(self.valueof)
 
     def bin_to_str(self, bin_index: int) -> str:
         return f"sum={self.sums[bin_index]}"
@@ -152,7 +152,7 @@ class BinsKeepingContents(BinsKeepingSums):
 
     >>> bins = BinsKeepingContents(3)
     >>> values = {"a":3, "b":4, "c":5, "d":5, "e":5}
-    >>> bins.map_item_to_value = lambda x: values[x]
+    >>> bins.valueof = lambda x: values[x]
     >>> bins.add_item_to_bin(item="a", bin_index=0)
     Bin #0: ['a'], sum=3.0
     Bin #1: [], sum=0.0
@@ -208,7 +208,7 @@ class BinsKeepingContents(BinsKeepingSums):
         return self
 
     def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
-        value = self.map_item_to_value(item)
+        value = self.valueof(item)
         if inplace:
             self.sums[bin_index] += value
             self.bins[bin_index].append(item)
@@ -218,7 +218,7 @@ class BinsKeepingContents(BinsKeepingSums):
             new_sums[bin_index] += value
             new_bins = list(self.bins)
             new_bins[bin_index] = new_bins[bin_index] + [item]
-            return BinsKeepingContents(self.num, new_sums, new_bins).set_map_item_to_value(self.map_item_to_value)
+            return BinsKeepingContents(self.num, new_sums, new_bins).set_valueof(self.valueof)
 
     def bin_to_str(self, bin_index: int) -> str:
         return f"{self.bins[bin_index]}, sum={self.sums[bin_index]}"

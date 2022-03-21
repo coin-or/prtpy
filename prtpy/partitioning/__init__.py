@@ -17,7 +17,7 @@ def partition(
     algorithm: Callable,
     numbins: int,
     items: Any,
-    map_item_to_value: Callable[[Any], float] = None,
+    valueof: Callable[[Any], float] = None,
     outputtype: out.OutputType = out.Partition,
     **kwargs
 ) -> List[List[int]]:
@@ -27,16 +27,16 @@ def partition(
     :param algorithm: a specific number-partitioning algorithm. Should accept the following parameters: 
         numbins (int), 
         items (list), 
-        map_item_to_value (callable), 
+        valueof (callable), 
         objective (Objective), 
         outputtype (OutputType).
 
     :param items: can be one of the following:
        * A list of values  (so that each item is equal to its value);
-       * A list of strings (in this case, map_item_to_value should also be defined);
+       * A list of strings (in this case, valueof should also be defined);
        * A dict (where the keys are the items and the values are their values).
 
-    :param map_item_to_value: optional; required only if `items` is a list of strings.
+    :param valueof: optional; required only if `items` is a list of strings.
 
     :param objective: defines the thing that should be optimized. See 'objectives.py'.
 
@@ -62,15 +62,15 @@ def partition(
     """
     if isinstance(items, dict):  # items is a dict mapping an item to its value.
         item_names = items.keys()
-        if map_item_to_value is None:
-            map_item_to_value = items.__getitem__
+        if valueof is None:
+            valueof = items.__getitem__
     else:  # items is a list
         item_names = items
-        if map_item_to_value is None:
-            map_item_to_value = lambda item: item
+        if valueof is None:
+            valueof = lambda item: item
     bins = outputtype.create_empty_bins(numbins)
-    bins.set_map_item_to_value(map_item_to_value)
-    bins = algorithm(bins, item_names, map_item_to_value, **kwargs)
+    bins.set_valueof(valueof)
+    bins = algorithm(bins, item_names, valueof, **kwargs)
     return outputtype.extract_output_from_bins(bins)
 
 
