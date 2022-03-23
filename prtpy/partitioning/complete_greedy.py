@@ -71,10 +71,14 @@ def anytime(
 
     It stops when the optimal partition is found, OR when the time runs out.
 
+    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    >>> anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference, time_in_seconds=1)
+    Bin #0: [6, 5, 4], sum=15.0
+    Bin #1: [8, 7], sum=15.0
+    
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference, time_in_seconds=1)
     Bin #0: [27, 26, 10], sum=63.0
     Bin #1: [39, 16], sum=55.0

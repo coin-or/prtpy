@@ -45,12 +45,23 @@ class LargestSum(Sums):
     def extract_output_from_sums(cls, sums: List[float]) -> List:
         return max(sums)
 
-
 class SmallestSum(Sums):
     # Output the smallest bin sum.
     @classmethod
     def extract_output_from_sums(cls, sums: List[float]) -> List:
         return min(sums)
+
+class ExtremeSums(Sums):
+    # Output the largest and the smallest sums.
+    @classmethod
+    def extract_output_from_sums(cls, sums: List[float]) -> List:
+        return (min(sums), max(sums))
+
+class Difference(Sums):
+    # Output the difference between largest and smallest sum.
+    @classmethod
+    def extract_output_from_sums(cls, sums: List[float]) -> List:
+        return max(sums)-min(sums)
 
 class BinCount(Sums):
     # Output the total number of bins.
