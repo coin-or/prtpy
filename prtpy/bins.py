@@ -7,8 +7,7 @@ Since:  2022-02
 
 from abc import ABC, abstractmethod
 import numpy as np
-from typing import List, Any, Callable
-
+from typing import Any, Callable
 
 
 class Bins(ABC):
