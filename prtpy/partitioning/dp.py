@@ -25,6 +25,9 @@ def optimal(
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    >>> optimal(BinsKeepingContents(2), [1,1,1,1,2], objective=obj.MaximizeSmallestSum).sums
+    array([3., 3.])
+
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
     >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference)
     Bin #0: [39, 16], sum=55.0

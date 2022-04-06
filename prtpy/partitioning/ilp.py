@@ -20,10 +20,11 @@ def optimal(
     items: List[Any],
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
-    outputtype: out.OutputType = out.Partition,
     copies=1,
     max_seconds=inf,
     additional_constraints:Callable=lambda sums:[],
+    weights:List[float]=None,
+    verbose=0
 ):
     """
     Produce a partition that minimizes the given objective, by solving an integer linear program (ILP).
@@ -36,11 +37,15 @@ def optimal(
     :param copies: how many copies there are of each item. Default: 1.
     :param max_seconds: stop the computation after this number of seconds have passed.
     :param additional_constraints: a function that accepts the list of sums in ascending order, and returns a list of possible additional constraints on the sums.
+    :param weights: if given, must be of size bins.num. Divides each sum by its weight before applying the objective function.
+
+    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    >>> optimal(BinsKeepingContents(2), [11.1,11,11,11,22], objective=obj.MaximizeSmallestSum).sums
+    array([33. , 33.1])
 
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference).sort()
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
@@ -60,6 +65,14 @@ def optimal(
     >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum).sums
     array([56., 56., 65.])
 
+    >>> items = [11.1, 11, 11, 11, 22]
+    >>> optimal(BinsKeepingContents(2), items, objective=obj.MaximizeSmallestSum, weights=[1,1]).sums
+    array([33. , 33.1])
+    >>> optimal(BinsKeepingContents(2), items, objective=obj.MaximizeSmallestSum, weights=[1,2]).sums
+    array([22. , 44.1])
+    >>> optimal(BinsKeepingContents(2), items, objective=obj.MaximizeSmallestSum, weights=[10,2]).sums
+    array([55. , 11.1])
+
     >>> from prtpy import partition
     >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['a', 'g'], ['c', 'd', 'e'], ['b', 'f']]
@@ -70,13 +83,15 @@ def optimal(
     ibins = range(bins.num)
     if isinstance(copies, Number):
         copies = {item: copies for item in items}
+    if weights is None:
+        weights = bins.num*[1]
 
     model = mip.Model("partition")
     counts: dict = {
         item: [model.add_var(var_type=mip.INTEGER) for ibin in ibins] for item in items
     }  # counts[i][j] determines how many times item i appears in bin j.
     bin_sums = [
-        sum([counts[item][ibin] * valueof(item) for item in items]) for ibin in ibins
+        sum([counts[item][ibin] * valueof(item) for item in items])/weights[ibin] for ibin in ibins
     ]
 
     model.objective = mip.minimize(
@@ -95,7 +110,7 @@ def optimal(
     for constraint in constraints: model += constraint
 
     # Solve the ILP:
-    model.verbose = 0
+    model.verbose = verbose
     status = model.optimize(max_seconds=max_seconds)
     if status != mip.OptimizationStatus.OPTIMAL:
         raise ValueError(f"Problem status is not optimal - it is {status}.")
