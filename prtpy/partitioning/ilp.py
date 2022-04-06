@@ -42,6 +42,8 @@ def optimal(
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> optimal(BinsKeepingContents(2), [11.1,11,11,11,22], objective=obj.MaximizeSmallestSum).sums
     array([33. , 33.1])
+    >>> optimal(BinsKeepingContents(2), [11,11,11,11,22], objective=obj.MaximizeSmallestSum).sums
+    array([33., 33.])
 
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
@@ -81,17 +83,19 @@ def optimal(
     """
 
     ibins = range(bins.num)
+    items = list(items)
+    iitems = range(len(items))
     if isinstance(copies, Number):
-        copies = {item: copies for item in items}
+        copies = {iitem: copies for iitem in iitems}
     if weights is None:
         weights = bins.num*[1]
 
     model = mip.Model("partition")
     counts: dict = {
-        item: [model.add_var(var_type=mip.INTEGER) for ibin in ibins] for item in items
+        iitem: [model.add_var(var_type=mip.INTEGER) for ibin in ibins] for iitem in iitems
     }  # counts[i][j] determines how many times item i appears in bin j.
     bin_sums = [
-        sum([counts[item][ibin] * valueof(item) for item in items])/weights[ibin] for ibin in ibins
+        sum([counts[iitem][ibin] * valueof(items[iitem]) for iitem in iitems])/weights[ibin] for ibin in ibins
     ]
 
     model.objective = mip.minimize(
@@ -99,9 +103,9 @@ def optimal(
     )
 
     # Construct the list of constraints:
-    counts_are_non_negative = [counts[item][ibin] >= 0 for ibin in ibins for item in items]
+    counts_are_non_negative = [counts[iitem][ibin] >= 0 for ibin in ibins for iitem in iitems]
     each_item_in_one_bin = [
-        sum([counts[item][ibin] for ibin in ibins]) == copies[item] for item in items
+        sum([counts[iitem][ibin] for ibin in ibins]) == copies[iitem] for iitem in iitems
     ]
     bin_sums_in_ascending_order = [  # a symmetry-breaker
         bin_sums[ibin + 1] >= bin_sums[ibin] for ibin in range(bins.num - 1)
@@ -117,10 +121,10 @@ def optimal(
 
     # Construct the output:
     for ibin in ibins:
-        for item in items:
-            count_item_in_bin = int(counts[item][ibin].x)
+        for iitem in iitems:
+            count_item_in_bin = int(counts[iitem][ibin].x)
             for _ in range(count_item_in_bin):
-                bins.add_item_to_bin(item, ibin)
+                bins.add_item_to_bin(items[iitem], ibin)
     return bins
 
 
