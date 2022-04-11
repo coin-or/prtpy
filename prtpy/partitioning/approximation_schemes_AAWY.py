@@ -27,18 +27,18 @@ def mainAlgorithm(epsilon:float, jobs: list[int], numbrOfMachines:int, f: Callab
     # """
     return [[0]]
 
-def ConvertJobs(jobs: list[int], L: int, lambda_star:int)->list[float]:
-    # """
-    # "this algorithm convert every job p_j to its corresponding job p_j#"
-    # >>> ConvertJobs([124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],500000,500)
-    # [124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642]
-    # """
-    """
-    "this algorithm convert every job p_j to its corresponding job p_j#"
-    >>> ConvertJobs([124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],500000,500)
-    [0]
-    """
-    return [0]    
+# def ConvertJobs(jobs: list[int], L: int, lambda_star:int)->list[float]:
+#     # """
+#     # "this algorithm convert every job p_j to its corresponding job p_j#"
+#     # >>> ConvertJobs([124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],500000,500)
+#     # [124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642]
+#     # """
+#     """
+#     "this algorithm convert every job p_j to its corresponding job p_j#"
+#     >>> ConvertJobs([124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],500000,500)
+#     [0]
+#     """
+#     return [0]    
     
 
 # def IP(ConvertedJobs: list[float], numbrOfMachines:int, f: Callable)->list[list[float]]:
