@@ -4,11 +4,11 @@ from typing import List
 
 
 
-def mainAlgorithm(epsilon:float, jobs: list[int], numbrOfMachines:int, f: Callable)->list[list[int]]:
+def mainAlgorithm(epsilon:float, jobs: List[int], numbrOfMachines:int, f: Callable)->List[List[int]]:
     """
     "Approximation Schemes for Scheduling on Parallel Machines", by Noga Alon, Yossi Azar, Gerhard J. Woeginger and Tal Yadid,
      (1975), https://onlinelibrary.wiley.com/doi/10.1002/(SICI)1099-1425(199806)1:1%3C55::AID-JOS2%3E3.0.CO;2-J
-    main algorithm in the artical (page.9): accepts list of jobs and number of machines 
+    main algorithm in the artical (page.9): accepts List of jobs and number of machines 
     and creates a schedule for the machines s.t, we process all the jobs and minimize sum(f(C_i)) 
     when C_i is the compilition time of machine #i (0<i<number_of_machines+1)
     f(x) is a given convex function.
@@ -29,7 +29,7 @@ def mainAlgorithm(epsilon:float, jobs: list[int], numbrOfMachines:int, f: Callab
     """
     return [[0]]
 
-def ConvertJobs(jobs: list[int], L: int, lambda_star:int)->list[float]:
+def ConvertJobs(jobs: List[int], L: int, lambda_star:int)->List[float]:
     """
     "this algorithm convert every job p_j to its corresponding job p_j#"
     >>> ConvertJobs([124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],500000,500)
@@ -38,7 +38,7 @@ def ConvertJobs(jobs: list[int], L: int, lambda_star:int)->list[float]:
     return [0]    
     
 
-def IP(ConvertedJobs: list[float], numbrOfMachines:int, f: Callable)->list[list[float]]:
+def IP(ConvertedJobs: List[float], numbrOfMachines:int, f: Callable)->List[List[float]]:
     """
     "partition the  converted jobs into numbrOfMachines parts in an optimal way such that we minimize sum(f(C_i))"
     >>> IP([124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642],2,lambda x:x**2)
@@ -46,7 +46,7 @@ def IP(ConvertedJobs: list[float], numbrOfMachines:int, f: Callable)->list[list[
     """
     return [[0]]
 
-def deconvertJobs(partition: list[list[float]], L: int, lambda_star:int)->list[list[int]]:
+def deconvertJobs(partition: List[List[float]], L: int, lambda_star:int)->List[List[int]]:
     """
     "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
     >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
