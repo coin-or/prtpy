@@ -41,31 +41,31 @@ def ConvertJobs(jobs: list[int], L: int, lambda_star:int)->list[float]:
     return [0]    
     
 
-def IP(ConvertedJobs: list[float], numbrOfMachines:int, f: Callable)->list[list[float]]:
-    # """
-    # "partition the  converted jobs into numbrOfMachines parts in an optimal way such that we minimize sum(f(C_i))"
-    # >>> IP([124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642],2,lambda x:x**2)
-    # [[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]]
-    # """
-    """
-    "partition the  converted jobs into numbrOfMachines parts in an optimal way such that we minimize sum(f(C_i))"
-    >>> IP([124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642],2,lambda x:x**2)
-    [[0]]
-    """
-    return [[0]]
+# def IP(ConvertedJobs: list[float], numbrOfMachines:int, f: Callable)->list[list[float]]:
+#     # """
+#     # "partition the  converted jobs into numbrOfMachines parts in an optimal way such that we minimize sum(f(C_i))"
+#     # >>> IP([124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642],2,lambda x:x**2)
+#     # [[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]]
+#     # """
+#     """
+#     "partition the  converted jobs into numbrOfMachines parts in an optimal way such that we minimize sum(f(C_i))"
+#     >>> IP([124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642],2,lambda x:x**2)
+#     [[0]]
+#     """
+#     return [[0]]
 
-def deconvertJobs(partition: list[list[float]], L: int, lambda_star:int)->list[list[int]]:
-    # """
-    # "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
-    # >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
-    # [[124000,54768,89765,78900,101436,52422,17642],[34000,115256,43124,107,23047,200101,65432]]
-    # """
-    """
-    "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
-    >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
-    [[0]]
-    """
-    return [[0]]
+# def deconvertJobs(partition: list[list[float]], L: int, lambda_star:int)->list[list[int]]:
+#     # """
+#     # "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
+#     # >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
+#     # [[124000,54768,89765,78900,101436,52422,17642],[34000,115256,43124,107,23047,200101,65432]]
+#     # """
+#     """
+#     "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
+#     >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
+#     [[0]]
+#     """
+#     return [[0]]
 
 # if __name__ == "__main__":
 #     import doctest
