@@ -1,6 +1,12 @@
 
 from typing import Callable
 
+def Algo():
+    """
+    >>> Algo()
+    0
+    """
+    return 0
 
 # def mainAlgorithm(epsilon:float, jobs: list[int], numbrOfMachines:int, f: Callable)->list[list[int]]:
 #     # """
@@ -67,6 +73,6 @@ from typing import Callable
 #     """
 #     return [[0]]
 
-# if __name__ == "__main__":
-#     import doctest
-#     print(doctest.testmod())    
+if __name__ == "__main__":
+    import doctest
+    print(doctest.testmod())    
