@@ -31,6 +31,7 @@ class partitioning:
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing
     from prtpy.packing.first_fit import online as ff, decreasing as ffd
+    from prtpy.packing.improved_bin_comletion import bin_packing as ibc
 
 class covering:
     from prtpy.packing.greedy_covering import decreasing as decreasing

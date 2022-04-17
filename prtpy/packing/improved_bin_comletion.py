@@ -28,5 +28,4 @@ def bin_packing(
     >>> list(bin_packing(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).sums)
     [9.0, 5.0, 9.0, 9.0]
     """
-    
-    assert("Not implemented yet")
+    assert False, "not implemented yet"
