@@ -14,12 +14,12 @@ import numpy as np
 from prtpy import outputtypes as out, objectives as obj, Bins
 
 
-def CBLDM(
+def cbldm(
     bins: Bins,
     items: List[float],
     valueof: Callable[[Any], float] = lambda x: x,
     time_in_seconds: float = np.inf,
-    partition_difference: int = sys.maxint
+    partition_difference: int = sys.maxsize
 ) -> Bins:
 
     """
