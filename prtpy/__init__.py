@@ -27,6 +27,8 @@ class partitioning:
     from prtpy.partitioning.roundrobin import roundrobin
     from prtpy.partitioning.multifit import multifit as multifit
 
+    from prtpy.partitioning.cbldm import cbldm
+
 
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing
