@@ -23,6 +23,7 @@ class TestSNP(unittest.TestCase):
         assert (Smallest_sum_bin == 8.0)
 
        ##-------------- more 3 way example------------------
+
         items2 = [1,3,3,4,4,5,5,5]
         bins = prtpy.partition(algorithm=snp, numbins=numbins, items=items2, outputtype=prtpy.out.Partition)
         bins.sort(key=lambda bin: (sum(bin), len(bin))) # so we are sure in the order we get the answer
@@ -69,20 +70,62 @@ class TestSNP(unittest.TestCase):
 
 
     def test_snp_4ways_dict(self):
-        items={"a":1, "b":1, "c":1}
+        items={"a":1, "b":1, "c":1,"d":2}
         numbins = 3
         bins = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
         bins.sort(key=lambda bin: (sum(bin), len(bin))) # so we are sure in the order we get the answer
-        assert (bins == [['a'], ['b'], ['c']])
+        assert (bins == [['a'], ['b'], ['c'], ['d']])
 
         bins_sums = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
-        assert (sorted(bins_sums) ==[1.0, 1.0, 1.0])
+        assert (sorted(bins_sums) ==[1.0, 1.0, 1.0, 2.0])
 
         largest_sum_bin = prtpy.partition(algorithm=snp, numbins=numbins, items=items,  outputtype=prtpy.out.LargestSum)
-        assert (largest_sum_bin == 1.0)
+        assert (largest_sum_bin == 2.0)
 
         Smallest_sum_bin = prtpy.partition(algorithm=snp, numbins=numbins, items=items,  outputtype=prtpy.out.SmallestSum)
         assert (Smallest_sum_bin == 1.0)
+    def test_snp_3ways_dict(self):
+        items={"a":4, "b":5, "c":6,"d":7, "e":8}
+        numbins = 3
+        bins = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
+        bins.sort(key=lambda bin: (sum(bin), len(bin))) # so we are sure in the order we get the answer
+        assert (bins == [['e'], ['b','c'], ['a','d']] or bins == [['e'], ['a','d'], ['b','c']])
+
+        bins_sums = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
+        assert (sorted(bins_sums) ==[8.0, 11.0, 11.0])
+
+        largest_sum_bin = prtpy.partition(algorithm=snp, numbins=numbins, items=items,  outputtype=prtpy.out.LargestSum)
+        assert (largest_sum_bin == 11.0)
+
+        Smallest_sum_bin = prtpy.partition(algorithm=snp, numbins=numbins, items=items,  outputtype=prtpy.out.SmallestSum)
+        assert (Smallest_sum_bin == 8.0)
+
+    def test_snp_5ways_dict(self):
+        items={"a":1, "b":2, "c":3,"d":4, "e":5, "f":6, "g":7, "h":8, "i":9}
+        numbins = 5
+        bins = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
+        bins.sort(key=lambda bin: (sum(bin), len(bin))) # so we are sure in the order we get the answer
+        assert (bins == [['i'], ['a','h'], ['b','g'], ['f','c'], ['d','e']])
+
+        bins_sums = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
+        assert (sorted(bins_sums) ==[9.0, 9.0, 9.0, 9.0, 9.0])
+
+        largest_sum_bin = prtpy.partition(algorithm=snp, numbins=numbins, items=items,  outputtype=prtpy.out.LargestSum)
+        assert (largest_sum_bin == 9.0)
+
+        Smallest_sum_bin = prtpy.partition(algorithm=snp, numbins=numbins, items=items,  outputtype=prtpy.out.SmallestSum)
+        assert (Smallest_sum_bin == 9.0)
+
+#----------------------Some specials cases  -------------------------
+     ## here k > |items|
+    def test_snp_zero(self):
+        items = [0,0]
+        numbins = 3
+        bins = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
+        assert (bins == [[0], [], [0]] or bins == [[], [0], [0]]  or bins == [[0], [0], []])
+
+
+
 
 
 if __name__ == '__main__':
