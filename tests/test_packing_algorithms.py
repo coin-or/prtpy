@@ -48,7 +48,7 @@ class TestPackingAlgorithms(unittest.TestCase):
         self._test_class_with_dict_input(theclass=prtpy.covering, binsize=9, items={"a":11, "b":22})
 
     def test_improved_bin_completion(self):
-        import prtpy.packing.improved_bin_comletion as IBC
+        import prtpy.packing.improved_bin_completion as IBC
         import prtpy.outputtypes as outputtype
 
         bins = outputtype.Partition.create_empty_bins(0)
