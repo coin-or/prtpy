@@ -8,7 +8,7 @@ class TestCBLDMAlgorithms(unittest.TestCase):
     def _test_algorithm(self, items, expected, time=1, delta=sys.maxsize, equal=True):
         algorithm = prtpy.partitioning.cbldm
         result = prtpy.partition(algorithm=algorithm, items=items, numbins=2, outputtype=prtpy.out.Sums, time_in_seconds=time, partition_difference=delta)
-        assert (abs(result[0] - result[1]) == expected)
+        self.assertTrue((abs(result[0] - result[1]) == expected) == equal)
 
     def test_int_partition(self):
         self._test_algorithm(items=[10], expected=10, delta=1)    # [[],[10]]
