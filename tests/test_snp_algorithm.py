@@ -125,12 +125,23 @@ class TestSNP(unittest.TestCase):
         assert (bins == [[0], [], [0]] or bins == [[], [0], [0]]  or bins == [[0], [0], []])
 
     def test_snp_9Bins_with_8Nums(self):
-        items = [1,2,4,5,6,7,8]
+        items = [1,2,3,4,5,6,7,8]
         numbins = 9
         bins_sums = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
         assert (sorted(bins_sums) ==[0.0, 1.0, 2.0, 3.0, 4.0, 5,0, 6,0, 7.0, 8.0])
 
-    # def exeption(self):
+
+#-------------wrong input cases that should throw exeption---------
+    def exeption(self):
+        items = [1,2,3,4,5]
+        numbins = 9
+        algo = []
+        for algorithm in functions_in_class(theclass):
+            algo.append(algorithm)
+        with self.assertRaises(Exception) as context:
+            snp(items,numbins)
+        self.assertTrue("wrong algorithm" in context.exception)
+        self.assertRaises("wrong outputtype" in context.exception)
 
 
 if __name__ == '__main__':
