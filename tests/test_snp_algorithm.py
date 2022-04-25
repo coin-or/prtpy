@@ -71,7 +71,7 @@ class TestSNP(unittest.TestCase):
 
     def test_snp_4ways_dict(self):
         items={"a":1, "b":1, "c":1,"d":2}
-        numbins = 3
+        numbins = 4
         bins = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
         bins.sort(key=lambda bin: (sum(bin), len(bin))) # so we are sure in the order we get the answer
         assert (bins == [['a'], ['b'], ['c'], ['d']])
@@ -124,8 +124,13 @@ class TestSNP(unittest.TestCase):
         bins = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
         assert (bins == [[0], [], [0]] or bins == [[], [0], [0]]  or bins == [[0], [0], []])
 
+    def test_snp_9Bins_with_8Nums(self):
+        items = [1,2,4,5,6,7,8]
+        numbins = 9
+        bins_sums = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
+        assert (sorted(bins_sums) ==[0.0, 1.0, 2.0, 3.0, 4.0, 5,0, 6,0, 7.0, 8.0])
 
-
+    # def exeption(self):
 
 
 if __name__ == '__main__':
