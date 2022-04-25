@@ -1,5 +1,4 @@
 import prtpy, unittest, itertools
-import numpy as np
 import sys
 
 
@@ -21,11 +20,16 @@ class TestCBLDMAlgorithms(unittest.TestCase):
     def test_exceptions(self):
         algorithm = prtpy.partitioning.cbldm
         items = [8,7,6,5,4]
-        self.assertRaises(prtpy.partition(algorithm=algorithm, items=[8,7,6,5,-4], numbins=3))
-        self.assertRaises(prtpy.partition(algorithm=algorithm, items=items, numbins=3))
-        self.assertRaises(prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_in_seconds=0))
-        self.assertRaises(prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_in_seconds=1, partition_difference=-1))
-        self.assertRaises(prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_in_seconds=1, partition_difference=1.5))
+        with self.assertRaises(ValueError):
+            prtpy.partition(algorithm=algorithm, items=[8, 7, 6, 5, -4], numbins=3)
+        with self.assertRaises(ValueError):
+            prtpy.partition(algorithm=algorithm, items=items, numbins=3)
+        with self.assertRaises(ValueError):
+            prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_in_seconds=0)
+        with self.assertRaises(ValueError):
+            prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_in_seconds=1, partition_difference=-1)
+        with self.assertRaises(ValueError):
+            prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_in_seconds=1, partition_difference=1.5)
 
 
 if __name__ == "__main__":
