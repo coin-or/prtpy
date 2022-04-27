@@ -29,11 +29,8 @@ class partitioning:
     from prtpy.partitioning.multifit import multifit as multifit
 
     from prtpy.partitioning.kk import kk
-
     from prtpy.partitioning.ckk import ckk
-
     from prtpy.partitioning.rnp import rnp
-
     from prtpy.partitioning.irnp import irnp
 
 
