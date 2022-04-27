@@ -1,5 +1,5 @@
 """
-    Partition the numbers using the Karmarkar-Karp Heuristic partitioning algorithm
+    Partition the numbers using the Karmarkar-karp heuristic partitioning algorithm
     Taken help from:
 
     Taken from the "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
