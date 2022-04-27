@@ -31,11 +31,8 @@ class partitioning:
     from prtpy.partitioning.cbldm import cbldm
 
     from prtpy.partitioning.kk import kk
-
     from prtpy.partitioning.ckk import ckk
-
     from prtpy.partitioning.rnp import rnp
-
     from prtpy.partitioning.irnp import irnp
 
 
