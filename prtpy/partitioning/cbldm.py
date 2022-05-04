@@ -82,7 +82,8 @@ def cbldm(
             break
         else:
             raise ValueError("items must be positive")
-    normalised_items = []
+
+    normalised_items = []  # list of bins, each bin contain a sub partition
     for i in sorted_items:
         b = BinsKeepingContents(2)
         b.add_item_to_bin(item=i, bin_index=1)
@@ -95,10 +96,10 @@ def cbldm(
 class CBLDM_algo:
 
     def __init__(self, length, time_in_seconds, difference, start):
-        self.delta = np.inf
+        self.delta = np.inf   # partition sum difference
         self.length = length
         self.time_in_seconds = time_in_seconds
-        self.difference = difference
+        self.difference = difference  # partition cardinal difference
         self.start = start
         self.best = BinsKeepingContents(2)
         self.best.add_item_to_bin(np.inf, 0)
@@ -107,7 +108,7 @@ class CBLDM_algo:
     def part(self, items):
         if time.perf_counter() - self.start >= self.time_in_seconds or self.opt:
             return
-        if len(items) == 1:
+        if len(items) == 1:  # possible partition
             if abs(len(items[0].bins[0]) - len(items[0].bins[1])) <= self.difference and abs(items[0].sums[0] - items[0].sums[1]) < self.delta:
                 self.best = items[0]
                 self.delta = abs(items[0].sums[0] - items[0].sums[1])
@@ -115,8 +116,8 @@ class CBLDM_algo:
                     self.opt = True
                 return
         else:
-            sum_xi = 0
-            max_x = 0
+            sum_xi = 0   # calculate the sum of the sum differences in items
+            max_x = 0    # max sum difference
             for i in items:
                 xi = abs(i.sums[0] - i.sums[1])
                 sum_xi += xi
@@ -124,8 +125,8 @@ class CBLDM_algo:
                     max_x = xi
             if 2 * max_x - sum_xi >= self.delta:
                 return
-            sum_mi = 0
-            max_m = 0
+            sum_mi = 0   # calculate the sum of the cardinal differences in items
+            max_m = 0    # max cardinal difference
             for i in items:
                 mi = abs(len(i.bins[0]) - len(i.bins[1]))
                 sum_mi += mi
@@ -135,16 +136,19 @@ class CBLDM_algo:
                 return
             if len(items) <= math.ceil(self.length / 2):
                 items = sorted(items, key=lambda item: abs(item.sums[0] - item.sums[1]), reverse=True)
+            # split items to left branch and right branch according to partition type
             left = items[2:]
             right = items[2:]
-            split = BinsKeepingContents(2)
-            combine = BinsKeepingContents(2)
-            for section in range(2):
+            split = BinsKeepingContents(2)     # split partition according to sum of bins
+            combine = BinsKeepingContents(2)   # merge partition according to sum of bins
+
+            for section in range(2):     # [small, big] + [small, big] -> [small + small, big + big]
                 for bin_i in range(2):
                     for i in items[section].bins[bin_i]:
                         combine.add_item_to_bin(i, bin_i)
             combine.sort()
-            for i in items[0].bins[0]:
+
+            for i in items[0].bins[0]:       # [small, big] + [small, big] -> [small + big, small + big]
                 split.add_item_to_bin(i, 1)
             for i in items[0].bins[1]:
                 split.add_item_to_bin(i, 0)
@@ -152,6 +156,7 @@ class CBLDM_algo:
                 for i in items[1].bins[bin_i]:
                     split.add_item_to_bin(i, bin_i)
             split.sort()
+
             right.append(combine)
             left.append(split)
             self.part(left)
@@ -160,6 +165,5 @@ class CBLDM_algo:
 
 if __name__ == "__main__":
     import doctest
-
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
