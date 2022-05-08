@@ -2,9 +2,18 @@
 from typing import Callable
 from typing import List
 
+from numpy import obj2sctype as obj
+
+from prtpy import bins
 
 
-def mainAlgorithm(epsilon:float, jobs: List[int], numbrOfMachines:int, f: Callable)->List[List[int]]:
+
+
+def mainAlgorithm( bins: bins, #bin is a machine
+                    items: List[any], #item jobs
+                    epsilon :float,
+                    valueof: Callable = lambda x: x, #the f function we use to calculate completion time
+                    )->List[List[int]]:
     """
     "Approximation Schemes for Scheduling on Parallel Machines", by Noga Alon, Yossi Azar, Gerhard J. Woeginger and Tal Yadid,
      (1975), https://onlinelibrary.wiley.com/doi/10.1002/(SICI)1099-1425(199806)1:1%3C55::AID-JOS2%3E3.0.CO;2-J
@@ -26,7 +35,7 @@ def mainAlgorithm(epsilon:float, jobs: List[int], numbrOfMachines:int, f: Callab
     Example 3:
     >>> mainAlgorithm(0.5,[107,7502,684,12123,450,4663,1985,4102,1052,407,310,113,200,23,1012,41,126,5100],4,lambda x:x**2)
     [[107,4663,1985,4102,407,113],[7502,23,1012,41,5100],[684,450,1052,310,200,126],[12123]]
-    """
+    """                
     return [[0]]
 
 def ConvertJobs(jobs: List[int], L: int, lambda_star:int)->List[float]:
