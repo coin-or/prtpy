@@ -88,7 +88,7 @@ def cbldm(
         b = BinsKeepingContents(2)
         b.add_item_to_bin(item=i, bin_index=1)
         normalised_items.append(b)
-    alg = CBLDM_algo(length=len(normalised_items), time_in_seconds=np.inf, difference=partition_difference, start=start)
+    alg = CBLDM_algo(length=len(normalised_items), time_in_seconds=time_in_seconds, difference=partition_difference, start=start)
     alg.part(normalised_items)
     return alg.best
 
@@ -102,7 +102,7 @@ class CBLDM_algo:
         self.difference = difference  # partition cardinal difference
         self.start = start
         self.best = BinsKeepingContents(2)
-        self.best.add_item_to_bin(np.inf, 0)
+        self.best.add_item_to_bin(np.inf, 1)
         self.opt = False
 
     def part(self, items):
