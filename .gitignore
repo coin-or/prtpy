@@ -131,3 +131,5 @@ dmypy.json
 
 # Old files
 *.old
+
+temp.py
