@@ -45,14 +45,8 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     array([16., 16.])
 
     """
-    values = None
-    if type(items) == list:
-        input_items = [i for i in items]
-    else:
-        input_items = list(items)
-        values = [i for i in items.values()]
-
-    original_items = [i for i in input_items]
+    input_items = items[:]
+    original_items = input_items[:]
     difference_sets = [[i for i in original_items]]
     while len(input_items) > 1:
         max_a = max(input_items)
@@ -61,8 +55,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
         input_items.remove(max_b)
         diff = abs(max_a - max_b)
         input_items.append(diff)
-        input_items.sort()
-        input_items.reverse()
+        input_items.sort(reverse=True)
         difference_sets.append(copy.copy(input_items))
 
     A, B = [], []
@@ -79,15 +72,9 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
             difference_set.remove(integer)
         difference_sets.remove(difference_set)
 
-    for i in reversed(A):
-        if i in original_items:
-            bins.add_item_to_bin(item=i, bin_index=0)
+    [bins.add_item_to_bin(item=i, bin_index=0) for i in reversed(A) if i in original_items]
+    [bins.add_item_to_bin(item=i, bin_index=1) for i in reversed(B) if i in original_items]
 
-    for i in reversed(B):
-        if i in original_items:
-            bins.add_item_to_bin(item=i, bin_index=1)
-
-    # print(bins)
     return bins
 
 
