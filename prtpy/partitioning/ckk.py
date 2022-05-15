@@ -11,40 +11,42 @@
     Date: 26/04/2022
     Email: kfir.goldfarb@msmail.ariel.ac.il
 """
+import copy
+
 import numpy as np
 from typing import Callable, List
 from prtpy import outputtypes as out, Bins, BinsKeepingContents
 
 
 def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
-    """
-    Partition the numbers using the complete Karmarkar-Karp Heuristic partitioning algorithm
-
-    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> ckk(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).bins
-    [[75, 85], [5, 95, 15, 25]]
-
-    >>> ckk(BinsKeepingContents(3), items=[5, 8, 6, 4, 7]).bins
-    [[4, 7], [5, 6], [8]]
-
-    >>> list(ckk(BinsKeepingContents(3), items=[1, 6, 2, 3, 4, 1, 7, 6, 4]).sums)
-    [17.0, 17.0]
-
-    >>> from prtpy import partition
-    >>> partition(algorithm=ckk, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
-
-    >>> partition(algorithm=ckk, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
-    array([16., 16.])
-
-    """
+    # """
+    # Partition the numbers using the complete Karmarkar-Karp Heuristic partitioning algorithm
+    #
+    # >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    # >>> ckk(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).bins
+    # [[75, 85], [5, 95, 15, 25]]
+    #
+    # >>> ckk(bins=BinsKeepingContents(3), items=[5, 8, 6, 4, 7]).bins
+    # [[4, 6], [5, 7], [8]]
+    #
+    # >>> list(ckk(BinsKeepingContents(3), items=[1, 6, 2, 3, 4, 1, 7, 6, 4]).sums)
+    # [17.0, 17.0]
+    #
+    # >>> from prtpy import partition
+    # >>> partition(algorithm=ckk, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    # [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
+    #
+    # >>> partition(algorithm=ckk, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
+    # array([16., 16.])
+    #
+    # """
     k = bins.num
     S = []
-    items.sort()
-    items.reverse()
+    items.sort(reverse=True)
     for i in items:
         s = [[i]]
-        s.extend([[] for _ in range(k - 1)])
+        s = filled_empy_lists(s, k)
+        # s.extend([[] for _ in range(k - 1)])
         S.append(s)
 
     while len(S) > 2:
@@ -95,7 +97,6 @@ def get_max_sum(s: list) -> list:
         if sum(i) > sum_of_list and len(i) > 0:
             sum_of_list = sum(i)
             result = i
-
     return result
 
 
@@ -106,7 +107,6 @@ def get_min_sum(s: list) -> list:
         if sum(i) < sum_of_list and len(i) > 0:
             sum_of_list = sum(i)
             result = i
-
     return result
 
 
@@ -120,35 +120,88 @@ def delete_empty_lists(s: list) -> list:
 
 
 def union(a: list, b: list) -> list:
-    return sorted(list(set(a)) + list(set(b)))
+    return sorted(list(set(a)) + list(set(b)), reverse=True)
 
 
-def combine(a, b, n):
+def filled_empy_lists(s: list, n: int):
+    result = copy.copy(s)
+    result.extend([[] for _ in range(n - 1)])
+    return result
+
+
+def len_filled_list(s: list):
+    length = 0
+    for i in s:
+        if len(i) != 0:
+            length += 1
+    return length
+
+
+def combine(a: list, b: list, n: int):
+    """
+    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    >>> combine(a=[[95], [85]], b=[[75], [25]], n=2)
+    [[95, 25], [85, 75]]
+
+    >>> combine(a=[[9], [7]], b=[[3]], n=2)
+    [[7, 3], [9]]
+
+    >>> combine(a=[[9], [7]], b=[[20]], n=2)
+    [[9, 7], [20]]
+
+    """
+    a.sort(reverse=True)
+    b.sort(reverse=True)
     result = []
-    for i in range(len(a)):
-        if len(a[i]) != 0:
-            result.append(a[i])
-    for i in range(len(b)):
-        if len(b[i]) != 0:
-            result.append(b[i])
+    a_length = len_filled_list(a)
+    b_length = len_filled_list(b)
+    if a_length > b_length:
+        if n <= 2:
+            max_of_a = get_max_sum(a)
+            min_of_a = get_min_sum(a)
+            num_of_b = b[0]
+            if num_of_b < min_of_a:
+                result = [union(min_of_a, num_of_b), max_of_a]
+            else:
+                result = [union(max_of_a, min_of_a), num_of_b]
+        else:
+            print("?")
+    elif a_length < b_length:
+        return combine(b, a, n)
+    elif a_length == 1 and b_length == 1:
+        result = [a[0], b[0]]
+    else:
+        rest = 0
+        if n > 2:
+            rest = max(get_max_sum(a), get_max_sum(b))
+            remove_from_nested_list(a, rest)
+            remove_from_nested_list(b, rest)
 
-    rest = n - len(result)
-    if rest < 0:
-        result = sorted(result, key=sum)
-        lowest_sum = result[0][:]
-        second_lowest_sum = result[1][:]
-        rest_of_result = result[2:]
-        result = [union(lowest_sum, second_lowest_sum)]
-        result.extend(rest_of_result)
-    elif rest > 0:
-        result.extend([[] for _ in range(rest)])
+        max_of_a = get_max_sum(a)
+        min_of_a = get_min_sum(a)
+        max_of_b = get_max_sum(b)
+        min_of_b = get_min_sum(b)
+
+        if n > 2:
+            result = [union(max_of_a, min_of_b), union(max_of_b, min_of_a), rest]
+        else:
+            result = [union(max_of_a, min_of_b), union(max_of_b, min_of_a)]
     return result
 
 
 if __name__ == "__main__":
-    # import doctest
+    import doctest
 
     # (failures, tests) = doctest.testmod(report=True)
     # print("{} failures, {} tests".format(failures, tests))
     # print(ckk(bins=BinsKeepingContents(3), items=[5, 8, 6, 4, 7]))
-    print(ckk(bins=BinsKeepingContents(3), items=[5, 8, 6, 4, 7]))
+    # print(ckk(bins=BinsKeepingContents(3), items=[5, 8, 6, 4, 7]))
+    print(ckk(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]))
+
+    # A = [[1000],[10],[]]
+    # B = [[100000000],[],[]]
+    # print(combine(B, A, 2))
+
+    # A = [[15], [5]]
+    # B = [[95, 25], [85, 75]]
+    # print(combine(A, B, 2))
