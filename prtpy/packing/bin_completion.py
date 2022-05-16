@@ -1,6 +1,46 @@
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, Bins, BinsKeepingContents
-from typing import Callable
+from prtpy.packing import first_fit
+import math
+
+
+def l2_lower_bound(binsize: float, items: List) -> float:
+    print(items)
+    print(sum(items))
+
+    items.sort(reverse=True)
+
+    total_sum = sum(items)
+    estimated_waste = 0
+    capacity = binsize
+
+    for x in items:
+        r = capacity - x
+        smaller_elements = []
+        for i in range(len(items) - 1, items.index(x), -1):
+            if (items[i] > r):
+                break
+            smaller_elements.append(items[i])
+
+        s = sum(smaller_elements)
+        if s == r:
+            for element in smaller_elements:
+                items.remove(element)
+            # items.remove(element for element in smaller_elements)
+            capacity = binsize
+        elif s < r:
+            estimated_waste += r - s
+            for element in smaller_elements:
+                items.remove(element)
+            # items.remove(element for element in smaller_elements)
+            capacity = binsize
+        else:
+            for element in smaller_elements:
+                items.remove(element)
+            # items.remove(element for element in smaller_elements)
+            capacity = binsize - (s - r)
+    print(estimated_waste)
+    return (estimated_waste + total_sum) / binsize
 
 
 def bin_completion(
@@ -41,10 +81,31 @@ def bin_completion(
     >>> bin_completion(BinsKeepingContents(), binsize=100, items=[99, 97, 94, 93, 8, 5, 4, 2])
     [[99], [97, 2], [94, 5], [93, 4], [8]]
     """
+
+    ffd_solution = first_fit.decreasing(BinsKeepingContents(), binsize, items)
+    lower_bound = l2_lower_bound(binsize, items)
+
+    # Check casting
+    if ffd_solution.num == math.ceil(lower_bound):
+        return ffd_solution
+
+    
+
     return 0
 
 
 if __name__ == "__main__":
     import doctest
 
-    print(doctest.testmod())
+    items = [99, 97, 94, 93, 8, 5, 4, 2]
+    s = sum(items)
+    print(l2_lower_bound(100, items))
+    print("sum ", s)
+    print("sum+98 ", (98 + sum(items)))
+    print("Should be ", ((98 + sum(items)) / 100))
+
+    from prtpy.packing import first_fit as ff
+
+    items = [100, 100, 100, 100, 100, 100]
+    print(ff.decreasing(BinsKeepingContents(), binsize=100, items=[99, 94, 79, 64, 50, 44, 43, 37, 32, 19, 18, 7, 3]))
+    # print(doctest.testmod())
