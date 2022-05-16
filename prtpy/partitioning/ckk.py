@@ -36,7 +36,7 @@ def _get_indices(numbers: List[int], partition: Partition) -> Partition:
     return indices
 
 
-def _complete_karmarkar_karp_pure_python(bins: Bins,items: List[int],  valueof: Callable=lambda x: x ) -> Iterator[PartitioningResult]:
+def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x ) -> Iterator[PartitioningResult]:
     stack = [[]]  #: List[List[Tuple[int, int, Partition, List[int]]]]
     heap_count = count()  # To avoid ambiguity in heaps
     for number in items:
@@ -57,7 +57,14 @@ def _complete_karmarkar_karp_pure_python(bins: Bins,items: List[int],  valueof: 
             if num > best:
                 best = num
                 _, _, final_partition, final_sums = partitions[0]
-                yield PartitioningResult(final_partition, final_sums)
+
+                for ibin in range(bins.num):
+                    for item in final_partition[ibin]:
+                        bins.add_item_to_bin(item, ibin)
+
+                yield bins
+
+                bins.clear_bins(bins.num)
                 if num == 0:
                     return
             continue
@@ -76,7 +83,7 @@ def _complete_karmarkar_karp_pure_python(bins: Bins,items: List[int],  valueof: 
 
 if __name__ == '__main__':
     lst = [4,5,6,7,8,9]
-    for part in _complete_karmarkar_karp_pure_python(BinsKeepingContents(2), items=[4, 5, 6, 7, 8,9]):
+    for part in ckk(BinsKeepingContents(3), items=[4, 5, 6, 7, 8]):
         print(part)
     # print(complete_karmarkar_karp(lst,2))
     # print(complete_karmarkar_karp(lst,2))

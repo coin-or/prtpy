@@ -62,6 +62,10 @@ class Bins(ABC):
         """
         return self
 
+    @abstractmethod
+    def clear_bins(self, numbins):
+        pass
+
     def __repr__(self) -> str:
         bins_str = [f"Bin #{i}: {self.bin_to_str(i)}" for i in range(self.num)]
         return "\n".join(bins_str)
@@ -126,6 +130,10 @@ class BinsKeepingSums(Bins):
         super().remove_bins(numbins)
         self.sums = self.sums[:-numbins]
         return self
+
+    def clear_bins(self, numbins):
+        self.sums = np.zeros(numbins)
+
 
     def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
         value = self.valueof(item)
@@ -205,6 +213,10 @@ class BinsKeepingContents(BinsKeepingSums):
         super().remove_bins(numbins)
         self.bins = self.bins[:-numbins]
         return self
+
+    def clear_bins(self, numbins):
+        self.sums = np.zeros(numbins)
+        self.bins = [[] for _ in range(numbins)]
 
     def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
         value = self.valueof(item)

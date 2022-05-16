@@ -52,6 +52,8 @@ def kk(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
 
 
 if __name__ == '__main__':
-    print( kk(BinsKeepingContents(3), items=[5,5,5,4,4,3,3,1]).bins )
+    from prtpy import partition
+
+    print( partition(algorithm=kk, numbins=2, items={"a":4, "b":5, "c":6, "d":7, "e":8}) )
     # print(final_partition)
     # print(final_sums)
