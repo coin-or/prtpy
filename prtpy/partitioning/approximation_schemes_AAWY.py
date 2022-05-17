@@ -189,11 +189,11 @@ def IP(convertedJobs: List[float], numbrOfMachines:int, f: Callable)->List[List[
     
 
 def deconvertJobs(originalJobs,partition: List[List[any]], L: float, lambda_star:int, SmallJobs:List[any],valueof:Callable=ValOf)->List[List[any]]:
-    """
-    "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
-    >>> deconvertJobs([(1,1),(2,2),(3,3),(4,4)],[[(3, 3.75), (-1, 2.5)],[(4, 5.0), (-1, 2.5)]],5,2,[(-1, 1), (-1, 2)])
-    """
-    # >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
+    # """
+    # "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
+    # >>> deconvertJobs([(1,1),(2,2),(3,3),(4,4)],[[(3, 3.75), (-1, 2.5)],[(4, 5.0), (-1, 2.5)]],5,2,[(-1, 1), (-1, 2)])
+    # """
+    # # >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
     # [[124000,54768,89765,78900,101436,52422,17642],[34000,115256,43124,107,23047,200101,65432]]
     deconvertPartition=[[]]*len(partition)
     numberOfSmallJobsPerM=[0]*len(partition)
