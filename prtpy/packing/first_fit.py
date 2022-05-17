@@ -8,14 +8,9 @@ from typing import Callable, List, Any
 from prtpy import outputtypes as out, Bins
 
 
-def online(
-    bins: Bins,
-    binsize: float,
-    items: List[any],
-    valueof: Callable[[Any], float] = lambda x: x,
-):
+def online(bins: Bins, binsize: float, items: List[any], valueof: Callable[[Any], float] = lambda x: x):
     """
-    Pack the given items into bins using the online first-fit algorithm.
+    Pack the given items into bins using the online *First-Fit* algorithm.
     The online algorithm handles the items in the order they are given.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
@@ -43,14 +38,9 @@ def online(
     return bins
 
 
-def decreasing(
-    bins: Bins,
-    binsize: float,
-    items: List[any],
-    valueof: Callable[[Any], float] = lambda x: x,
-):
+def decreasing(bins: Bins, binsize: float, items: List[any], valueof: Callable[[Any], float] = lambda x: x):
     """
-    Pack the given items into bins using the first-fit-decreasing algorithm.
+    Pack the given items into bins using the *First-Fit-Decreasing* algorithm.
     It sorts the items by descending value, and then runs first-fit.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
@@ -79,12 +69,8 @@ def decreasing(
     >>> pack(algorithm=decreasing, binsize=60, items={"a":44, "b":24, "c":24, "d":22, "e":21, "f":17, "g":8, "h":8, "i":6, "j":6}, outputtype=out.Sums)
     array([60., 60., 60.])
     """
-    return online(
-        bins,
-        binsize, 
-        sorted(items, key=valueof, reverse=True),
-        valueof,
-    )
+    items = sorted(items, key=valueof, reverse=True)
+    return online(bins, binsize, items, valueof)
 
 
 if __name__ == "__main__":
