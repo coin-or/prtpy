@@ -6,6 +6,8 @@ Since:  2022-02
 """
 
 from abc import ABC, abstractmethod
+from copy import deepcopy
+
 import numpy as np
 from typing import Any, Callable
 
@@ -64,6 +66,10 @@ class Bins(ABC):
 
     @abstractmethod
     def clear_bins(self, numbins):
+        pass
+
+    @abstractmethod
+    def combine_bins(self, ibin, other_bin, other_ibin):
         pass
 
     def __repr__(self) -> str:
@@ -131,10 +137,6 @@ class BinsKeepingSums(Bins):
         self.sums = self.sums[:-numbins]
         return self
 
-    def clear_bins(self, numbins):
-        self.sums = np.zeros(numbins)
-
-
     def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
         value = self.valueof(item)
         if inplace:
@@ -150,6 +152,14 @@ class BinsKeepingSums(Bins):
 
     def sort(self):
         self.sums.sort()
+        return self
+
+    def clear_bins(self, numbins):
+        self.sums = np.zeros(numbins)
+        return self
+
+    def combine_bins(self, ibin, other_bin, other_ibin):
+        self.sums[ibin] += other_bin.sums[other_ibin]
         return self
 
 
@@ -214,10 +224,6 @@ class BinsKeepingContents(BinsKeepingSums):
         self.bins = self.bins[:-numbins]
         return self
 
-    def clear_bins(self, numbins):
-        self.sums = np.zeros(numbins)
-        self.bins = [[] for _ in range(numbins)]
-
     def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
         value = self.valueof(item)
         if inplace:
@@ -225,9 +231,9 @@ class BinsKeepingContents(BinsKeepingSums):
             self.bins[bin_index].append(item)
             return self
         else:
-            new_sums = np.copy(self.sums)
+            new_sums = deepcopy(self.sums)
             new_sums[bin_index] += value
-            new_bins = list(self.bins)
+            new_bins = deepcopy(list(self.bins))
             new_bins[bin_index] = new_bins[bin_index] + [item]
             return BinsKeepingContents(self.num, new_sums, new_bins).set_valueof(self.valueof)
 
@@ -236,8 +242,19 @@ class BinsKeepingContents(BinsKeepingSums):
 
     def sort(self):
         self.sums.sort()
-        self.bins.sort(key=lambda bin: (sum(bin), len(bin)))
+        self.bins.sort(key=lambda bin: (sum(map(self.valueof,bin)), len(bin)))
         return self
+
+    def clear_bins(self, numbins):
+        super().clear_bins(numbins)
+        self.bins = [[] for _ in range(numbins)]
+        return self
+
+    def combine_bins(self, ibin, other_bin, other_ibin):
+        super().combine_bins(ibin, other_bin, other_ibin)
+        self.bins[ibin] += other_bin.bins[other_ibin]
+        return self
+
 
 
 if __name__ == "__main__":
