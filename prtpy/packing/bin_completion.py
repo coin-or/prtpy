@@ -5,41 +5,40 @@ import math
 
 
 def l2_lower_bound(binsize: float, items: List) -> float:
-    print(items)
-    print(sum(items))
+    copy_items = items.copy()
 
-    items.sort(reverse=True)
+    copy_items.sort(reverse=True)
 
-    total_sum = sum(items)
+    total_sum = sum(copy_items)
     estimated_waste = 0
     capacity = binsize
 
-    for x in items:
+    for x in copy_items:
         r = capacity - x
         smaller_elements = []
-        for i in range(len(items) - 1, items.index(x), -1):
-            if (items[i] > r):
+        for i in range(len(copy_items) - 1, copy_items.index(x), -1):
+            if copy_items[i] > r:
                 break
-            smaller_elements.append(items[i])
+            smaller_elements.append(copy_items[i])
 
         s = sum(smaller_elements)
         if s == r:
             for element in smaller_elements:
-                items.remove(element)
+                copy_items.remove(element)
             # items.remove(element for element in smaller_elements)
             capacity = binsize
         elif s < r:
             estimated_waste += r - s
             for element in smaller_elements:
-                items.remove(element)
+                copy_items.remove(element)
             # items.remove(element for element in smaller_elements)
             capacity = binsize
         else:
             for element in smaller_elements:
-                items.remove(element)
+                copy_items.remove(element)
             # items.remove(element for element in smaller_elements)
             capacity = binsize - (s - r)
-    print(estimated_waste)
+
     return (estimated_waste + total_sum) / binsize
 
 
@@ -89,7 +88,7 @@ def bin_completion(
     if ffd_solution.num == math.ceil(lower_bound):
         return ffd_solution
 
-    
+
 
     return 0
 
