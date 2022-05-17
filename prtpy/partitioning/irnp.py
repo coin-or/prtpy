@@ -38,7 +38,11 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     array([16., 16.])
 
     """
-    pass
+    k = bins.num
+    if k == 0:
+        return bins
+    elif k == 1:
+        return [bins.add_item_to_bin(item=item, bin_index=0) for item in items]
 
 
 if __name__ == "__main__":
