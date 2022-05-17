@@ -17,8 +17,8 @@
 
 """
 import copy
-from typing import Callable, List, Any, Dict, Union
-from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
+from typing import Callable, List
+from prtpy import outputtypes as out, Bins, BinsKeepingContents
 
 
 def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -38,25 +38,20 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> list(kk(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).sums)
     [37.0, 31.0]
 
-    #>>> from prtpy import partition
-    #>>> partition(algorithm=kk, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    #[['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
-    #>>> partition(algorithm=kk, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
+    >>> from prtpy import partition
+    >>> partition(algorithm=kk, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
+    >>> partition(algorithm=kk, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     array([16., 16.])
 
     """
-    input_items = items[:]
-    original_items = input_items[:]
-    difference_sets = [[i for i in original_items]]
-    while len(input_items) > 1:
-        max_a = max(input_items)
-        input_items.remove(max_a)
-        max_b = max(input_items)
-        input_items.remove(max_b)
-        diff = abs(max_a - max_b)
-        input_items.append(diff)
-        input_items.sort(reverse=True)
-        difference_sets.append(copy.copy(input_items))
+    k = bins.num
+    if k == 0:
+        return bins
+    elif k == 1:
+        return [bins.add_item_to_bin(item=item, bin_index=0) for item in items]
+
+    difference_sets, original_items = kk_heuristic(items=items)
 
     A, B = [], []
     difference_sets.reverse()
@@ -76,6 +71,22 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     [bins.add_item_to_bin(item=i, bin_index=1) for i in reversed(B) if i in original_items]
 
     return bins
+
+
+def kk_heuristic(items: List[any]):
+    input_items = items[:]
+    original_items = input_items[:]
+    difference_sets = [[i for i in original_items]]
+    while len(input_items) > 1:
+        max_a = max(input_items)
+        input_items.remove(max_a)
+        max_b = max(input_items)
+        input_items.remove(max_b)
+        diff = abs(max_a - max_b)
+        input_items.append(diff)
+        input_items.sort(reverse=True)
+        difference_sets.append(copy.copy(input_items))
+    return difference_sets, original_items
 
 
 if __name__ == "__main__":

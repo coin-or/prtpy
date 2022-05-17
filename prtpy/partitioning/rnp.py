@@ -11,9 +11,9 @@
     Date: 26/04/2022
     Email: kfir.goldfarb@msmail.ariel.ac.il
 """
-
-from typing import Callable, List, Any
-from prtpy import outputtypes as out, objectives as obj, Bins
+import itertools
+from typing import Callable, List
+from prtpy import outputtypes as out, Bins, BinsKeepingContents
 
 
 def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -21,11 +21,11 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     Partition the numbers using the recursive number partitioning algorithm
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> rnp(BinsKeepingContents(2), items=[1, 6, 2, 3, 4, 1, 7, 6, 4]).bins
-    [[4, 7, 6], [1, 2, 1, 3, 4, 6]]
+    >>> rnp(BinsKeepingContents(2), items=[1, 6, 2, 3, 4, 7]).bins
+    [[1, 6, 4], [2, 3, 7]]
 
     >>> rnp(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).bins
-    [[8, 11, 17], [12, 18, 2]]
+    [[18, 12, 2], [17, 11, 8]]
 
     >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)
     [163.0, 140.0]
@@ -38,7 +38,53 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     array([16., 16.])
 
     """
-    pass
+    k = bins.num
+    if k == 0:
+        return bins
+    elif k == 1:
+        return [bins.add_item_to_bin(item=item, bin_index=0) for item in items]
+
+    # even
+    if k % 2 == 0:  # work very good
+        items_combinations = [i for i in itertools.combinations(items, int(len(items) / 2))]
+        differences = {}
+        for items_combination in items_combinations:
+            complementary_set = get_complementary(items, items_combination)
+            diff = abs(sum(items_combination) - sum(complementary_set))
+            differences[items_combination] = diff
+        best_items = min(differences, key=differences.get)
+        [bins.add_item_to_bin(item=item, bin_index=0) for item in best_items]
+        [bins.add_item_to_bin(item=item, bin_index=1) for item in get_complementary(items, best_items)]
+
+    # odd and k >= 3
+    else:  # TODO - @kggold4, not always working properly need to debug
+        items_combinations_1 = [i for i in itertools.combinations(items, 1)]
+        items_combinations_2 = [i for i in itertools.combinations(items, 2)]
+        items_combinations_k = [i for i in itertools.combinations(items, k)]
+        differences = {}
+
+        for i, j, q in zip(items_combinations_1, items_combinations_2, items_combinations_k):
+            a = i
+            b = get_complementary(a, j)
+            c = get_complementary(b, q)
+            diff = abs(sum(a) - sum(b)) + abs(sum(a) - sum(c)) + abs(sum(b) - sum(c))
+            differences[a] = diff
+        best_items = min(differences, key=differences.get)
+        [bins.add_item_to_bin(item=item, bin_index=1) for item in best_items]
+        best_items_2 = get_complementary(items, best_items)
+        [bins.add_item_to_bin(item=item, bin_index=2) for item in best_items_2]
+        [bins.add_item_to_bin(item=item, bin_index=3) for item in
+         get_complementary(items, list(best_items) + list(best_items_2))]
+
+    return bins
+
+
+def get_complementary(items: list, sub_items: list) -> list:
+    result = []
+    for item in items:
+        if item not in sub_items:
+            result.append(item)
+    return result
 
 
 if __name__ == "__main__":
