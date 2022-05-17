@@ -1,45 +1,10 @@
+import copy
+import functools
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, Bins, BinsKeepingContents
 from prtpy.packing import first_fit
+from prtpy.packing.bc_utilities import *
 import math
-
-
-def l2_lower_bound(binsize: float, items: List) -> float:
-    copy_items = items.copy()
-
-    copy_items.sort(reverse=True)
-
-    total_sum = sum(copy_items)
-    estimated_waste = 0
-    capacity = binsize
-
-    for x in copy_items:
-        r = capacity - x
-        smaller_elements = []
-        for i in range(len(copy_items) - 1, copy_items.index(x), -1):
-            if copy_items[i] > r:
-                break
-            smaller_elements.append(copy_items[i])
-
-        s = sum(smaller_elements)
-        if s == r:
-            for element in smaller_elements:
-                copy_items.remove(element)
-            # items.remove(element for element in smaller_elements)
-            capacity = binsize
-        elif s < r:
-            estimated_waste += r - s
-            for element in smaller_elements:
-                copy_items.remove(element)
-            # items.remove(element for element in smaller_elements)
-            capacity = binsize
-        else:
-            for element in smaller_elements:
-                copy_items.remove(element)
-            # items.remove(element for element in smaller_elements)
-            capacity = binsize - (s - r)
-
-    return (estimated_waste + total_sum) / binsize
 
 
 def bin_completion(
@@ -88,6 +53,28 @@ def bin_completion(
     if ffd_solution.num == math.ceil(lower_bound):
         return ffd_solution
 
+    best_solution_so_far = ffd_solution
+    # possible_partial_solutions = []
+    bin_index = 0
+
+    sorted_items = sorted(items, reverse=True)
+    bin_tree = NodeBin(items)
+
+    for x in sorted_items:
+        bins.add_empty_bins()
+        bins.add_item_to_bin(sorted_items.pop(0), bin_index)
+
+        current_bin_completions = find_undominated_completions()
+
+        if len(current_bin_completions) == 1:
+            map(functools.partial(bins.add_item_to_bin, bin_index=bin_index), current_bin_completions[0])
+            bin_index += 1
+        else:
+            chosen_completion = sorted(current_bin_completions, key=sum).pop()
+            map(functools.partial(bins.add_item_to_bin, bin_index=bin_index), chosen_completion)
+            possible_partial_solutions.extend(current_bin_completions)
+
+
 
 
     return 0
@@ -107,4 +94,18 @@ if __name__ == "__main__":
 
     items = [100, 100, 100, 100, 100, 100]
     print(ff.decreasing(BinsKeepingContents(), binsize=100, items=[99, 94, 79, 64, 50, 44, 43, 37, 32, 19, 18, 7, 3]))
+    print()
+    print(bin_completion(BinsKeepingContents(), binsize=100, items=[99, 94, 79, 64, 50, 44, 43, 37, 32, 19, 18, 7, 3]))
+
+    def f(x, y):
+        return x+y
+
+
+    m =map(functools.partial(f, y=10), items)
+
+    print(list(m))
+
+    binstest = ff.decreasing(BinsKeepingContents(), binsize=100, items=[99, 94, 79, 64, 50, 44, 43, 37, 32, 19, 18, 7, 3])
+
+
     # print(doctest.testmod())
