@@ -11,14 +11,9 @@ from prtpy.packing import first_fit
 import logging
 logger = logging.getLogger(__name__)
 
-def multifit(
-    bins: Bins,
-    items: List[any],
-    valueof: Callable[[Any], float] = lambda x: x,
-    iterations = 10,
-):
+def multifit(bins: Bins, items: List[any], valueof: Callable[[Any], float] = lambda x: x, iterations = 10):
     """
-    Partition the numbers using MultiFit.
+    Partition the numbers using the MultiFit algorithm.
 
     :param iterations: how many iterationss to run in the binary search. The relative error of the result is at most 2^{-iterations}.
                        The default is 10 iterations, which means a relative error of less than 1:1000.
