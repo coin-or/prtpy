@@ -14,6 +14,7 @@
 import itertools
 from typing import Callable, List
 from prtpy import outputtypes as out, Bins, BinsKeepingContents
+from prtpy.objectives import get_complementary
 
 
 def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -27,15 +28,11 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> rnp(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).bins
     [[18, 12, 2], [17, 11, 8]]
 
-    >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)
+    >>> list(rnp(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).sums)
+    [135.0, 165.0]
+
+    >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)  # need to debug
     [163.0, 140.0]
-
-    >>> from prtpy import partition
-    >>> partition(algorithm=rnp, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
-
-    >>> partition(algorithm=rnp, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
-    array([16., 16.])
 
     """
     k = bins.num
@@ -53,6 +50,8 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
             diff = abs(sum(items_combination) - sum(complementary_set))
             differences[items_combination] = diff
         best_items = min(differences, key=differences.get)
+        if valueof == "list":
+            return list(best_items), list(get_complementary(items, best_items))
         [bins.add_item_to_bin(item=item, bin_index=0) for item in best_items]
         [bins.add_item_to_bin(item=item, bin_index=1) for item in get_complementary(items, best_items)]
 
@@ -76,15 +75,10 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
         [bins.add_item_to_bin(item=item, bin_index=3) for item in
          get_complementary(items, list(best_items) + list(best_items_2))]
 
+        if valueof == "list":
+            return list(best_items), best_items_2, list(best_items) + list(best_items_2)
+
     return bins
-
-
-def get_complementary(items: list, sub_items: list) -> list:
-    result = []
-    for item in items:
-        if item not in sub_items:
-            result.append(item)
-    return result
 
 
 if __name__ == "__main__":

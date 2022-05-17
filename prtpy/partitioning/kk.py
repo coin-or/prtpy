@@ -38,12 +38,6 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> list(kk(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).sums)
     [37.0, 31.0]
 
-    >>> from prtpy import partition
-    >>> partition(algorithm=kk, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
-    >>> partition(algorithm=kk, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
-    array([16., 16.])
-
     """
     k = bins.num
     if k == 0:
