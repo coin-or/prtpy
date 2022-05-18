@@ -89,7 +89,7 @@ def cbldm(
     if length == 0:                         # empty items returns empty partition
         return bins
     if partition_difference >= length - 2:  # having partition difference greater than the length - 2 has same partition
-        if length <= 2:
+        if length <= 2:                     # as having length - 2 >= 1 partition difference
             partition_difference = 1        # minimum partition difference is 1
         else:
             partition_difference = length - 2  # having partition difference outside the range can break the algorithm
