@@ -38,7 +38,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
 if __name__ == '__main__':
     from prtpy import partition
 
-    print( partition(algorithm=kk, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}) )
-    print(partition(algorithm=kk, numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.Sums))
+    print( partition(algorithm=kk, numbins=5, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}) )
+    print(partition(algorithm=kk, numbins=5, items=[1,2,3,3,5,9,9], outputtype=out.Sums))
     # print(final_partition)
     # print(final_sums)

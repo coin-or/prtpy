@@ -13,7 +13,7 @@ class Node:
 class InExclusionBinTree:
 
     def __init__(self, items: List, upper_bound, lower_bound):
-        self.items = items.sort(reverse = True)
+        self.items = items.sort(reverse=True)
         self.leaf_depth = len(items)
         self.root = Node(0, [], items)  # root
 
@@ -29,8 +29,8 @@ class InExclusionBinTree:
     # exclusion
     def add_left(self, parent: Node):
         parent.left = Node(depth=parent.depth+1,
-                            cur_set=parent.cur_set,
-                            remaining_numbers=parent.remaining_numbers[1:])
+                           cur_set=parent.cur_set,
+                           remaining_numbers=parent.remaining_numbers[1:])
 
     def generate_tree(self) -> Generator:
         current_node = self.root

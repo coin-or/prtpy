@@ -131,9 +131,9 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
 
 if __name__ == '__main__':
     lst = [4,5,6,7,8,9]
-    for part in ckk(BinsKeepingContents(2), items=[4, 5, 6, 7, 8,9]):
+    for part in ckk(BinsKeepingContents(4), items=[4, 5, 6, 7, 8,9]):
         print(part, '\n')
     # print(complete_karmarkar_karp(lst,2))
     # print(complete_karmarkar_karp(lst,2))
     print("Best:\n")
-    print(best_ckk_partition(BinsKeepingContents(2), items=[4, 5, 6, 7, 8,9]))
+    print(best_ckk_partition(BinsKeepingContents(4), items=[4, 5, 6, 7, 8,9]))
