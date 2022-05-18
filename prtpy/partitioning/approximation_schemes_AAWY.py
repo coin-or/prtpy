@@ -189,13 +189,15 @@ def IP(convertedJobs: List[float], numbrOfMachines:int, f: Callable)->List[List[
     
 
 def deconvertJobs(originalJobs,partition: List[List[any]], L: float, lambda_star:int, SmallJobs:List[any],valueof:Callable=ValOf)->List[List[any]]:
-    # """
-    # "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
-    # >>> deconvertJobs([(1,1),(2,2),(3,3),(4,4)],[[(3, 3.75), (-1, 2.5)],[(4, 5.0), (-1, 2.5)]],5,2,[(-1, 1), (-1, 2)])
-    # """
-    # # >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
-    # [[124000,54768,89765,78900,101436,52422,17642],[34000,115256,43124,107,23047,200101,65432]]
-    deconvertPartition=[[]]*len(partition)
+    """
+    "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
+    >>> deconvertJobs([(1,1),(2,2),(3,3),(4,4)],[[(3, 3.75), (-1, 2.5)],[(4, 5.0), (-1, 2.5)]],5,2,[(1, 1), (2, 2)])
+    [[(3, 3), (1, 1)], [(4, 4), (2, 2)]]
+    """
+    # >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
+    [[124000,54768,89765,78900,101436,52422,17642],[34000,115256,43124,107,23047,200101,65432]]
+    #deconvertPartition=[[]]*len(partition)
+    deconvertPartition = [[] for _ in partition]
     numberOfSmallJobsPerM=[0]*len(partition)
     numberOfMachines=len(partition)
     # for i in range(numberOfMachines):
@@ -209,7 +211,7 @@ def deconvertJobs(originalJobs,partition: List[List[any]], L: float, lambda_star
                 results = [t[1] for t in originalJobs if t[0] == i]
                 deconvertPartition[index].append((i,results[0])) #BUG!!!!!!!!!!!!
             else:
-                print(numberOfSmallJobsPerM[index])
+                #print(numberOfSmallJobsPerM[index])
                 numberOfSmallJobsPerM[index]+=1  
                 numberOfSmallJobs+=1
         index+=1        
@@ -246,8 +248,10 @@ if __name__ == "__main__":
     jobs=[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642]
     ConvertJobs([1,2,3,4],5,2)
     #print(deconvertJobs([(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)],[[(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)]],70,10,[(8,1)]))
-   
-   
+    listlist = [[] for _ in range(4)]
+    print(listlist)
+    listlist[0].append(1)
+    print(listlist)
    
    
    
