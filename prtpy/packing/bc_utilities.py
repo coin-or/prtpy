@@ -108,12 +108,12 @@ def fill_bins(items: List, bins: Bins, bin_index: int, binsize: int, bound: int)
     if not possible_bin_completions:
         return fill_bins(items, bins, bin_index + 1, binsize, bound)
 
-    # if len(possible_bin_completions) == 1:
-    #     new_items = [element for element in items if element not in possible_bin_completions[0]]
-    #     new_bins = copy.deepcopy(bins)
-    #     map(functools.partial(bins.add_item_to_bin, bin_index=bin_index), possible_bin_completions[0])
-    #
-    #     return fill_bins(new_items, new_bins, bin_index + 1, binsize, bound)
+    if len(possible_bin_completions) == 1:
+        new_items = [element for element in items if element not in possible_bin_completions[0]]
+        new_bins = copy.deepcopy(bins)
+        map(functools.partial(bins.add_item_to_bin, bin_index=bin_index), possible_bin_completions[0])
+
+        return fill_bins(new_items, new_bins, bin_index + 1, binsize, bound)
 
     # Go through all possible completions,
     # for each option - try to fill the next bins like a branch
