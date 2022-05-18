@@ -77,63 +77,68 @@ def ValOf(x):
         return x    
     else:
         return x[1]    
-# def mainAlgorithm( bins: Bins, #bin is a machine
-#                     items: List[any], #item jobs
-#                     epsilon :float,
-#                     f:Callable= lambda x: x,
-#                     valueof: Callable = lambda x: x, #the f function we use to calculate completion time
-#                     )->List[List[int]]:
-#     bins.set_valueof(ValOf)                
-#     if isinstance(items[0],int):
-#         items=list(enumerate(items,1))
-#     print(items)
-#     Partition=[]          
-#     lambda_star=CalcLambda_star(f,epsilon)      
-#     print(epsilon, lambda_star)    
-#     jobsSum=0
-#     #print(items)
-#     for item in items:
-#         jobsSum+=valueof(item)
-#     L=jobsSum/bins.num
-#     fullBins = [False] * bins.num
-#     for (i,job) in items[:]:
-#         if job>=L:
-#             items.remove((i,job))
-#             index_of_least_full_bin = min(range(bins.num), key=bins.sums.__getitem__)
-#             bins.add_item_to_bin(item, index_of_least_full_bin)
-#             fullBins[index_of_least_full_bin]=True
-#             Partition.append([(i,job)])
-#     CJ, SJ=ConvertJobs(items,L,lambda_star)   
-#     partition=IP(CJ,bins.num,valueof)
-#     deconvertJobs(jobs, partition,L,lambda_star,SJ)
-#     # """
-#     # "Approximation Schemes for Scheduling on Parallel Machines", by Noga Alon, Yossi Azar, Gerhard J. Woeginger and Tal Yadid,
-#     #  (1975), https://onlinelibrary.wiley.com/doi/10.1002/(SICI)1099-1425(199806)1:1%3C55::AID-JOS2%3E3.0.CO;2-J
-#     # main algorithm in the artical (page.9): accepts List of jobs and number of machines 
-#     # and creates a schedule for the machines s.t, we process all the jobs and minimize sum(f(C_i)) 
-#     # when C_i is the compilition time of machine #i (0<i<number_of_machines+1)
-#     # f(x) is a given convex function.
-#     # the gerenteed result is that the diffenence between the algorithm output and the optimal schedul (that minimize sum(f(C_i)) )
-#     # is <= epsilon * OPT"
+def mainAlgorithm( bins: Bins, #bin is a machine
+                    items: List[any], #item jobs
+                    epsilon :float,
+                    f:Callable= lambda x: x,#the f function we use to calculate completion time
+                    valueof: Callable = ValOf, 
+                    )->List[List[int]]:
+    """
+    "Approximation Schemes for Scheduling on Parallel Machines", by Noga Alon, Yossi Azar, Gerhard J. Woeginger and Tal Yadid,
+     (1975), https://onlinelibrary.wiley.com/doi/10.1002/(SICI)1099-1425(199806)1:1%3C55::AID-JOS2%3E3.0.CO;2-J
+    main algorithm in the artical (page.9): accepts List of jobs and number of machines 
+    and creates a schedule for the machines s.t, we process all the jobs and minimize sum(f(C_i)) 
+    when C_i is the compilition time of machine #i (0<i<number_of_machines+1)
+    f(x) is a given convex function.
+    the gerenteed result is that the diffenence between the algorithm output and the optimal schedul (that minimize sum(f(C_i)) )
+    is <= epsilon * OPT"
 
-#     # Example 1: 
-#     # >>> mainAlgorithm(0.1,[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],2,lambda x:x**2)
-#     # [[124000,54768,89765,78900,101436,52422,17642],[34000,115256,43124,107,23047,200101,65432]]
+    >>> mainAlgorithm(BinsKeepingContents(2),[10,10,10],0.1, lambda x:x**2,ValOf)
+    [[(2, 10)], [(1, 10), (3, 10)]]
+
+    Example 1: 
+    >>> mainAlgorithm(BinsKeepingContents(2),[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],0.1,lambda x:x**2)
+    [[(8, 23047), (6, 43124), (3, 54768), (10, 78900), (12, 101436), (1, 124000), (7, 107)], [(14, 17642), (2, 34000), (13, 52422), (11, 65432), (5, 89765), (4, 115256), (9, 200101)]]
+    """    
     
-#     # Example 2: 
-#     # >>> mainAlgorithm(0.5,[426,666,846,8500,3300,1546,985,103,674,131,124,564,135],2,lambda x:x)
-#     # [[426,666,846,8500,3300,1546,985,103,674,131,124,564,135][]]
+    # Example 2: 
+    # >>> mainAlgorithm(0.5,[426,666,846,8500,3300,1546,985,103,674,131,124,564,135],2,lambda x:x)
+    # [[426,666,846,8500,3300,1546,985,103,674,131,124,564,135][]]
 
-#     # Example 3:
-#     # >>> mainAlgorithm(0.5,[107,7502,684,12123,450,4663,1985,4102,1052,407,310,113,200,23,1012,41,126,5100],4,lambda x:x**2)
-#     # [[107,4663,1985,4102,407,113],[7502,23,1012,41,5100],[684,450,1052,310,200,126],[12123]]
-#     # """                
-#     return [[0]]
-def addSmallJob(set, job,value):
+    # Example 3:
+    # >>> mainAlgorithm(0.5,[107,7502,684,12123,450,4663,1985,4102,1052,407,310,113,200,23,1012,41,126,5100],4,lambda x:x**2)
+    # [[107,4663,1985,4102,407,113],[7502,23,1012,41,5100],[684,450,1052,310,200,126],[12123]]
+                            
+    bins.set_valueof(ValOf)                
+    if isinstance(items[0],int):
+        items=list(enumerate(items,1))
+    Partition=[]          
+    lambda_star=CalcLambda_star(f,epsilon)       
+    jobsSum=0
+    for item in items:
+        jobsSum+=valueof(item)
+    L=jobsSum/bins.num
+    fullBins = [False] * bins.num
+    for (i,job) in items[:]:
+        if job>=L:
+            items.remove((i,job))
+            index_of_least_full_bin = min(range(bins.num), key=bins.sums.__getitem__)
+            bins.add_item_to_bin(item, index_of_least_full_bin)
+            fullBins[index_of_least_full_bin]=True
+            Partition.append([(i,job)])
+    CJ, SJ=ConvertJobs(items,L,lambda_star)   
+    partition=IP(CJ,bins.num,valueof)
+    ans=deconvertJobs(items, partition,L,lambda_star,SJ)
+    return ans
+
+def addSmallJob(set, job,value, index=0):
     if isinstance(job,int):
         set.append(value) 
     else:    
-        set.append((-1,value)) 
+        if index==0:
+            set.append((job[0],value)) 
+        else:
+            set.append((index,value))     
 
 def addBigJob(set, job, value):
     if isinstance(job,int):
@@ -151,9 +156,9 @@ def ConvertJobs(jobs: List[any], L: int, lambda_star:int, Valueof:Callable=ValOf
     >>> ConvertJobs([1,2,3,4],5,2)
     ([3.75, 5.0, 2.5, 2.5], [1, 2])
     >>> ConvertJobs([(1,1),(2,2),(3,3),(4,4)],5,2)
-    ([(3, 3.75), (4, 5.0), (-1, 2.5), (-1, 2.5)], [(-1, 1), (-1, 2)])
+    ([(3, 3.75), (4, 5.0), (-1, 2.5), (-1, 2.5)], [(1, 1), (2, 2)])
     >>> ConvertJobs([(1,1),(2,1),(3,3),(4,4)],7,2)
-    ([(4, 5.25), (-1, 3.5), (-1, 3.5)], [(-1, 1), (-1, 1), (-1, 3)])
+    ([(4, 5.25), (-1, 3.5), (-1, 3.5)], [(1, 1), (2, 1), (3, 3)])
     """
     convertedSet=[]
     communMultiple=L/(lambda_star**2)
@@ -169,7 +174,7 @@ def ConvertJobs(jobs: List[any], L: int, lambda_star:int, Valueof:Callable=ValOf
             addSmallJob(smallJobs,job,Valueof(job)) 
     NumNewSmallJobs=int(math.ceil(S/LdivLambda))       
     for i in range(NumNewSmallJobs):
-        addSmallJob(convertedSet, job,LdivLambda) 
+        addSmallJob(convertedSet, job,LdivLambda,-1) 
     return convertedSet,smallJobs    
     
 
@@ -189,6 +194,7 @@ def IP(convertedJobs: List[float], numbrOfMachines:int, f: Callable)->List[List[
     
 
 def deconvertJobs(originalJobs,partition: List[List[any]], L: float, lambda_star:int, SmallJobs:List[any],valueof:Callable=ValOf)->List[List[any]]:
+    
     """
     "this algorithm deconvert the partition of the converted jobs into a new parition of the original jobs
     >>> deconvertJobs([(1,1),(2,2),(3,3),(4,4)],[[(3, 3.75), (-1, 2.5)],[(4, 5.0), (-1, 2.5)]],5,2,[(1, 1), (2, 2)])
@@ -213,7 +219,7 @@ def deconvertJobs(originalJobs,partition: List[List[any]], L: float, lambda_star
             else:
                 #print(numberOfSmallJobsPerM[index])
                 numberOfSmallJobsPerM[index]+=1  
-                numberOfSmallJobs+=1
+                numberOfSmallJobs+=1        
         index+=1        
     curSmallJob=0  
     SJpartition=[[]]* numberOfMachines  
@@ -248,10 +254,7 @@ if __name__ == "__main__":
     jobs=[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642]
     ConvertJobs([1,2,3,4],5,2)
     #print(deconvertJobs([(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)],[[(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)]],70,10,[(8,1)]))
-    listlist = [[] for _ in range(4)]
-    print(listlist)
-    listlist[0].append(1)
-    print(listlist)
+   
    
    
    
