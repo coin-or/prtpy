@@ -5,7 +5,7 @@ import math
 from typing import Callable
 from typing import List
 
-from numpy import number, obj2sctype as obj
+from numpy import append, number, obj2sctype as obj
 
 from prtpy import bins
 from prtpy import objectives as obj, Bins, partitioning
@@ -93,12 +93,19 @@ def mainAlgorithm( bins: Bins, #bin is a machine
     the gerenteed result is that the diffenence between the algorithm output and the optimal schedul (that minimize sum(f(C_i)) )
     is <= epsilon * OPT"
 
+    >>> mainAlgorithm(BinsKeepingContents(3),[100,100,10,50],0.1, lambda x:x**2,ValOf)
+    Bin #0: [(1, 100)], sum=100.0
+    Bin #1: [(2, 100)], sum=100.0
+    Bin #2: [(3, 10), (4, 50)], sum=60.0
+
     >>> mainAlgorithm(BinsKeepingContents(2),[10,10,10],0.1, lambda x:x**2,ValOf)
-    [[(2, 10)], [(1, 10), (3, 10)]]
+    Bin #0: [(2, 10)], sum=10.0
+    Bin #1: [(1, 10), (3, 10)], sum=20.0
 
     Example 1: 
     >>> mainAlgorithm(BinsKeepingContents(2),[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],0.1,lambda x:x**2)
-    [[(8, 23047), (6, 43124), (3, 54768), (10, 78900), (12, 101436), (1, 124000), (7, 107)], [(14, 17642), (2, 34000), (13, 52422), (11, 65432), (5, 89765), (4, 115256), (9, 200101)]]
+    Bin #0: [(8, 23047), (6, 43124), (3, 54768), (10, 78900), (12, 101436), (1, 124000), (7, 107)], sum=425382.0
+    Bin #1: [(14, 17642), (2, 34000), (13, 52422), (11, 65432), (5, 89765), (4, 115256), (9, 200101)], sum=574618.0
     """    
     
     # Example 2: 
@@ -112,24 +119,32 @@ def mainAlgorithm( bins: Bins, #bin is a machine
     bins.set_valueof(ValOf)                
     if isinstance(items[0],int):
         items=list(enumerate(items,1))
-    Partition=[]          
+    Finalpartition=[]          
     lambda_star=CalcLambda_star(f,epsilon)       
     jobsSum=0
     for item in items:
         jobsSum+=valueof(item)
     L=jobsSum/bins.num
     fullBins = [False] * bins.num
+    numOfFullBins=0
     for (i,job) in items[:]:
         if job>=L:
             items.remove((i,job))
             index_of_least_full_bin = min(range(bins.num), key=bins.sums.__getitem__)
-            bins.add_item_to_bin(item, index_of_least_full_bin)
+            bins.add_item_to_bin((i,job), index_of_least_full_bin)
             fullBins[index_of_least_full_bin]=True
-            Partition.append([(i,job)])
+            Finalpartition.append([(i,job)])
+            numOfFullBins+=1
+
     CJ, SJ=ConvertJobs(items,L,lambda_star)   
-    partition=IP(CJ,bins.num,valueof)
+    partition=IP(CJ,bins.num-numOfFullBins,valueof)
     ans=deconvertJobs(items, partition,L,lambda_star,SJ)
-    return ans
+    for machine in ans:
+        Finalpartition.append(machine)
+        for job in machine:
+            bins.add_item_to_bin(job,numOfFullBins)
+        numOfFullBins+=1    
+    return bins
 
 def addSmallJob(set, job,value, index=0):
     if isinstance(job,int):
