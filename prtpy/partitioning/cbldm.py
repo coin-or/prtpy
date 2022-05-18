@@ -86,13 +86,13 @@ def cbldm(
             raise ValueError("items must be none negative")
 
     length = len(items)
-    if length == 0:                         # empty items returns empty partition
+    if length == 0:  # empty items returns empty partition
         return bins
-    if partition_difference >= length - 2:  # having partition difference greater than the length - 2 has same partition
-        if length <= 2:                     # as having length - 2 >= 1 partition difference
-            partition_difference = 1        # minimum partition difference is 1
-        else:
-            partition_difference = length - 2  # having partition difference outside the range can break the algorithm
+    # if partition_difference >= length - 2:  # having partition difference greater than the length-2 has same partition
+    #    if length <= 2:                     # as having length - 2 >= 1 partition difference
+    #        partition_difference = 1        # minimum partition difference is 1
+    #    else:
+    #        partition_difference = length - 2  # having partition difference outside the range can break the algorithm
 
     normalised_items = []  # list of bins, each bin contain a sub partition
     for i in sorted_items:
@@ -107,7 +107,7 @@ def cbldm(
 class CBLDM_algo:
 
     def __init__(self, length, time_in_seconds, difference, start):
-        self.delta = np.inf   # partition sum difference
+        self.delta = np.inf  # partition sum difference
         self.length = length
         self.time_in_seconds = time_in_seconds
         self.difference = difference  # partition cardinal difference
@@ -120,15 +120,16 @@ class CBLDM_algo:
         if time.perf_counter() - self.start >= self.time_in_seconds or self.opt:
             return
         if len(items) == 1:  # possible partition
-            if abs(len(items[0].bins[0]) - len(items[0].bins[1])) <= self.difference and abs(items[0].sums[0] - items[0].sums[1]) < self.delta:
+            if abs(len(items[0].bins[0]) - len(items[0].bins[1])) <= self.difference and abs(
+                    items[0].sums[0] - items[0].sums[1]) < self.delta:
                 self.best = items[0]
                 self.delta = abs(items[0].sums[0] - items[0].sums[1])
                 if self.delta == 0:
                     self.opt = True
                 return
         else:
-            sum_xi = 0   # calculate the sum of the sum differences in items
-            max_x = 0    # max sum difference
+            sum_xi = 0  # calculate the sum of the sum differences in items
+            max_x = 0  # max sum difference
             for i in items:
                 xi = abs(i.sums[0] - i.sums[1])
                 sum_xi += xi
@@ -136,30 +137,30 @@ class CBLDM_algo:
                     max_x = xi
             if 2 * max_x - sum_xi >= self.delta:
                 return
-            sum_mi = 0   # calculate the sum of the cardinal differences in items
-            max_m = 0    # max cardinal difference
+            sum_mi = 0  # calculate the sum of the cardinal differences in items
+            max_m = 0  # max cardinal difference
             for i in items:
                 mi = abs(len(i.bins[0]) - len(i.bins[1]))
                 sum_mi += mi
                 if mi > max_m:
                     max_m = mi
-            if 2 * max_m - sum_mi > self.difference or sum_mi < self.difference:
+            if 2 * max_m - sum_mi > self.difference:  # or sum_mi < self.difference: # or breaks algo
                 return
             if len(items) <= math.ceil(self.length / 2):
                 items = sorted(items, key=lambda item: abs(item.sums[0] - item.sums[1]), reverse=True)
             # split items to left branch and right branch according to partition type
             left = items[2:]
             right = items[2:]
-            split = BinsKeepingContents(2)     # split partition according to sum of bins
-            combine = BinsKeepingContents(2)   # merge partition according to sum of bins
+            split = BinsKeepingContents(2)  # split partition according to sum of bins
+            combine = BinsKeepingContents(2)  # merge partition according to sum of bins
 
-            for section in range(2):     # [small, big] + [small, big] -> [small + small, big + big]
+            for section in range(2):  # [small, big] + [small, big] -> [small + small, big + big]
                 for bin_i in range(2):
                     for i in items[section].bins[bin_i]:
                         combine.add_item_to_bin(i, bin_i)
             combine.sort()
 
-            for i in items[0].bins[0]:       # [small, big] + [small, big] -> [small + big, small + big]
+            for i in items[0].bins[0]:  # [small, big] + [small, big] -> [small + big, small + big]
                 split.add_item_to_bin(i, 1)
             for i in items[0].bins[1]:
                 split.add_item_to_bin(i, 0)
@@ -176,5 +177,6 @@ class CBLDM_algo:
 
 if __name__ == "__main__":
     import doctest
+
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
