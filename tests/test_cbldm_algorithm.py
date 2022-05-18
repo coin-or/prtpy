@@ -14,6 +14,7 @@ class TestCBLDMAlgorithms(unittest.TestCase):
 
     def test_int_partition(self):
         self._test_algorithm(items=[10], expected=10, delta=1)    # [[],[10]]
+        self._test_algorithm(items=[10,0], expected=10, delta=3)  # [[0],[10]]
         self._test_algorithm(items=[0.5,1/3,0.2], expected=1/30, delta=1)    # [[0.5],[0.2,1/3]]
         self._test_algorithm(items=[8,7,6,5,4], expected=0, delta=1)    # [[4,5,6], [7,8]]
         self._test_algorithm(items=[6,6,5,5,5], expected=3, delta=1)    # [[6,6], [5,5,5]]
