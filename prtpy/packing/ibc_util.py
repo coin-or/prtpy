@@ -1,0 +1,74 @@
+import functools
+from itertools import chain, combinations
+from typing import Generator, Tuple
+
+
+def _power_set(numbers: list[int]) -> chain[Tuple[int, ...]]:
+    '''
+    _power_set([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)
+    '''
+    return chain.from_iterable(combinations(numbers, r) for r in range(len(numbers)+1))
+
+
+def _compere(set1, set2):
+    # Bigger first
+    if sum(set1) < sum(set2):
+        return -1
+    elif sum(set2) < sum(set1):
+        return 1
+
+    # Less elements first
+    if len(set1) < len(set2):
+        return 1
+    elif len(set2) < len(set1):
+        return -1
+
+    # Biggest smallest element first
+    for x, y in zip(reversed(set1), reversed(set2)):
+        if x < y:
+            return -1
+        elif y < x:
+            return 1
+    return 0
+
+
+def undominated_generator(bin_size: int, numbers: list[int], b_chunks_size: int) -> Generator[Tuple[int, ...], None, None]:
+    '''
+    Generate in chunks of b sized, then sort them by _compere function
+    Bigger chunk size can remove more duplications and sort better but takes more time
+    '''
+    # Init variables
+    sorted_numbers = sorted(numbers, reverse=True)
+    biggest = sorted_numbers.pop(0)
+    generator = _power_set(sorted_numbers)
+
+    # Generate chunks
+    more_to_gen: bool = True
+    while(more_to_gen):
+        b: set[Tuple[int, ...]] = set()
+
+        # Generate the options
+        for _ in range(b_chunks_size):
+            try:
+                tmp: Tuple[int, ...] = (biggest,) + next(generator)
+            except StopIteration:
+                more_to_gen = False
+                break
+
+            if sum(tmp) <= bin_size:
+                b.add(tmp)
+        b_list: list[Tuple[int, ...]] = sorted(list(b), key=functools.cmp_to_key(
+            _compere), reverse=True)
+        for option in b_list:
+            yield option
+
+
+if __name__ == "__main__":
+    for i in undominated_generator(15, [1, 3, 5, 7, 3, 4, 5, 2, 9, 10, 3], 10):
+        print(i)
+        ...
+    print(_compere((10,), (10,)))  # equals 0
+    print(_compere((10, 1), (11, 1)))  # size -1
+    print(_compere((10, 1), (11,)))  # len -1
+    print(_compere((10, 3, 2), (10, 4, 1)))  # first 1
+    print(_compere((10, 2, 1, 1), (10, 3, 1)))  # len -1
