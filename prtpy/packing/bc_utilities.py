@@ -19,8 +19,17 @@ def list_without_items(original: list, to_remove: Iterable) -> list:
     return output
 
 
+def unique_list(lst: list):
+    output = []
+    for element in lst:
+        if element not in output:
+            output.append(element)
+    return output
+
+
 def lower_bound(binsize: float, items: List) -> float:
     return math.ceil(sum(items)/binsize)
+
 
 def l2_lower_bound(binsize: float, items: List) -> float:
     copy_items = items.copy()
@@ -87,90 +96,60 @@ def find_undominated_pairs(x: int, y: int, items: List, binsize: int) -> List:
     return undominated_pairs
 
 
-def generate_undominated_bin_completions(items: List, binsize: int) -> List:
-    x = items[0]
+class BinBranch:
+    def __init__(self, items: list, bins: Bins, bin_index: int):
+        self.items = items
+        self.bins = bins
+        self.bin_index = bin_index
 
-    if len(items) == 1 or x + items[-1] > binsize:
+def find_bin_completions(x: int, items: list, binsize: int):
+    """
+        Test 1:
+        >>> find_bin_completions(99, [94,79,64,50,44,43,37,32,19,18,7,3], 100)
+        []
+
+        Test 2:
+        >>> find_bin_completions(94, [79,64,50,44,43,37,32,19,18,7,3], 100)
+        [[3]]
+
+        Test 3:
+        >>> find_bin_completions(79, [64,50,44,43,37,32,19,18,7], 100)
+        [[19], [18], [7]]
+
+        Test 4:
+        >>> find_bin_completions(64, [64,50,44,43,37,32,18,7], 100)
+        [[32], [18, 7], [18], [7]]
+
+        Test 5:
+        >>> find_bin_completions(50, [44,43,37,18,7], 100)
+        [[43, 7], [44], [37, 7], [43], [37], [18, 7], [18], [7]]
+    """
+    if not items:
         return []
-    if len(items) == 2:
-        return [[items[1]]]
 
-    y = 0
-    for i in range(1, len(items) - 1):
-        if (x + items[i]) < binsize:
-            y = items[i]
-            break
+    y = next((item for item in items if x + item <= binsize), 0)
 
-    items.remove(x)
+    if y == 0:
+        return []
 
-    found_completions = []
-
-    if y != 0:
-        found_completions.append([y])
+    found_completions = [[y]]
 
     for i in range(len(items)+1):
-        feasible_completions = list(filter(lambda s: x + sum(s) <= binsize, combinations(items, i)))
+        feasible_completions = filter(lambda s: x + sum(s) <= binsize, combinations(items, i))
         for fc in feasible_completions:
             constant_elements = x + sum(fc)
             items_left = list_without_items(items, fc)
             undominated_pairs = find_undominated_pairs(constant_elements, y, items_left, binsize)
             if undominated_pairs:
                 found_completions.extend(undominated_pairs)
-            else:
+            elif fc:
                 found_completions.append(list(fc))
 
-    if not found_completions:
-        return [[y]]
-    else:
-        return found_completions
+
+    return unique_list(sorted(found_completions, key=sum, reverse=True))
 
 
-# This is a recursive function which fills the bins.
-# See comments below.
-def fill_bins(items: List, bins: Bins, bin_index: int, binsize: int, upper_bound: int, lower_bound: int) -> tuple[Bins, bool]:
-    # if items is empty,
-    # and we finished with fewer bins than the old bound, solution was found
-    # if we reached the same amount of bins or more - return false
-    current_upper_bound = upper_bound
-    if not items:
-        if bins.num == lower_bound:
-            return bins, True
-        else:
-            return bins, False
+if __name__ == "__main__":
+    import doctest
 
-    # if we are reached the same amount of bins or more - return false
-    if bins.num >= lower_bound:
-        return bins, False
-
-    bins.add_empty_bins()
-    # Add the largest item to the bin and generate possible completions for that bin
-    bins.add_item_to_bin(items[0], bin_index)
-    possible_bin_completions = generate_undominated_bin_completions(items, binsize)
-
-    # print("######POSSIBLE COMP:####")
-    # print(possible_bin_completions)
-
-    # if no possible completions was found - fill the next bin
-    if not possible_bin_completions:
-        return fill_bins(items, bins, bin_index + 1, binsize, upper_bound, lower_bound)
-
-    if len(possible_bin_completions) == 1:
-        new_items = list_without_items(items, possible_bin_completions[0])
-        new_bins = copy.deepcopy(bins)
-        map(functools.partial(bins.add_item_to_bin, bin_index=bin_index), possible_bin_completions[0])
-
-        return fill_bins(new_items, new_bins, bin_index + 1, binsize, upper_bound, lower_bound)
-
-    # Go through all possible completions,
-    # for each option - try to fill the next bins like a branch
-    # if the solution found was not valid - move on to the next completion
-    for comp in sorted(possible_bin_completions, key=sum, reverse=True):
-        new_items = list_without_items(items, comp)
-        new_bins = copy.deepcopy(bins)
-        map(functools.partial(bins.add_item_to_bin, bin_index=bin_index), comp)
-        solution, valid = fill_bins(new_items, new_bins, bin_index + 1, binsize,upper_bound, lower_bound)
-
-        if valid:
-            return solution, valid
-
-    return bins, False
+    print(doctest.testmod())

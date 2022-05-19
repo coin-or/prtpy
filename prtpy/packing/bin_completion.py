@@ -1,9 +1,12 @@
+import copy
 import itertools
+import logging
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, Bins, BinsKeepingContents
 from prtpy.packing import best_fit
 from prtpy.packing.bc_utilities import *
 import math
+from functools import partial
 
 
 def bin_completion(
@@ -30,11 +33,11 @@ def bin_completion(
 
     Example 3: Complex input
     >>> bin_completion(BinsKeepingContents(), binsize=100, items=[99,94,79,64,50,44,43,37,32,19,18,7,3]).bins
-    [[99], [94,3], [79,18], [64,32], [50,43,7], [44,37,19]]
+    [[99], [94, 3], [79, 19], [64, 32], [50, 43, 7], [44, 37, 18]]
 
     Example 4: Article Example #1
     >>> bin_completion(BinsKeepingContents(), binsize=100, items=[100, 98, 96, 93, 91, 87, 81, 59, 58, 55, 50, 43, 22, 21, 20, 15, 14, 10, 8, 6, 5, 4, 3, 1, 0]).bins
-    [[100], [98, 1], [96, 4], [93, 6], [91, 8], [87, 10, 3], [81, 14, 5], [59, 21, 20], [58, 22, 15], [55, 43], [50]]
+    [[100], [98], [96, 4], [93, 6, 1], [91, 8], [87, 10, 3], [81, 15], [59, 22, 14, 5], [58, 21, 20], [55, 43], [50]]
 
     Example 5: Article Example #2
     >>> bin_completion(BinsKeepingContents(), binsize=100, items=[6, 12, 15, 40, 43, 82]).bins
@@ -50,50 +53,73 @@ def bin_completion(
     # Find the FFD solution and check if it's optimal using the L2 lower bound
     bfd_solution = best_fit.decreasing(BinsKeepingContents(), binsize, items.copy())
     lb = lower_bound(binsize, items.copy())
-    print("bfd.num: ", bfd_solution.num, ", lower bound: ", lb, " returning bfd solution:\n", bfd_solution)
 
-    # if bfd_solution.num == lb:
-    #     return bfd_solution
+    if bfd_solution.num == lb:
+        return bfd_solution
 
+    best_solution_so_far = bfd_solution
     sorted_items = sorted(items, reverse=True)
 
-    # fill the bins to find a solution
-    solution, valid = fill_bins(sorted_items, bins, 0, binsize, bfd_solution.num, lb)
+    main_branch = BinBranch(sorted_items, bins, bin_index=0)
+    branches = [main_branch]
 
-    return solution
+    while branches:
+        # cb = current branch
+        cb = branches.pop(0)
+
+        for x in cb.items:
+            cb.bins.add_empty_bins()
+            cb.bins.add_item_to_bin(x, cb.bin_index)
+            updated_list = cb.items[1:]
+            # cb.items.remove(x)
+            possible_undominated_completions = find_bin_completions(x, updated_list, binsize)
+
+            if len(possible_undominated_completions) == 1:
+                # print("before: bin index: ", cb.bin_index, " completion: ", possible_undominated_completions[0], " bins: \n", cb.bins)
+                list(map(partial(cb.bins.add_item_to_bin, bin_index=cb.bin_index), possible_undominated_completions[0]))
+                # print("after: bin index: ", cb.bin_index, " completion: ", possible_undominated_completions[0], " bins: \n", cb.bins)
+
+                list(map(updated_list.remove, possible_undominated_completions[0]))
+            elif len(possible_undominated_completions) > 1:
+                for completion in possible_undominated_completions[1:]:
+                    new_items = list_without_items(updated_list, completion)
+                    new_bins = copy.deepcopy(cb.bins)
+
+                    list(map(partial(new_bins.add_item_to_bin, bin_index=cb.bin_index), completion))
+
+                    branches.append(BinBranch(new_items, new_bins, cb.bin_index+1))
+
+                list(map(partial(cb.bins.add_item_to_bin, bin_index=cb.bin_index), possible_undominated_completions[0]))
+                list(map(updated_list.remove, possible_undominated_completions[0]))
+
+            cb.bin_index += 1
+
+            # if cb.bin_index == 4:
+            #     return BinsKeepingContents()
+
+            cb.items = updated_list
+            partial_lower_bound = cb.bins.num + (sum(updated_list) / binsize)
+            if partial_lower_bound >= best_solution_so_far.num:
+                logging.info(f"branch pruned. partial lower bound {partial_lower_bound} best lower bound {best_solution_so_far.num}")
+                break
+
+            if not cb.items:
+                break
+
+        if not cb.items and cb.bins.num < best_solution_so_far.num:
+            best_solution_so_far = cb.bins
+
+        if best_solution_so_far.num == lb:
+            break
+
+
+    # fill the bins to find a solution
+    # solution, valid = fill_bins(sorted_items, bins, 0, binsize, bfd_solution.num, lb)
+
+    return best_solution_so_far
 
 
 if __name__ == "__main__":
     import doctest
 
-    # items = [99, 97, 94, 93, 8, 5, 4, 2]
-    # s = sum(items)
-    # print(l2_lower_bound(100, items))
-    # print("sum ", s)
-    # print("sum+98 ", (98 + sum(items)))
-    # print("Should be ", ((98 + sum(items)) / 100))
-    #
-    # from prtpy.packing import first_fit as ff
-    #
-    # items = [100, 100, 100, 100, 100, 100]
-    # print(ff.decreasing(BinsKeepingContents(), binsize=100, items=[99, 94, 79, 64, 50, 44, 43, 37, 32, 19, 18, 7, 3]))
-    # print()
-    # print(bin_completion(BinsKeepingContents(), binsize=100, items=[99, 94, 79, 64, 50, 44, 43, 37, 32, 19, 18, 7, 3]))
-    #
-    # def f(x, y):
-    #     return x+y
-    #
-    #
-    # m = map(functools.partial(f, y=10), items)
-    #
-    # print(list(m))
-    #
-    # binstest = ff.decreasing(BinsKeepingContents(), binsize=100, items=[99, 94, 79, 64, 50, 44, 43, 37, 32, 19, 18, 7, 3])
-    #
-    # print("TEST")
-    # print()
-    # items = [99,94,79,64,50,44,43,37,32,19,18,7,3]
-    # comb = list(itertools.combinations(items, 2))
-    # print(sum(comb[0]))
-    # print(type(BinsKeepingContents().bins))
     print(doctest.testmod())
