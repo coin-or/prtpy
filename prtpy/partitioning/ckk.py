@@ -40,7 +40,7 @@ def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
         return [bins.add_item_to_bin(item=item, bin_index=0) for item in items]
 
     S = []
-    items.sort(reverse=True)
+    items.sort(reverse=True, key=valueof)
     for i in items:
         s = [[i]]
         s = filled_empy_lists(s, k)
@@ -98,8 +98,8 @@ def delete_empty_lists(s: list) -> list:
     return s
 
 
-def union(a: list, b: list) -> list:
-    return sorted(list(set(a)) + list(set(b)), reverse=True)
+def union(a: list, b: list, valueof: Callable = lambda x: x) -> list:
+    return sorted(list(set(a)) + list(set(b)), reverse=True, key=valueof)
 
 
 def filled_empy_lists(s: list, n: int):
@@ -116,7 +116,7 @@ def len_filled_list(s: list):
     return length
 
 
-def combine(a: list, b: list, n: int):
+def combine(a: list, b: list, n: int, valueof: Callable = lambda x: x):
     """
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> combine(a=[[95], [85]], b=[[75], [25]], n=2)
@@ -129,8 +129,8 @@ def combine(a: list, b: list, n: int):
     [[9, 7], [20]]
 
     """
-    a.sort(reverse=True)
-    b.sort(reverse=True)
+    a.sort(reverse=True, key=valueof)
+    b.sort(reverse=True, key=valueof)
     result = []
     a_length = len_filled_list(a)
     b_length = len_filled_list(b)
