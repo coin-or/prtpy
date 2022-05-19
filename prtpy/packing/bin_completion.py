@@ -1,6 +1,7 @@
+import itertools
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, Bins, BinsKeepingContents
-from prtpy.packing import first_fit
+from prtpy.packing import best_fit
 from prtpy.packing.bc_utilities import *
 import math
 
@@ -29,7 +30,7 @@ def bin_completion(
 
     Example 3: Complex input
     >>> bin_completion(BinsKeepingContents(), binsize=100, items=[99,94,79,64,50,44,43,37,32,19,18,7,3]).bins
-    [[99], [94,6], [79,18,3], [64,32], [50,43,7], [44,37,19]]
+    [[99], [94,3], [79,18], [64,32], [50,43,7], [44,37,19]]
 
     Example 4: Article Example #1
     >>> bin_completion(BinsKeepingContents(), binsize=100, items=[100, 98, 96, 93, 91, 87, 81, 59, 58, 55, 50, 43, 22, 21, 20, 15, 14, 10, 8, 6, 5, 4, 3, 1, 0]).bins
@@ -37,26 +38,27 @@ def bin_completion(
 
     Example 5: Article Example #2
     >>> bin_completion(BinsKeepingContents(), binsize=100, items=[6, 12, 15, 40, 43, 82]).bins
-    [[82,6,12], [15,40,43]]
+    [[82, 12, 6], [43, 40, 15]]
 
     Example 6: Article Example #3
     >>> bin_completion(BinsKeepingContents(), binsize=100, items=[99, 97, 94, 93, 8, 5, 4, 2]).bins
     [[99], [97, 2], [94, 5], [93, 4], [8]]
     """
 
+    items = list(filter((0).__ne__, items))
+
     # Find the FFD solution and check if it's optimal using the L2 lower bound
-    ffd_solution = first_fit.decreasing(BinsKeepingContents(), binsize, items.copy())
-    lower_bound = l2_lower_bound(binsize, items.copy())
+    bfd_solution = best_fit.decreasing(BinsKeepingContents(), binsize, items.copy())
+    lb = lower_bound(binsize, items.copy())
+    print("bfd.num: ", bfd_solution.num, ", lower bound: ", lb, " returning bfd solution:\n", bfd_solution)
 
-    if ffd_solution.num == math.ceil(lower_bound):
-        return ffd_solution
-
-    best_solution_so_far = ffd_solution
+    # if bfd_solution.num == lb:
+    #     return bfd_solution
 
     sorted_items = sorted(items, reverse=True)
 
     # fill the bins to find a solution
-    solution, valid = fill_bins(sorted_items, bins, 0, binsize, lower_bound)
+    solution, valid = fill_bins(sorted_items, bins, 0, binsize, bfd_solution.num, lb)
 
     return solution
 
@@ -91,6 +93,7 @@ if __name__ == "__main__":
     # print("TEST")
     # print()
     # items = [99,94,79,64,50,44,43,37,32,19,18,7,3]
-    # print(bin_completion(BinsKeepingContents(), 100, items))
-
+    # comb = list(itertools.combinations(items, 2))
+    # print(sum(comb[0]))
+    # print(type(BinsKeepingContents().bins))
     print(doctest.testmod())
