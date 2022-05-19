@@ -144,8 +144,8 @@ class CBLDM_algo:
                 sum_mi += mi
                 if mi > max_m:
                     max_m = mi
-            if 2 * max_m - sum_mi > self.difference:  # or sum_mi < self.difference: # or breaks algo
-                return
+            if 2 * max_m - sum_mi > self.difference:  # or sum_mi < self.difference: # or breaks algorithm
+                return                                                               # despite being in the paper
             if len(items) <= math.ceil(self.length / 2):
                 items = sorted(items, key=lambda item: abs(item.sums[0] - item.sums[1]), reverse=True)
             # split items to left branch and right branch according to partition type
