@@ -14,11 +14,10 @@
     - help -
     https://en.wikipedia.org/wiki/Largest_differencing_method#:~:text=The%20complete%20Karmarkar%E2%80%93Karp%20algorithm,constructing%20a%20tree%20of%20degree&text=In%20the%20case%20k%3D2,them%20in%20the%20same%20set).
     http://web.cecs.pdx.edu/~bart/cs510ai/papers/korf-ckk.pdf
-
 """
 import copy
 from typing import Callable, List
-from prtpy import outputtypes as out, Bins, BinsKeepingContents
+from prtpy import Bins, BinsKeepingContents
 
 
 def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -45,7 +44,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     elif k == 1:
         return [bins.add_item_to_bin(item=item, bin_index=0) for item in items]
 
-    difference_sets, original_items = kk_heuristic(items=items)
+    difference_sets, original_items = kk_heuristic(items=items, valueof=valueof)
 
     A, B = [], []
     difference_sets.reverse()
@@ -67,7 +66,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     return bins
 
 
-def kk_heuristic(items: List[any]):
+def kk_heuristic(items: List[any], valueof: Callable = lambda x: x):
     input_items = items[:]
     original_items = input_items[:]
     difference_sets = [[i for i in original_items]]
@@ -78,7 +77,7 @@ def kk_heuristic(items: List[any]):
         input_items.remove(max_b)
         diff = abs(max_a - max_b)
         input_items.append(diff)
-        input_items.sort(reverse=True)
+        input_items.sort(reverse=True, key=valueof)
         difference_sets.append(copy.copy(input_items))
     return difference_sets, original_items
 
