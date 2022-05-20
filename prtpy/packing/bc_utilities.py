@@ -1,15 +1,27 @@
 """
 These functions are being used by the Bin-Completion algorithm for solving the bin packing problem.
 See "bin_completion.py" for more details.
+
+Authors: Avshalom Avraham & Tehila Ben-Kalifa
+Since: 05-2022
 """
-import copy
-import functools
 import math
 from itertools import combinations
 from typing import List, Iterable
-from prtpy import outputtypes as out, Bins, BinsKeepingContents
+from prtpy import Bins
+import logging
 
 
+# A simple class to store a state of bins arrangement.
+# We keep the current bin arrangement and index of the next bin, as well as the items left to arrange in those bins.
+class BinBranch:
+    def __init__(self, items: list, bins: Bins, bin_index: int):
+        self.items = items
+        self.bins = bins
+        self.bin_index = bin_index
+
+
+# Returns a new list which is a copy of 'original' but without the items in 'to_remove' if they existed.
 def list_without_items(original: list, to_remove: Iterable) -> list:
     output = original.copy()
     for obj in to_remove:
@@ -19,7 +31,8 @@ def list_without_items(original: list, to_remove: Iterable) -> list:
     return output
 
 
-def unique_list(lst: list):
+# Returns a new list which is a copy of 'lst' but without duplicate items.
+def unique_list(lst: list) -> list:
     output = []
     for element in lst:
         if element not in output:
@@ -27,10 +40,13 @@ def unique_list(lst: list):
     return output
 
 
+# Calculates the lower bound of bins for bin packing problem.
 def lower_bound(binsize: float, items: List) -> float:
-    return math.ceil(sum(items)/binsize)
+    return math.ceil(sum(items) / binsize)
 
 
+# Calculates the L2 lower bound using Martello and Toth algorithm.
+# See article for details.
 def l2_lower_bound(binsize: float, items: List) -> float:
     copy_items = items.copy()
 
@@ -41,13 +57,19 @@ def l2_lower_bound(binsize: float, items: List) -> float:
     capacity = binsize
 
     for x in copy_items:
+        # 'r' is the residual capacity in a bin.
         r = capacity - x
+
+        # We need to find all the items smaller than r
         smaller_elements = []
+
+        # We go through the items from end to beginning because they are sorted.
         for i in range(len(copy_items) - 1, 0, -1):
             if copy_items[i] > r:
                 break
             smaller_elements.append(copy_items[i])
 
+        # See article for details about conditions
         s = sum(smaller_elements)
         if s == r:
             for element in smaller_elements:
@@ -66,9 +88,14 @@ def l2_lower_bound(binsize: float, items: List) -> float:
     return (estimated_waste + total_sum) / binsize
 
 
+# Calculates the L3 lower bound using Martello and Toth algorithm.
+# See article for details.
 def l3_lower_bound(binsize: float, items: List) -> float:
     copy_items = items.copy()
     best_lower_bound = l2_lower_bound(binsize, copy_items)
+
+    # We successively prune the smallest element and calculate L2 lower bound each time.
+    # At the end we return the highest lower bound.
     for i in range(len(items)):
         copy_items.remove(min(copy_items))
         new_l2 = l2_lower_bound(binsize, copy_items)
@@ -77,6 +104,9 @@ def l3_lower_bound(binsize: float, items: List) -> float:
 
     return best_lower_bound
 
+
+# Returns a list of the pairs undominated by y (highest element that fits the bin with x).
+# See article for details.
 def find_undominated_pairs(x: int, y: int, items: List, binsize: int) -> List:
     start = 0;
     end = len(items) - 1
@@ -96,12 +126,8 @@ def find_undominated_pairs(x: int, y: int, items: List, binsize: int) -> List:
     return undominated_pairs
 
 
-class BinBranch:
-    def __init__(self, items: list, bins: Bins, bin_index: int):
-        self.items = items
-        self.bins = bins
-        self.bin_index = bin_index
-
+# Returns all the possible completions of undominated items for the bin containing x.
+# See article for details.
 def find_bin_completions(x: int, items: list, binsize: int):
     """
         Test 1:
@@ -124,28 +150,45 @@ def find_bin_completions(x: int, items: list, binsize: int):
         >>> find_bin_completions(50, [44,43,37,18,7], 100)
         [[43, 7], [44], [37, 7], [43], [37], [18, 7], [18], [7]]
     """
+    if x > binsize:
+        raise ValueError(f"Item 'x' has size {x} which is larger than the bin size {binsize}.")
+
+    # No more items to add.
     if not items:
+        logging.info(f"Items list is empty.")
         return []
 
+    # We find the largest element y for which (x+y) <= binsize.
     y = next((item for item in items if x + item <= binsize), 0)
 
+    # No element fits the bin with x.
     if y == 0:
+        logging.info(f"No other element fits with {x}.")
         return []
 
+    # The largest element is always undominated because no other element can contain it.
     found_completions = [[y]]
 
-    for i in range(len(items)+1):
+    # We go through all combinations of items subsets of all sizes, that fits the bin containing x.
+    for i in range(len(items) + 1):
         feasible_completions = filter(lambda s: x + sum(s) <= binsize, combinations(items, i))
+
+        # For every subset that fits the bin containing x, we find undominated pair of items to add to our completions.
+        # When we take subset of size 1 and find a pair, it's like finding a triplet.
+        # When we take subset of size 2 and find a pair, it's like finding a quadruple etc.
         for fc in feasible_completions:
             constant_elements = x + sum(fc)
             items_left = list_without_items(items, fc)
             undominated_pairs = find_undominated_pairs(constant_elements, y, items_left, binsize)
+
+            # We add the undominated pairs to possible completions.
+            # if none were found - we add the subset fc as a possible completions.
             if undominated_pairs:
                 found_completions.extend(undominated_pairs)
             elif fc:
                 found_completions.append(list(fc))
 
-
+    # Return the possible completions without duplicated, sorted in descending order by their sum.
     return unique_list(sorted(found_completions, key=sum, reverse=True))
 
 

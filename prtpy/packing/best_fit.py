@@ -12,6 +12,19 @@ def online(
     items: List[any],
     valueof: Callable[[Any], float] = lambda x: x,
 ):
+    """
+        Pack the given items into bins using the online best-fit algorithm.
+        The online algorithm handles the items in the order they are given.
+
+        >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+        >>> online(BinsKeepingContents(), binsize=9, items=[4,7,2,1,5,8,4]).bins
+        [[4, 1, 4], [7, 2], [5], [8]]
+        >>> online(BinsKeepingContents(), binsize=18, items=[1,2,10,14,4,10,5]).bins
+        [[1, 2, 10, 5], [14, 4], [10]]
+        >>> list(online(BinsKeepingContents(), binsize=18, items=[1,2,10,14,4,10,5]).sums)
+        [18.0, 18.0, 10.0]
+        """
+
     bins.add_empty_bins()
     for item in items:
         value = valueof(item)
@@ -47,9 +60,9 @@ def decreasing(
         valueof,
     )
 
-#
-# if __name__ == "__main__":
-#     import doctest
-#
-#     (failures, tests) = doctest.testmod(report=True)
-#     print("{} failures, {} tests".format(failures, tests))
+
+if __name__ == "__main__":
+    import doctest
+
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))
