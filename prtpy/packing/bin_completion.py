@@ -10,7 +10,8 @@ from typing import Callable, Any
 from prtpy.packing import best_fit
 from prtpy.packing.bc_utilities import *
 from functools import partial
-
+import copy
+from prtpy.bins import BinsKeepingContents
 
 def bin_completion(
         bins: Bins,

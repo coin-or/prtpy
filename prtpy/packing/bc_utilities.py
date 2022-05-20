@@ -8,8 +8,9 @@ Since: 05-2022
 import math
 from itertools import combinations
 from typing import List, Iterable
-from prtpy import Bins
 import logging
+from prtpy.bins import Bins
+
 
 
 # A simple class to store a state of bins arrangement.
@@ -108,6 +109,27 @@ def l3_lower_bound(binsize: float, items: List) -> float:
 # Returns a list of the pairs undominated by y (highest element that fits the bin with x).
 # See article for details.
 def find_undominated_pairs(x: int, y: int, items: List, binsize: int) -> List:
+    """
+            Test 1:
+            >>> find_undominated_pairs(94, 3, [79,64,50,44,43,37,32,19,18,7,3], 100)
+            []
+
+            Test 2:
+            >>> find_undominated_pairs(79, 19, [79,64,50,44,43,37,32,19,18,7,3], 100)
+            [[18, 3]]
+
+            Test 3:
+            >>> find_undominated_pairs(64, 32, [50,44,43,37,32,19,18,7], 100)
+            []
+
+            Test 4:
+            >>> find_undominated_pairs(50, 44, [44,43,37,32,18,7], 100)
+            [[43, 7], [32, 18]]
+
+            Test 5:
+            >>> find_undominated_pairs(44, 43, [43,37,18,7], 100)
+            [[43, 7], [37, 18]]
+        """
     start = 0;
     end = len(items) - 1
     undominated_pairs = []
