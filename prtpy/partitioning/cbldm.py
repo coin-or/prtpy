@@ -70,6 +70,9 @@ def cbldm(
     Traceback (most recent call last):
         ...
     ValueError: items must be none negative
+
+    >>> partition(algorithm=cbldm, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    [['g', 'b', 'e'], ['f', 'd', 'c', 'a']]
     """
     start = time.perf_counter()
     if bins.num != 2:
@@ -80,7 +83,7 @@ def cbldm(
         raise ValueError("partition_difference must be a complete number and >= 1")
     sorted_items = sorted(items, key=valueof, reverse=True)
     for i in reversed(sorted_items):
-        if i >= 0:
+        if valueof(i) >= 0:
             break
         else:
             raise ValueError("items must be none negative")
@@ -97,34 +100,36 @@ def cbldm(
     normalised_items = []  # list of bins, each bin contain a sub partition
     for i in sorted_items:
         b = BinsKeepingContents(2)
+        b.set_valueof(valueof)
         b.add_item_to_bin(item=i, bin_index=1)
         normalised_items.append(b)
-    alg = CBLDM_algo(length=length, time_in_seconds=time_in_seconds, difference=partition_difference, start=start)
+    alg = CBLDM_algo(length=length, time_in_seconds=time_in_seconds, difference=partition_difference, start=start, val=valueof)
     alg.part(normalised_items)
     return alg.best
 
 
 class CBLDM_algo:
 
-    def __init__(self, length, time_in_seconds, difference, start):
-        self.delta = np.inf  # partition sum difference
+    def __init__(self, length, time_in_seconds, difference, start, val):
+        self.sum_delta = np.inf  # partition sum difference
         self.length = length
         self.time_in_seconds = time_in_seconds
-        self.difference = difference  # partition cardinal difference
+        self.len_delta = difference  # partition cardinal difference
         self.start = start
         self.best = BinsKeepingContents(2)
         self.best.add_item_to_bin(np.inf, 1)
         self.opt = False
+        self.val = val
 
     def part(self, items):
         if time.perf_counter() - self.start >= self.time_in_seconds or self.opt:
             return
         if len(items) == 1:  # possible partition
-            if abs(len(items[0].bins[0]) - len(items[0].bins[1])) <= self.difference and abs(
-                    items[0].sums[0] - items[0].sums[1]) < self.delta:
+            if abs(len(items[0].bins[0]) - len(items[0].bins[1])) <= self.len_delta and abs(
+                    items[0].sums[0] - items[0].sums[1]) < self.sum_delta:
                 self.best = items[0]
-                self.delta = abs(items[0].sums[0] - items[0].sums[1])
-                if self.delta == 0:
+                self.sum_delta = abs(items[0].sums[0] - items[0].sums[1])
+                if self.sum_delta == 0:
                     self.opt = True
                 return
         else:
@@ -135,7 +140,7 @@ class CBLDM_algo:
                 sum_xi += xi
                 if xi > max_x:
                     max_x = xi
-            if 2 * max_x - sum_xi >= self.delta:
+            if 2 * max_x - sum_xi >= self.sum_delta:
                 return
             sum_mi = 0  # calculate the sum of the cardinal differences in items
             max_m = 0  # max cardinal difference
@@ -144,7 +149,7 @@ class CBLDM_algo:
                 sum_mi += mi
                 if mi > max_m:
                     max_m = mi
-            if 2 * max_m - sum_mi > self.difference:  # or sum_mi < self.difference: # or breaks algorithm
+            if 2 * max_m - sum_mi > self.len_delta:  # or sum_mi < self.difference: # or breaks algorithm
                 return                                                               # despite being in the paper
             if len(items) <= math.ceil(self.length / 2):
                 items = sorted(items, key=lambda item: abs(item.sums[0] - item.sums[1]), reverse=True)
@@ -153,12 +158,14 @@ class CBLDM_algo:
             right = items[2:]
             split = BinsKeepingContents(2)  # split partition according to sum of bins
             combine = BinsKeepingContents(2)  # merge partition according to sum of bins
+            split.set_valueof(self.val)
+            combine.set_valueof(self.val)
 
             for section in range(2):  # [small, big] + [small, big] -> [small + small, big + big]
                 for bin_i in range(2):
                     for i in items[section].bins[bin_i]:
                         combine.add_item_to_bin(i, bin_i)
-            combine.sort()
+            #combine.sort() # uncomment when bins are updated
 
             for i in items[0].bins[0]:  # [small, big] + [small, big] -> [small + big, small + big]
                 split.add_item_to_bin(i, 1)
@@ -167,7 +174,7 @@ class CBLDM_algo:
             for bin_i in range(2):
                 for i in items[1].bins[bin_i]:
                     split.add_item_to_bin(i, bin_i)
-            split.sort()
+            #split.sort() # uncomment when bins are updated
 
             right.append(combine)
             left.append(split)
