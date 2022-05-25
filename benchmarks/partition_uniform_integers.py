@@ -42,9 +42,10 @@ if __name__ == "__main__":
 
     input_ranges = {
         "algorithm": [prtpy.partitioning.greedy, prtpy.partitioning.roundrobin, prtpy.partitioning.multifit],
+        # "algorithm": [prtpy.partitioning.ilp, prtpy.partitioning.complete_greedy],
         "numbins": [2],
         "numitems": [10,20,30,40,50,60,70,80],
         "bitsperitem": [16,32,48],
-        "instance_id": range(11)
+        "instance_id": range(10)
     }
     experiment.run(partition_random_items, input_ranges)
