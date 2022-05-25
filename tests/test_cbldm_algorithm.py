@@ -21,13 +21,21 @@ class TestCBLDMAlgorithms(unittest.TestCase):
         self._test_algorithm(items=[4,1,1,1,1], expected=0)    # [[1,1,1,1], [4]]
         self._test_algorithm(items=[1,1,1,1,1,1,1,1,1,1], expected=0, delta=10)
         self._test_algorithm(items=[4,1,1,1,1], expected=0, delta=1, equal=False)   # [[1,1,1], [1,4]]
-
+        self._test_algorithm(items={'a':10}, expected=10, delta=1)  # [[],[10]]
+        self._test_algorithm(items={'a':10, 'b':0}, expected=10, delta=3)  # [[0],[10]]
+        self._test_algorithm(items={'a':0.5, 'b':1/3, 'c':0.2}, expected=1 / 30, delta=1)  # [[0.5],[0.2,1/3]]
+        self._test_algorithm(items={'a':8, 'b':7, 'c':6, 'd':5, 'e':4}, expected=0, delta=1)  # [[4,5,6], [7,8]]
+        self._test_algorithm(items={'a':6, 'b':6, 'c':5, 'd':5, 'e':5}, expected=3, delta=1)  # [[6,6], [5,5,5]]
+        self._test_algorithm(items={'a':4, 'b':1, 'c':1, 'd':1, 'e':1}, expected=0)  # [[1,1,1,1], [4]]
+        self._test_algorithm(items={'a':1, 'b':1, 'c':1, 'd':1, 'e':1, 'f':1, 'g':1, 'i':1, 'h':1, 'q':1}, expected=0)
 
     def test_exceptions(self):
         algorithm = prtpy.partitioning.cbldm
         items = [8,7,6,5,4]
         with self.assertRaises(ValueError):
-            prtpy.partition(algorithm=algorithm, items=[8, 7, 6, 5, -4], numbins=3)
+            prtpy.partition(algorithm=algorithm, items=[8, 7, 6, 5, -4], numbins=2)
+        with self.assertRaises(ValueError):
+            prtpy.partition(algorithm=algorithm, items={'a':8, 'b':7, 'c':6, 'd':5, 'e':-4}, numbins=2)
         with self.assertRaises(ValueError):
             prtpy.partition(algorithm=algorithm, items=items, numbins=3)
         with self.assertRaises(ValueError):
