@@ -54,13 +54,19 @@ def bin_completion(
     # Remove zeros from items as they are irrelevant.
     items = list(filter((0).__ne__, items))
 
+    # Test if there is an item larger than binsize.
+    for item in items:
+        if item > binsize:
+            raise ValueError(f"Item has size {item} which is larger than the bin size {binsize}.")
+
     # Find the BFD solution and check if it's optimal using the lower bound calculation.
     bfd_solution = best_fit.decreasing(BinsKeepingContents(), binsize, items.copy())
-    lb = lower_bound(binsize, items.copy())
+    lb = lower_bound(binsize, items)
 
     # If the BFD solution is optimal - return it.
     if bfd_solution.num == lb:
         logging.info(f"BFD has returned an optimal solution with {lb} bins.")
+        bins = bfd_solution
         return bfd_solution
 
     # We keep the BFD solution as the best solution so far and sort the items in descending order.
@@ -78,9 +84,6 @@ def bin_completion(
         cb = branches.pop(0)
 
         for x in cb.items:
-            if x > binsize:
-                raise ValueError(f"Item has size {x} which is larger than the bin size {binsize}.")
-
             # Add a new bin and add x to that bin
             cb.bins.add_empty_bins()
             cb.bins.add_item_to_bin(x, cb.bin_index)
@@ -92,8 +95,9 @@ def bin_completion(
 
             # If we found only 1 possible completion - we add it to the bin and remove it from the updated item list.
             if len(possible_undominated_completions) == 1:
-                list(map(partial(cb.bins.add_item_to_bin, bin_index=cb.bin_index), possible_undominated_completions[0]))
-                list(map(updated_list.remove, possible_undominated_completions[0]))
+                for item in possible_undominated_completions[0]:
+                    cb.bins.add_item_to_bin(item, cb.bin_index)
+                    updated_list.remove(item)
 
             # If we found more than 1 possible completion:
             elif len(possible_undominated_completions) > 1:
@@ -104,13 +108,24 @@ def bin_completion(
                     new_items = list_without_items(updated_list, completion)
                     new_bins = copy.deepcopy(cb.bins)
 
-                    list(map(partial(new_bins.add_item_to_bin, bin_index=cb.bin_index), completion))
+                    # list(map(partial(new_bins.add_item_to_bin, bin_index=new_bins.bin_index), completion))
+                    for item in completion:
+                        new_bins.add_item_to_bin(item, cb.bin_index)
 
-                    branches.append(BinBranch(new_items, new_bins, cb.bin_index + 1))
+                    # We can calculate the partial lower bound in O(1) and pass on the branch if we are working on
+                    # a solution that is worse than our best solution so far.
+                    partial_lower_bound = new_bins.num + (sum(new_items) / binsize)
+                    if partial_lower_bound >= best_solution_so_far.num:
+                        logging.info(
+                            f"Redundant branch. partial lower bound - {partial_lower_bound}, exceeds or equals best lower "
+                            f"bound found so far -  {best_solution_so_far.num}.")
+                    else:
+                        branches.append(BinBranch(new_items, new_bins, cb.bin_index + 1))
 
                 # We add the first completions (with the largest sum) to our current branch.
-                list(map(partial(cb.bins.add_item_to_bin, bin_index=cb.bin_index), possible_undominated_completions[0]))
-                list(map(updated_list.remove, possible_undominated_completions[0]))
+                for item in possible_undominated_completions[0]:
+                    cb.bins.add_item_to_bin(item, cb.bin_index)
+                    updated_list.remove(item)
 
             # We finished with the current bin, and we move on to the next bin.
             cb.bin_index += 1
