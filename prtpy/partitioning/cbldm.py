@@ -130,22 +130,22 @@ class CBLDM_algo:
         else:
             sum_xi = 0  # calculate the sum of the sum differences in items
             max_x = 0  # max sum difference
+            sum_mi = 0  # calculate the sum of the cardinal differences in items
+            max_m = 0  # max cardinal difference
             for i in items:
                 xi = abs(i.sums[0] - i.sums[1])
                 sum_xi += xi
+                mi = abs(len(i.bins[0]) - len(i.bins[1]))
+                sum_mi += mi
+                if mi > max_m:
+                    max_m = mi
                 if xi > max_x:
                     max_x = xi
             if 2 * max_x - sum_xi >= self.sum_delta:
                 return
-            sum_mi = 0  # calculate the sum of the cardinal differences in items
-            max_m = 0  # max cardinal difference
-            for i in items:
-                mi = abs(len(i.bins[0]) - len(i.bins[1]))
-                sum_mi += mi
-                if mi > max_m:
-                    max_m = mi                                                      # despite being in the paper
-            if 2 * max_m - sum_mi > self.len_delta:  # or sum_mi < self.difference: # or breaks algorithm
-                return                                                              # breaks on [1,1,1,1,1,1,1,1,1,1]
+            # despite being in the paper, or condition breaks algorithm. for example breaks on [1,1,1,1,1,1,1,1,1,1]
+            if 2 * max_m - sum_mi > self.len_delta:  # or sum_mi < self.difference:
+                return
             if len(items) <= math.ceil(self.length / 2):
                 items = sorted(items, key=lambda item: abs(item.sums[0] - item.sums[1]), reverse=True)
             # split items to left branch and right branch according to partition type
