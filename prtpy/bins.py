@@ -6,7 +6,9 @@ Since:  2022-02
 """
 
 from abc import ABC, abstractmethod
+from typing import Iterator
 from copy import deepcopy
+from itertools import permutations
 
 import numpy as np
 from typing import Any, Callable
@@ -70,6 +72,10 @@ class Bins(ABC):
 
     @abstractmethod
     def combine_bins(self, ibin, other_bin, other_ibin):
+        pass
+
+    @abstractmethod
+    def combinations(self, other_bins):
         pass
 
     def __repr__(self) -> str:
@@ -162,6 +168,15 @@ class BinsKeepingSums(Bins):
         self.sums[ibin] += other_bin.sums[other_ibin]
         return self
 
+    def combinations(self, other_bins:Bins) -> Iterator[Bins]:
+        yielded = set()
+        for permutation in permutations(self.sums, self.num):
+            new_sums = sorted(p + l for p, l in zip(permutation, other_bins.sums))
+            out_ = tuple(el for el in new_sums)
+            if out_ not in yielded:
+                yielded.add(out_)
+                yield BinsKeepingSums(self.num, new_sums).set_valueof(self.valueof)
+
 
 class BinsKeepingContents(BinsKeepingSums):
     """
@@ -233,7 +248,7 @@ class BinsKeepingContents(BinsKeepingSums):
         else:
             new_sums = deepcopy(self.sums)
             new_sums[bin_index] += value
-            new_bins = deepcopy(list(self.bins))
+            new_bins = deepcopy(self.bins)
             new_bins[bin_index] = new_bins[bin_index] + [item]
             return BinsKeepingContents(self.num, new_sums, new_bins).set_valueof(self.valueof)
 
@@ -255,6 +270,16 @@ class BinsKeepingContents(BinsKeepingSums):
         self.bins[ibin] += other_bin.bins[other_ibin]
         return self
 
+    def combinations(self, other_bins:Bins) -> Iterator[Bins]:
+        yielded = set()
+        for permutation in permutations(self.bins, self.num):
+            new_bins = sorted(sorted(p + l) for p, l in zip(permutation, other_bins.bins))
+            out_ = tuple(tuple(el) for el in new_bins)
+            if out_ not in yielded:
+                new_sums = [sum(map(self.valueof,bin) )for bin in new_bins]
+                yielded.add(out_)
+                yield BinsKeepingContents(self.num, new_sums,new_bins).set_valueof(self.valueof)
+
 
 
 if __name__ == "__main__":
@@ -262,3 +287,9 @@ if __name__ == "__main__":
 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+
+    # b1 = BinsKeepingContents(3,[1,2,3],[[1],[2],[3]])
+    # b2 = BinsKeepingContents(3,[4,5,6],[[4],[5],[6]])
+    #
+    # for perm in b1.combinations(b2):
+    #     print(f"sums={perm.sums}, bins= {perm.bins}")

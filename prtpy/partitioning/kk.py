@@ -1,6 +1,6 @@
 
 from typing import Callable, List, Any
-from prtpy import outputtypes as out, objectives as obj, Bins
+from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
 import heapq
 from itertools import count
 
@@ -39,6 +39,8 @@ if __name__ == '__main__':
     from prtpy import partition
 
     print( partition(algorithm=kk, numbins=5, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}) )
-    print(partition(algorithm=kk, numbins=5, items=[1,2,3,3,5,9,9], outputtype=out.Sums))
+    print(partition(algorithm=kk, numbins=4, items=[1,2,3,3,5,9,9]))
+    print(kk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]))
+
     # print(final_partition)
     # print(final_sums)

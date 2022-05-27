@@ -145,4 +145,4 @@ if __name__ == '__main__':
 
     print(snp(BinsKeepingContents(3), items=[8, 6, 5, 3, 2, 2, 1]).bins)
 
-
+    print(snp(BinsKeepingContents(4), items=[8, 7, 6, 5, 4]).bins)

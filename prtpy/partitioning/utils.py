@@ -53,7 +53,6 @@ class InExclusionBinTree:
         yield from self.rec_generate_tree(current_node.left)
 
 
-
 if __name__ == '__main__':
 
     t = InExclusionBinTree([4, 5, 6, 7, 8 ], upper_bound=10, lower_bound=8)
