@@ -6,10 +6,10 @@ Authors: Avshalom Avraham & Tehila Ben-Kalifa
 Since: 05-2022
 """
 import math
-from itertools import combinations
+from itertools import combinations, product
 from typing import List, Iterable
 import logging
-from prtpy.bins import Bins
+from prtpy.bins import Bins, BinsKeepingContents
 
 
 # A simple class to store a state of bins arrangement.
@@ -105,6 +105,90 @@ def l3_lower_bound(binsize: float, items: List) -> float:
     return best_lower_bound
 
 
+# A function that creates all possible arrangements of items in 'num_of_sublists' lists.
+# For example: find_all_bin_arrangements(range(2), 2) => [[0,1],[]], [[0],[1]], [[1], [0]], etc......
+def find_all_bin_arrangements(items: list, num_of_sublists: int):
+    for locs in product(range(num_of_sublists), repeat=len(items)):
+        output = [[] for _ in range(num_of_sublists)]
+        for elem, loc in zip(items, locs):
+            output[loc].append(elem)
+        yield output
+
+
+# A function that gets a list of 'n' numbers and an arrangement in length 'n',
+# and checks if each list in the arrangement fits the corresponding item in the same index
+def check_fits(items: list[int], arrangement: list[list]):
+    if len(items) != len(arrangement):
+        raise ValueError(f"items list ({len(items)}) and arrangement ({len(arrangement)}) are not in the same size")
+
+    for i in range(len(items)):
+        if sum(arrangement[i]) > items[i]:
+            return False
+
+    # Return true if each of the lists in the arrangement fits the size of the item in the same index
+    return True
+
+
+def is_dominant(list1: list, list2: list):
+    """
+            Test 1:
+            >>> is_dominant([10], [])
+            True
+
+            Test 2:
+            >>> is_dominant([], [10])
+            False
+
+            Test 3:
+            >>> is_dominant([10], [9])
+            True
+
+            Test 4:
+            >>> is_dominant([9], [10])
+            False
+
+            Test 5:
+            >>> is_dominant([10,5,2], [5,2])
+            True
+
+            Test 6:
+            >>> is_dominant([10,5,2], [9,4])
+            True
+
+            Test 7:
+            >>> is_dominant([10,8,6,4,2], [9,7,3,1])
+            True
+
+            Test 8:
+            >>> is_dominant([9,7,3,1], [10,8,6,4,2])
+            False
+        """
+
+    # If list2 is empty - everything dominates it. return True.
+    # If list2 is NOT empty and list1 IS empty - list1 can't dominate list2. return False.
+    if not list2:
+        return True
+    elif not list1:
+        return False
+
+    # If list2 is a sublist of list1
+    if all(x in list1 for x in list2):
+        return True
+
+    # If the largest item in list2 does not fit the largest item in list1 - list1 can't dominate list2
+    if list1[0] < list2[0]:
+        return False
+
+    # Create all possible arrangements of list2 in len(list1) 'bins'.
+    # If found an arrangement that can be fitted perfectly in list1 items (assuming each item is a bin) - return True
+    for arrangement in find_all_bin_arrangements(list2, len(list1)):
+        if check_fits(list1, arrangement):
+            return True
+
+    return False
+
+
+
 def check_for_dominance(completions: list[list]):
     """
             Test 1:
@@ -113,15 +197,15 @@ def check_for_dominance(completions: list[list]):
 
             Test 2:
             >>> check_for_dominance([[32], [30], [18, 7], [10, 5]])
-            [[32], [18, 7]]
+            [[32]]
 
             Test 3:
             >>> check_for_dominance([[32], [18, 7], [20, 5]])
-            [[32], [18, 7], [20, 5]]
+            [[32]]
 
             Test 4:
             >>> check_for_dominance([[30, 20, 10], [29, 19, 9], [28, 21, 10], [4, 8], [5, 7], [2,1]])
-            [[30, 20, 10], [28, 21, 10], [4, 8], [5, 7]]
+            [[30, 20, 10], [28, 21, 10]]
         """
 
     # if got only 1 completion - it is undominated
@@ -131,43 +215,27 @@ def check_for_dominance(completions: list[list]):
     # We are going to collect all the dominated completions and then remove them from the original completion list
     dominated_completions = []
 
-    # We sort the lists be length because we want to compare groups from the same length in a convenient way
-    sorted_by_len = sorted(completions, key=len, reverse=True)
-
-    # We go into a double FOR loop for brute-force testing for dominance
-    for i in range(len(sorted_by_len) - 1):
-        # We check for each 'first_list' if it's dominating another list
-        first_list = sorted_by_len[i]
-
-        # If current list is already dominated by a previously tested list - no need to check further.
-        # if list1 dominating list2 AND list2 dominating list3 - then list1 dominating list3.
-        # that means that all lists dominated by list2 are already in 'dominated_completions'.
-        if first_list in dominated_completions:
+    for i in range(len(completions) - 1):
+        list1 = completions[i]
+        if list1 in dominated_completions:
             continue
 
-        # We go through all lists from 'first_list' to end
-        for j in range(i+1, len(sorted_by_len)):
-            second_list = sorted_by_len[j]
+        for j in range(i+1, len(completions)):
+            list2 = completions[j]
+            if list2 in dominated_completions:
+                continue
 
-            # Flag as dominated - until proven otherwise
-            dominated = True
+            # If list1 dominates list2 - append list2 to the dominated completions and continue to the next iteration
+            if is_dominant(list1, list2):
+                dominated_completions.append(list2)
+                continue
 
-            # if we reached a list with a shorter length - no need to check anymore
-            if len(first_list) != len(second_list):
+            # Else - if list2 dominates list1 - append list1 to the dominated completions and break (for a new list1)
+            if is_dominant(list2, list1):
+                dominated_completions.append(list1)
                 break
 
-            # Since completions was ordered by SUM in descending order,
-            # if all items in 'first_list' should be larger than the items in 'second_list' - first dominates second
-            # if we found even 1 item from first_list that is smaller - then second_list is not "nested" in first_list.
-            # meaning that second_list is not dominated by first_list
-            for item1, item2 in zip(first_list, second_list):
-                if item1 < item2:
-                    dominated = False
-                    break
-
-            # Add second_list to the removal candidates
-            if dominated:
-                dominated_completions.append(second_list)
+            # If list1 nor list1 is dominated - continue for the next list2 without doing anything
 
     # Remove dominated lists from completions and return them ordered by their sum.
     output_list = list_without_items(completions, dominated_completions)
@@ -229,12 +297,12 @@ def find_bin_completions(x: int, items: list, binsize: int):
         [[3]]
 
         Test 3:
-        >>> find_bin_completions(79, [64,50,44,43,37,32,19,18,7], 100)
-        [[19]]
+        >>> find_bin_completions(79, [64,50,44,43,37,32,19,18,7,3], 100)
+        [[18, 3], [19]]
 
         Test 4:
         >>> find_bin_completions(64, [64,50,44,43,37,32,18,7], 100)
-        [[32], [18, 7]]
+        [[32]]
 
         Test 5:
         >>> find_bin_completions(50, [44,43,37,18,7], 100)
@@ -242,11 +310,11 @@ def find_bin_completions(x: int, items: list, binsize: int):
 
         Test 6:
         >>> find_bin_completions(81, [59, 58, 55, 50, 43, 22, 21, 20, 15, 14, 10, 8, 6, 5, 4, 3, 1], 100)
-        [[15, 3, 1], [10, 6, 3], [14, 4, 1], [15, 4], [14, 5], [10, 8, 1], [10, 5, 4], [8, 6, 5], [10, 5, 3, 1], [8, 6, 4, 1], [6, 5, 4, 3, 1], [10, 8], [6, 5, 4, 3], [15]]
+        [[10, 6, 3], [15, 4], [14, 5], [10, 8, 1]]
 
         Test 7:
         >>> find_bin_completions(85, [5, 4, 3, 2, 1], 100)
-        [[5, 4, 3, 2, 1], [5, 4, 3, 2], [5, 4, 3], [5, 4], [5]]
+        [[5, 4, 3, 2, 1]]
     """
     # No more items to add.
     if not items:
