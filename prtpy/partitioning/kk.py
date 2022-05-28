@@ -26,28 +26,36 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> kk(BinsKeepingContents(2), items=[1, 6, 2, 3, 7, 4, 5, 8]).bins
-    [[8, 5, 3, 2], [7, 6, 4, 1]]
+    [[2, 3, 6, 7], [1, 4, 5, 8]]
 
     >>> kk(BinsKeepingContents(2), [1, 2, 3, 4, 5, 6]).bins
-    [[5, 3, 2], [6, 4, 1]]
+    [[1, 4, 5], [2, 3, 6]]
 
     >>> list(kk(BinsKeepingContents(2), items=[4, 5, 6, 7, 8]).bins)
-    [[8, 6], [7, 5, 4]]
+    [[6, 7], [4, 5, 8]]
 
     >>> list(kk(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).sums)
-    [37.0, 31.0]
+    [31.0, 37.0]
+
+    >>> kk(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
+    [[1, 6, 2, 3, 4, 7]]
+
+    >>> kk(BinsKeepingContents(2),items=[3,6,13,20,30,40,73]).bins
+    [[3, 20, 30, 40], [6, 13, 73]]
 
     """
     k = bins.num
     if k == 0:
         return bins
     elif k == 1:
-        return [bins.add_item_to_bin(item=item, bin_index=0) for item in items]
+        for item in items:
+            bins.add_item_to_bin(item=item, bin_index=0)
+        return bins
 
     difference_sets, original_items = kk_heuristic(items=items, valueof=valueof)
 
     A, B = [], []
-    difference_sets.reverse()
+    # difference_sets.reverse()
     while len(difference_sets) > 0:
         difference_set = difference_sets[0]
         while len(difference_set) > 0:
@@ -76,7 +84,8 @@ def kk_heuristic(items: List[any], valueof: Callable = lambda x: x):
         max_b = max(input_items)
         input_items.remove(max_b)
         diff = abs(max_a - max_b)
-        input_items.append(diff)
+        if diff > 0:
+            input_items.append(diff)
         input_items.sort(reverse=True, key=valueof)
         difference_sets.append(copy.copy(input_items))
     return difference_sets, original_items
