@@ -32,6 +32,12 @@ def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> list(ckk(BinsKeepingContents(2), items=[1, 6, 2, 3, 4, 7]).sums)
     [12.0, 11.0]
 
+    >>> ckk(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).bins
+    [[95, 25, 15, 5], [85, 75]]
+
+    >>> ckk(bins=BinsKeepingContents(2), items=[5, 8, 6, 4, 7]).bins
+    [[8, 7], [6, 5, 4]]
+
     """
     k = bins.num
     if k == 0:
