@@ -26,22 +26,22 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> kk(BinsKeepingContents(2), items=[1, 6, 2, 3, 7, 4, 5, 8]).bins
-    [[2, 3, 6, 7], [1, 4, 5, 8]]
+    [[8, 5, 4, 1], [7, 6, 3, 2]]
 
     >>> kk(BinsKeepingContents(2), [1, 2, 3, 4, 5, 6]).bins
-    [[1, 4, 5], [2, 3, 6]]
+    [[6, 3, 2], [5, 4, 1]]
 
     >>> list(kk(BinsKeepingContents(2), items=[4, 5, 6, 7, 8]).bins)
-    [[6, 7], [4, 5, 8]]
+    [[8, 5, 4], [7, 6]]
 
     >>> list(kk(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).sums)
-    [31.0, 37.0]
+    [37.0, 31.0]
 
     >>> kk(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
     [[1, 6, 2, 3, 4, 7]]
 
     >>> kk(BinsKeepingContents(2),items=[3,6,13,20,30,40,73]).bins
-    [[3, 20, 30, 40], [6, 13, 73]]
+    [[73, 13, 6], [40, 30, 20, 3]]
 
     """
     k = bins.num
@@ -68,8 +68,12 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
             difference_set.remove(integer)
         difference_sets.remove(difference_set)
 
-    [bins.add_item_to_bin(item=i, bin_index=0) for i in reversed(A) if i in original_items]
-    [bins.add_item_to_bin(item=i, bin_index=1) for i in reversed(B) if i in original_items]
+    if sum(A) > sum(B):
+        [bins.add_item_to_bin(item=i, bin_index=0) for i in A if i in original_items]
+        [bins.add_item_to_bin(item=i, bin_index=1) for i in B if i in original_items]
+    else:
+        [bins.add_item_to_bin(item=i, bin_index=0) for i in B if i in original_items]
+        [bins.add_item_to_bin(item=i, bin_index=1) for i in A if i in original_items]
 
     return bins
 
@@ -86,7 +90,7 @@ def kk_heuristic(items: List[any], valueof: Callable = lambda x: x):
         diff = abs(max_a - max_b)
         if diff > 0:
             input_items.append(diff)
-        input_items.sort(reverse=True, key=valueof)
+            input_items.sort(reverse=True, key=valueof)
         difference_sets.append(copy.copy(input_items))
     return difference_sets, original_items
 
