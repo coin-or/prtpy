@@ -37,6 +37,9 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> irnp(BinsKeepingContents(3), items=[5, 8, 6, 4, 7]).bins
     [[4, 7], [5, 6], [8]]
 
+    >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)  # need to debug
+    [163.0, 140.0]
+
     """
     k = bins.num
     if k == 0:
