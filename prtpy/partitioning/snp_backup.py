@@ -2,7 +2,7 @@
 """
 This class is based on "Multi-Way Number Partitioning" by: Richard E. Korf , 2009
 The main purpose of this article is to solve the known Number Partitioning problem, in focus
-on multy way Partitioning (more than 2 bins).
+on multi way Partitioning (more than 2 bins).
 In this article he develops two new linear-space algorithms for multi-way partitioning, and demonstrate their
 performance on three, four, and five-way partitioning.
 
@@ -155,7 +155,7 @@ def snp3(bins: Bins, items: List[any], valueof, best_diff):
 
 if __name__ == '__main__':
 
-    print(snp(BinsKeepingContents(4), items=[8,7,6,5,4]).bins)
+    print(snp(BinsKeepingContents(3), items=[8, 6, 5, 3, 2, 2, 1]).bins)
 
 
 

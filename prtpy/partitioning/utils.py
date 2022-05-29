@@ -1,4 +1,4 @@
-from typing import List, Generator
+from typing import List, Generator, Callable
 
 
 class Node:
@@ -12,11 +12,11 @@ class Node:
 
 class InExclusionBinTree:
 
-    def __init__(self, items: List, upper_bound, lower_bound):
-        self.items = items.sort(reverse=True)
+    def __init__(self, items: List, valueof: Callable, upper_bound, lower_bound):
+        self.items = sorted(items, key=valueof, reverse=True)
         self.leaf_depth = len(items)
-        self.root = Node(0, [], items)  # root
-
+        self.root = Node(0, [], self.items)  # root
+        self.valueof = valueof
         self.upper_bound = upper_bound
         self.lower_bound = lower_bound
 
@@ -38,8 +38,8 @@ class InExclusionBinTree:
 
     def rec_generate_tree(self, current_node: Node) -> Generator:
         # prune
-        if sum(current_node.cur_set) > self.upper_bound or \
-                sum(current_node.cur_set + current_node.remaining_numbers) < self.lower_bound:
+        if sum(map(self.valueof,current_node.cur_set)) > self.upper_bound or \
+                sum(map(self.valueof,current_node.cur_set + current_node.remaining_numbers)) < self.lower_bound:
             return
         # generate
         if current_node.depth == self.leaf_depth:
@@ -54,7 +54,10 @@ class InExclusionBinTree:
 
 
 if __name__ == '__main__':
+    items = {"a": 1, "b": 2, "c": 3, "d": 3, "e": 5, "f": 9, "g": 9}
+    item_names = items.keys()
+    valueof = items.__getitem__
 
-    t = InExclusionBinTree([4, 5, 6, 7, 8 ], upper_bound=10, lower_bound=8)
+    t = InExclusionBinTree(item_names, valueof, upper_bound=10, lower_bound=7)
     for s in t.generate_tree():
         print(s)

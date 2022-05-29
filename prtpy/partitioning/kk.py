@@ -42,5 +42,10 @@ if __name__ == '__main__':
     print(partition(algorithm=kk, numbins=4, items=[1,2,3,3,5,9,9]))
     print(kk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]))
 
-    # print(final_partition)
-    # print(final_sums)
+    print(kk(BinsKeepingContents(3), items=[8, 6, 5, 7, 4]).bins)
+    print(kk(BinsKeepingContents(4), items=[8, 7, 6, 5, 4]).bins)
+
+    print(kk(BinsKeepingContents(3), items=[8, 6, 5, 3, 2, 2, 1]).bins)
+    print(kk(BinsKeepingContents(3), items=[1, 3, 3, 4, 4, 5, 5, 5]).bins)
+
+    print(kk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]).bins)

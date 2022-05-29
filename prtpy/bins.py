@@ -78,6 +78,10 @@ class Bins(ABC):
     def combinations(self, other_bins):
         pass
 
+    @abstractmethod
+    def create_new_bins(self, numbins):
+        pass
+
     def __repr__(self) -> str:
         bins_str = [f"Bin #{i}: {self.bin_to_str(i)}" for i in range(self.num)]
         return "\n".join(bins_str)
@@ -176,6 +180,9 @@ class BinsKeepingSums(Bins):
             if out_ not in yielded:
                 yielded.add(out_)
                 yield BinsKeepingSums(self.num, new_sums).set_valueof(self.valueof)
+
+    def create_new_bins(self, numbins):
+        return BinsKeepingSums(numbins).set_valueof(self.valueof)
 
 
 class BinsKeepingContents(BinsKeepingSums):
@@ -280,6 +287,8 @@ class BinsKeepingContents(BinsKeepingSums):
                 yielded.add(out_)
                 yield BinsKeepingContents(self.num, new_sums,new_bins).set_valueof(self.valueof)
 
+    def create_new_bins(self, numbins):
+        return BinsKeepingContents(numbins).set_valueof(self.valueof)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 """
 This class is based on "Multi-Way Number Partitioning" by: Richard E. Korf , 2009 
 The main purpose of this article is to solve the known Number Partitioning problem, in focus 
-on multy way Partitioning (more than 2 bins). 
+on multi way Partitioning (more than 2 bins).
 In this article he develops two new linear-space algorithms for multi-way partitioning, and demonstrate their
 performance on three, four, and five-way partitioning.
 
@@ -16,10 +16,11 @@ Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
 from copy import deepcopy
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
-from kk import kk
+from prtpy.partitioning.kk import kk
+import numpy as np
 from prtpy import partition
 from prtpy.partitioning.ckk import best_ckk_partition
-from utils import InExclusionBinTree, Node
+from prtpy.partitioning.utils import InExclusionBinTree
 
 
 def find_diff(l1: List, l2: List):
@@ -46,19 +47,19 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> snp(BinsKeepingContents(3), items=[4, 5, 7, 8, 6]).bins
-    [[8], [5, 6], [4, 7]]
+    [[8], [4, 7], [5, 6]]
     >>> list(snp(BinsKeepingContents(3), items=[4, 5, 7, 8, 6]).sums)
     [8.0, 11.0, 11.0]
     >>> snp(BinsKeepingContents(4), items=[4, 5, 7, 8, 6]).bins
-    [[6],[7],[8],[5,4]]
+    [[6], [7], [8], [4, 5]]
     >>> list(snp(BinsKeepingContents(4), items=[4, 5, 7, 8, 6]).sums)
     [6.0, 7.0, 8.0, 9.0]
     >>> snp(BinsKeepingContents(3), items=[1,3,3,4,4,5,5,5]).bins
-    [[3,3,4],[5,5],[5,4,1]]
+    [[1, 4, 5], [3, 3, 4], [5, 5]]
     >>> list(snp(BinsKeepingContents(3), items=[1,3,3,4,4,5,5,5]).sums)
     [10.0, 10.0, 10.0]
     >>> snp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9]).bins
-    [[9],[5,4],[6,3],[7,2],[8,1]]
+    [[9], [2, 7], [4, 5], [3, 6], [1, 8]]
     >>> list(snp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9]).sums)
     [9.0, 9.0, 9.0, 9.0, 9.0]
 
@@ -66,83 +67,62 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     >>> partition(algorithm=snp, numbins=3, items={"a":1, "b":1, "c":1})
     [['a'], ['b'], ['c']]
     >>> partition(algorithm=snp, numbins=3, items={"a":1, "b":1, "c":1}, outputtype=out.Sums)
-    array([1.0, 1.0, 1.0 ])
+    array([1., 1., 1.])
     """
     k_way = bins.num
 
-    best_diff = partition(algorithm=kk, numbins=k_way, items=items, outputtype=out.Difference)
+    bins = kk(bins, items, valueof)
+    best_diff = max(bins.sums) - min(bins.sums)
 
-    bins, best_diff = rec_generate_sets(bins,items, valueof,[], best_diff, k_way)
+    if best_diff == 0:
+        return bins
+
+    prior_bins = bins.create_new_bins(0)
+
+    rec_generate_sets(prior_bins, bins, items, valueof, best_diff, k_way)
     return bins
 
 
-def rec_generate_sets(bins: Bins , items, valueof, current_sets: List, best_diff, k_way):
+def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, best_diff, k_way) :
 
-    if k_way == 3:
-        new_bin ,diff = snp3(bins, items, valueof, best_diff)
-        return new_bin, diff
+    best_diff = max(bins.sums) - min(bins.sums)
 
-    t = sum(items)
-    in_ex_tree = InExclusionBinTree(items=items, lower_bound=(t - (k_way -1) * best_diff) /float(k_way), upper_bound=t /float(k_way))
+    if k_way == 2:
+        two_bins = prior_bins.create_new_bins(2)
+        two_bins = best_ckk_partition(two_bins, items=items, valueof=valueof)
 
-    for bounded_subset in in_ex_tree.generate_tree():
-        current_sets.append(bounded_subset)
-        remaining_items = find_diff(items, bounded_subset)
-        new_bin, diff = rec_generate_sets(bins,remaining_items, valueof,current_sets, best_diff, k_way-1)
-        if diff < best_diff:
-            best_diff = diff
-            in_ex_tree.lower_bound = (t - (k_way -1) * best_diff) /float(k_way)
-            bins = deepcopy(new_bin)
-
-    return bins, best_diff
-
-
-def snp3(bins: Bins, items: List[any], valueof, best_diff) -> Bins:
-    '''
-    >>> snp3(BinsKeepingContents(3), items=[8, 6, 5, 3, 2, 2, 1])[0].bins
-    [[2, 2, 5], [3, 6], [8, 1]]
-    '''
-    # d - the difference in the paper
-    bins = kk(BinsKeepingContents(3), items=items)
-    # t - the items sum in the paper
-    t = sum(items)
-
-    in_ex_tree = InExclusionBinTree(items=items, lower_bound=(t - 2*best_diff)/3.0, upper_bound=t/3.0 )
-
-    for bounded_subset in in_ex_tree.generate_tree():
-
-        remaining_items = find_diff(items, bounded_subset)
-        possible_part = best_ckk_partition(BinsKeepingContents(2), items=remaining_items)
-
-        sums = list(possible_part.sums)
-        sums.append(sum(bounded_subset))
-
+        sums = np.append(two_bins.sums, prior_bins.sums)
         diff = max(sums) - min(sums)
 
         if diff < best_diff:
-            # clear the prev bins
             bins.clear_bins(bins.num)
-            # creating the best found so far partition
-            current_best_part = possible_part.bins
-            current_best_part.append(bounded_subset)
 
-            for ibin in range(bins.num):
-                for item in current_best_part[ibin]:
-                    bins.add_item_to_bin(item, ibin)
+            for ibin in range(2):
+                bins.combine_bins(ibin,two_bins,ibin)
+            for ibin in range(2, bins.num):
+                bins.combine_bins(ibin,prior_bins,ibin - 2)
 
-            best_diff = diff
-            if best_diff == 0:  # perfect partition was found
-                return bins, best_diff
+        return
 
-            in_ex_tree.lower_bound = (t - 2*best_diff)/3.0
+    t = sum(map(valueof, items))
+    in_ex_tree = InExclusionBinTree(items=items, valueof=valueof,
+                                    lower_bound=(t - (k_way - 1) * best_diff) / k_way, upper_bound=t / k_way)
 
-    return bins, best_diff
+    for bounded_subset in in_ex_tree.generate_tree():
+
+        prior_bins.add_empty_bins()
+
+        for item in bounded_subset:
+            prior_bins.add_item_to_bin(item,bin_index=prior_bins.num - 1)
+
+        remaining_items = find_diff(items, bounded_subset)
+        rec_generate_sets(prior_bins, bins, remaining_items, valueof, best_diff, k_way-1)
+
+        prior_bins.remove_bins()
 
 
 if __name__ == '__main__':
+    import doctest
 
-    print(snp(BinsKeepingContents(3), items=[8, 6, 5, 7, 4]).bins)
-
-    print(snp(BinsKeepingContents(3), items=[8, 6, 5, 3, 2, 2, 1]).bins)
-
-    print(snp(BinsKeepingContents(4), items=[8, 7, 6, 5, 4]).bins)
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))
