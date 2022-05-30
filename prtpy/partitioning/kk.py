@@ -40,7 +40,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> kk(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
     [[1, 6, 2, 3, 4, 7]]
 
-    >>> kk(BinsKeepingContents(2),items=[3,6,13,20,30,40,73]).bins
+    >>> kk(BinsKeepingContents(2),items=[3, 6, 13, 20, 30, 40, 73]).bins
     [[73, 13, 6], [40, 30, 20, 3]]
 
     """
@@ -90,7 +90,7 @@ def kk_heuristic(items: List[any], valueof: Callable = lambda x: x):
         diff = abs(max_a - max_b)
         if diff > 0:
             input_items.append(diff)
-            input_items.sort(reverse=True, key=valueof)
+        input_items.sort(reverse=True, key=valueof)
         difference_sets.append(copy.copy(input_items))
     return difference_sets, original_items
 
