@@ -1,5 +1,6 @@
 
 from math import inf
+from time import time
 from typing import Iterator, List, Tuple
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
@@ -120,11 +121,15 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
 
 
 if __name__ == '__main__':
-    lst = [4,5,6,7,8,9]
-    items = {"a": 1, "b": 2, "c": 3, "d": 3, "e": 5, "f": 9, "g": 9}
-
-    from prtpy import partition
-    print(partition(algorithm=best_ckk_partition, numbins=3, items=items))
-
-    # [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
-    print(partition(algorithm=best_ckk_partition, numbins=3, items=items, outputtype=out.Sums))
+    # lst = [4,5,6,7,8,9]
+    # items = {"a": 1, "b": 2, "c": 3, "d": 3, "e": 5, "f": 9, "g": 9}
+    #
+    # from prtpy import partition
+    # print(partition(algorithm=best_ckk_partition, numbins=3, items=items))
+    #
+    # # [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
+    # print(partition(algorithm=best_ckk_partition, numbins=3, items=items, outputtype=out.Sums))
+    start = time()
+    print(best_ckk_partition(BinsKeepingContents(5),
+              items=[1,3,3,4,4,5,5,5]).bins)
+    print(time() - start)

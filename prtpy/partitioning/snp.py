@@ -14,6 +14,7 @@ and then optimally partition the remaining numbers two ways (using CKK algorithm
 Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
 """
 from copy import deepcopy
+from time import time
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
 from prtpy.partitioning.kk import kk
@@ -79,21 +80,25 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
 
     prior_bins = bins.create_new_bins(0)
 
-    rec_generate_sets(prior_bins, bins, items, valueof, best_diff, k_way)
+    # insert inplace in bins
+    rec_generate_sets(prior_bins, bins, items, valueof, k_way, trees=[])
+
     return bins
 
 
-def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, best_diff, k_way) :
+def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees: List) :
 
     best_diff = max(bins.sums) - min(bins.sums)
 
     if k_way == 2:
+        # ckk 2 way on remaining numbers
         two_bins = prior_bins.create_new_bins(2)
         two_bins = best_ckk_partition(two_bins, items=items, valueof=valueof)
 
         sums = np.append(two_bins.sums, prior_bins.sums)
         diff = max(sums) - min(sums)
 
+        # fill the bins if better partition
         if diff < best_diff:
             bins.clear_bins(bins.num)
 
@@ -102,21 +107,26 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, best_diff, k
             for ibin in range(2, bins.num):
                 bins.combine_bins(ibin,prior_bins,ibin - 2)
 
+            # update lower bounds
+            for tree in trees:
+                tree[0].lower_bound = (tree[1] - (tree[2] - 1) * diff) / tree[2]
+
         return
 
     t = sum(map(valueof, items))
     in_ex_tree = InExclusionBinTree(items=items, valueof=valueof,
                                     lower_bound=(t - (k_way - 1) * best_diff) / k_way, upper_bound=t / k_way)
 
-    for bounded_subset in in_ex_tree.generate_tree():
+    trees.append((in_ex_tree, t, k_way))
 
+    for bounded_subset in in_ex_tree.generate_tree():
         prior_bins.add_empty_bins()
 
         for item in bounded_subset:
             prior_bins.add_item_to_bin(item,bin_index=prior_bins.num - 1)
 
         remaining_items = find_diff(items, bounded_subset)
-        rec_generate_sets(prior_bins, bins, remaining_items, valueof, best_diff, k_way-1)
+        rec_generate_sets(prior_bins, bins, remaining_items, valueof, k_way-1, trees)
 
         prior_bins.remove_bins()
 
