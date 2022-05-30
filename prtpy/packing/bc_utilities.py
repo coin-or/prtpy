@@ -15,14 +15,14 @@ from prtpy.bins import Bins, BinsKeepingContents
 # A simple class to store a state of bins arrangement.
 # We keep the current bin arrangement and index of the next bin, as well as the items left to arrange in those bins.
 class BinBranch:
-    def __init__(self, items: list, bins: Bins, bin_index: int):
+    def __init__(self, items: List, bins: Bins, bin_index: int):
         self.items = items
         self.bins = bins
         self.bin_index = bin_index
 
 
 # Returns a new list which is a copy of 'original' but without the items in 'to_remove' if they existed.
-def list_without_items(original: list, to_remove: Iterable) -> list:
+def list_without_items(original: List, to_remove: Iterable) -> List:
     output = original.copy()
     for obj in to_remove:
         if obj in output:
@@ -32,7 +32,7 @@ def list_without_items(original: list, to_remove: Iterable) -> list:
 
 
 # Returns a new list which is a copy of 'lst' but without duplicate items.
-def unique_list(lst: list) -> list:
+def unique_list(lst: List) -> List:
     output = []
     for element in lst:
         if element not in output:
@@ -42,6 +42,8 @@ def unique_list(lst: list) -> list:
 
 # Calculates the lower bound of bins for bin packing problem.
 def lower_bound(binsize: float, items: List) -> float:
+    if binsize == 0:
+        return 0
     return math.ceil(sum(items) / binsize)
 
 
@@ -107,7 +109,7 @@ def l3_lower_bound(binsize: float, items: List) -> float:
 
 # A function that creates all possible arrangements of items in 'num_of_sublists' lists.
 # For example: find_all_bin_arrangements(range(2), 2) => [[0,1],[]], [[0],[1]], [[1], [0]], etc......
-def find_all_bin_arrangements(items: list, num_of_sublists: int):
+def find_all_bin_arrangements(items: List, num_of_sublists: int):
     for locs in product(range(num_of_sublists), repeat=len(items)):
         output = [[] for _ in range(num_of_sublists)]
         for elem, loc in zip(items, locs):
@@ -117,7 +119,7 @@ def find_all_bin_arrangements(items: list, num_of_sublists: int):
 
 # A function that gets a list of 'n' numbers and an arrangement in length 'n',
 # and checks if each list in the arrangement fits the corresponding item in the same index
-def check_fits(items: list[int], arrangement: list[list]):
+def check_fits(items: List[int], arrangement: List[List]):
     if len(items) != len(arrangement):
         raise ValueError(f"items list ({len(items)}) and arrangement ({len(arrangement)}) are not in the same size")
 
@@ -129,7 +131,7 @@ def check_fits(items: list[int], arrangement: list[list]):
     return True
 
 
-def is_dominant(list1: list, list2: list):
+def is_dominant(list1: List, list2: List):
     """
             Test 1:
             >>> is_dominant([10], [])
@@ -189,7 +191,7 @@ def is_dominant(list1: list, list2: list):
 
 
 
-def check_for_dominance(completions: list[list]):
+def check_for_dominance(completions: List[List]):
     """
             Test 1:
             >>> check_for_dominance([[3], [2], [1]])
@@ -286,7 +288,7 @@ def find_undominated_pairs(constant_elements_sum: int, y: int, items: List, bins
 
 # Returns all the possible completions of undominated items for the bin containing x.
 # See article for details.
-def find_bin_completions(x: int, items: list, binsize: int):
+def find_bin_completions(x: int, items: List, binsize: int):
     """
         Test 1:
         >>> find_bin_completions(99, [94,79,64,50,44,43,37,32,19,18,7,3], 100)

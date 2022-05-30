@@ -51,13 +51,13 @@ def bin_completion(
     >>> bin_completion(BinsKeepingContents(), binsize=100, items=[99, 97, 94, 93, 8, 5, 4, 2]).bins
     [[99], [97, 2], [94, 5], [93, 4], [8]]
     """
+    # Test if there is an item which is not a number OR larger than binsize.
+    for item in items:
+        if not isinstance(item, int) or item > binsize:
+            raise ValueError(f"Item {item} is not valid.")
+
     # Remove zeros from items as they are irrelevant.
     items = list(filter((0).__ne__, items))
-
-    # Test if there is an item larger than binsize.
-    for item in items:
-        if item > binsize:
-            raise ValueError(f"Item has size {item} which is larger than the bin size {binsize}.")
 
     # Find the BFD solution and check if it's optimal using the lower bound calculation.
     bfd_solution = best_fit.decreasing(BinsKeepingContents(), binsize, items.copy())
