@@ -1,4 +1,5 @@
 
+
 """
 This class is based on "Multi-Way Number Partitioning" by: Richard E. Korf , 2009 
 The main purpose of this article is to solve the known Number Partitioning problem, in focus 
@@ -72,6 +73,7 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     """
     k_way = bins.num
 
+    # bins will always remember the best partition found so far
     bins = kk(bins, items, valueof)
     best_diff = max(bins.sums) - min(bins.sums)
 
@@ -93,7 +95,7 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
     if k_way == 2:
         # ckk 2 way on remaining numbers
         two_bins = prior_bins.create_new_bins(2)
-        two_bins = best_ckk_partition(two_bins, items=items, valueof=valueof)
+        two_bins = best_ckk_partition(bins=two_bins, items=items, valueof=valueof)
 
         sums = np.append(two_bins.sums, prior_bins.sums)
         diff = max(sums) - min(sums)
@@ -103,9 +105,9 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
             bins.clear_bins(bins.num)
 
             for ibin in range(2):
-                bins.combine_bins(ibin,two_bins,ibin)
+                bins.combine_bins(ibin=ibin, other_bin=two_bins, other_ibin=ibin)
             for ibin in range(2, bins.num):
-                bins.combine_bins(ibin,prior_bins,ibin - 2)
+                bins.combine_bins(ibin=ibin, other_bin=prior_bins, other_ibin=ibin - 2)
 
             # update lower bounds
             for tree in trees:
@@ -113,6 +115,7 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
 
         return
 
+    # t is the sum of all the remaining items
     t = sum(map(valueof, items))
     in_ex_tree = InExclusionBinTree(items=items, valueof=valueof,
                                     lower_bound=(t - (k_way - 1) * best_diff) / k_way, upper_bound=t / k_way)
@@ -123,7 +126,7 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
         prior_bins.add_empty_bins()
 
         for item in bounded_subset:
-            prior_bins.add_item_to_bin(item,bin_index=prior_bins.num - 1)
+            prior_bins.add_item_to_bin(item=item, bin_index=prior_bins.num - 1)
 
         remaining_items = find_diff(items, bounded_subset)
         rec_generate_sets(prior_bins, bins, remaining_items, valueof, k_way-1, trees)
