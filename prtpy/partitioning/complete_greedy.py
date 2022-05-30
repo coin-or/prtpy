@@ -13,46 +13,6 @@ from prtpy import objectives as obj, Bins, partitioning
 
 logger = logging.getLogger(__name__)
 
-
-# def optimal(
-#     bins: Bins,
-#     items: List[any],
-#     valueof: Callable[[Any], float] = lambda x: x,
-#     objective: obj.Objective = obj.MinimizeDifference,
-# ):
-#     """
-#     Returns the optimal partition - the partition that minimizes the objective.
-
-#     To find the optimal partition it generates all partitions using the order from the greedy algorithm, and returns the optimal result.
-
-#     The following examples are based on:
-#         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
-#     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-#     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-#     >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference)
-#     Bin #0: [27, 26, 10], sum=63.0
-#     Bin #1: [39, 16], sum=55.0
-#     Bin #2: [46, 13], sum=59.0
-#     >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
-#     Bin #0: [27, 26], sum=53.0
-#     Bin #1: [39, 13, 10], sum=62.0
-#     Bin #2: [46, 16], sum=62.0
-#     >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
-#     Bin #0: [27, 16, 13], sum=56.0
-#     Bin #1: [39, 26], sum=65.0
-#     Bin #2: [46, 10], sum=56.0
-
-#     >>> from prtpy import partition, outputtypes as out
-#     >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-#     [['e', 'c', 'd'], ['g', 'a'], ['f', 'b']]
-#     >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
-#     array([16., 16.])
-#     """
-#     for result in generator(bins, items, valueof, objective):
-#         logger.info("Improved result: %s", result.sums)
-#     return result
-
-
 def anytime(
     bins: Bins,
     items: List[any],
