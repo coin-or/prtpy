@@ -19,7 +19,7 @@ from prtpy.bins import BinsKeepingSums
 
 from heapq import heapreplace
 
-from pytz import country_timezones
+
 
 def sublist_creator(x, n, sort=True):
     bins = [[0] for _ in range(n)]
