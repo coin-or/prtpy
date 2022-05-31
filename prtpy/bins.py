@@ -2,6 +2,7 @@
 Utility functions and classes for incrementally filling bins during an algorithm.
 
 Author: Erel Segal-Halevi
+Co-Authors: Jonathan Escojido & Samuel Harroch
 Since:  2022-02
 """
 
@@ -264,7 +265,7 @@ class BinsKeepingContents(BinsKeepingSums):
 
     def sort(self):
         self.sums.sort()
-        self.bins.sort(key=lambda bin: (sum(map(self.valueof,bin)), len(bin)))
+        self.bins.sort(key=lambda bin: (sum(map(self.valueof, bin)), len(bin)))
         return self
 
     def clear_bins(self, numbins):
@@ -297,8 +298,12 @@ if __name__ == "__main__":
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
 
-    # b1 = BinsKeepingContents(3,[1,2,3],[[1],[2],[3]])
-    # b2 = BinsKeepingContents(3,[4,5,6],[[4],[5],[6]])
+    # b1 = BinsKeepingContents(3,[3,1,7],[[1,2],[1],[4,3]])
+    # b3 = BinsKeepingContents(3,[1,2,3],[[1],[2],[3]])
     #
-    # for perm in b1.combinations(b2):
-    #     print(f"sums={perm.sums}, bins= {perm.bins}")
+    # b2 = BinsKeepingContents(3,[7,3,1],[[3,4],[2,1],[1]])
+    # print(b1==b2)
+    # print(b1==b3)
+    #
+    # # for perm in b1.combinations(b2):
+    # #     print(f"sums={perm.sums}, bins= {perm.bins}")

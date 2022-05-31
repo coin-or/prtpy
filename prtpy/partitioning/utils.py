@@ -1,3 +1,9 @@
+"""
+Authors: Jonathan Escojido & Samuel Harroch
+
+Since = 03-2022
+"""
+
 from typing import List, Generator, Callable
 
 

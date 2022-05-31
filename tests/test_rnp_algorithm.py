@@ -27,7 +27,7 @@ class TestRNP(unittest.TestCase):
         numbins = 4
         bins = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
         bins.sort(key=lambda bin: (sum(bin), len(bin)))  # so we are sure in the order we get the answer
-        assert (bins == [[6], [7], [8], [5, 4]])
+        assert (bins == [[6], [7], [8], [4, 5]])
 
         bins_sums = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
         assert (sorted(bins_sums) == [6.0, 7.0, 8.0, 9.0])
@@ -70,7 +70,7 @@ class TestRNP(unittest.TestCase):
         items={"a":4, "b":5, "c":6,"d":7, "e":8}
         numbins = 3
         bins = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
-        bins.sort(key=lambda bin: (sum(bin), len(bin))) # so we are sure in the order we get the answer
+        bins.sort(key=lambda bin: (len(bin),bin[0], sum(map(items.__getitem__,bin)))) # so we are sure in the order we get the answer
         assert (bins == [['e'], ['b','c'], ['a','d']] or bins == [['e'], ['a','d'], ['b','c']])
 
         bins_sums = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
@@ -86,7 +86,7 @@ class TestRNP(unittest.TestCase):
         items={"a":1, "b":1, "c":1,"d":2}
         numbins = 4
         bins = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
-        bins.sort(key=lambda bin: (sum(bin), len(bin))) # so we are sure in the order we get the answer
+        bins.sort(key=lambda bin: (len(bin),bin[0], sum(map(items.__getitem__,bin)))) # so we are sure in the order we get the answer
         assert (bins == [['a'], ['b'], ['c'], ['d']])
 
         bins_sums = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
@@ -102,8 +102,8 @@ class TestRNP(unittest.TestCase):
         items={"a":1, "b":2, "c":3,"d":4, "e":5, "f":6, "g":7, "h":8, "i":9}
         numbins = 5
         bins = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
-        bins.sort(key=lambda bin: (sum(bin), len(bin))) # so we are sure in the order we get the answer
-        assert (bins == [['i'], ['a','h'], ['b','g'], ['f','c'], ['d','e']])
+        bins.sort(key=lambda bin: (len(bin),bin[0], sum(map(items.__getitem__,bin)))) # so we are sure in the order we get the answer
+        assert (bins == [['i'], ['a','h'], ['b','g'], ['c','f'], ['d','e']])
 
         bins_sums = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
         assert (sorted(bins_sums) == [9.0, 9.0, 9.0, 9.0, 9.0])

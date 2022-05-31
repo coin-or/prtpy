@@ -1,6 +1,10 @@
 
 
 """
+Authors: Jonathan Escojido & Samuel Harroch
+
+Since = 03-2022
+
 This class is based on "Multi-Way Number Partitioning" by: Richard E. Korf , 2009 
 The main purpose of this article is to solve the known Number Partitioning problem, in focus 
 on multi way Partitioning (more than 2 bins).
@@ -139,3 +143,5 @@ if __name__ == '__main__':
 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+
+    print(snp(BinsKeepingContents(4), items=[1,3,3,4,4,5,5,5]).bins)

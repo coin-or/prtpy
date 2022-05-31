@@ -1,4 +1,8 @@
+"""
+Authors: Jonathan Escojido & Samuel Harroch
 
+Since = 03-2022
+"""
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
 import heapq
