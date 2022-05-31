@@ -1,6 +1,7 @@
 
 from ast import Call
 from cgitb import small
+from itertools import repeat
 import math
 from typing import Callable
 from typing import List
@@ -12,9 +13,13 @@ from prtpy import objectives as obj, Bins, partitioning
 
 from prtpy.bins import BinsKeepingContents
 
+from prtpy.bins import BinsKeepingSums
+
 
 
 from heapq import heapreplace
+
+from pytz import country_timezones
 
 def sublist_creator(x, n, sort=True):
     bins = [[0] for _ in range(n)]
@@ -99,13 +104,13 @@ def mainAlgorithm( bins: Bins, #bin is a machine
     Bin #2: [(3, 10), (4, 50)], sum=60.0
 
     >>> mainAlgorithm(BinsKeepingContents(2),[10,10,10],0.1, lambda x:x**2,ValOf)
-    Bin #0: [(2, 10)], sum=10.0
-    Bin #1: [(1, 10), (3, 10)], sum=20.0
+    Bin #0: [(1, 10), (2, 10)], sum=20.0
+    Bin #1: [(3, 10)], sum=10.0
 
     Example 1: 
     >>> mainAlgorithm(BinsKeepingContents(2),[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],0.1,lambda x:x**2)
-    Bin #0: [(8, 23047), (6, 43124), (3, 54768), (10, 78900), (12, 101436), (1, 124000), (7, 107)], sum=425382.0
-    Bin #1: [(14, 17642), (2, 34000), (13, 52422), (11, 65432), (5, 89765), (4, 115256), (9, 200101)], sum=574618.0
+    Bin #0: [(2, 34000), (11, 65432), (10, 78900), (1, 124000), (9, 200101)], sum=502433.0
+    Bin #1: [(14, 17642), (8, 23047), (6, 43124), (13, 52422), (3, 54768), (5, 89765), (12, 101436), (4, 115256), (7, 107)], sum=497567.0
     """    
     
     # Example 2: 
@@ -192,20 +197,45 @@ def ConvertJobs(jobs: List[any], L: int, lambda_star:int, Valueof:Callable=ValOf
         addSmallJob(convertedSet, job,LdivLambda,-1) 
     return convertedSet,smallJobs    
     
+def numberToBase(n, b, length):
+    if n == 0:
+        return "0"*length
+    digits = ""
+    while n:
+        digits+=str(int(n % b))#.append(int(n % b))
+        n //= b
+    if len(digits)<length: 
+        digits="0"*(-len(digits)+length)+digits   
+    return digits#[::-1]
+
+def calculateMaxInDiv(curDiv,base, jobs):
+    makespan=[0]*base
+    jobList=a = [[] for x in repeat(None, base)]
+    for i in range(len(jobs)):
+        makespan[int(curDiv[i])]+=ValOf(jobs[i])
+        jobList[int(curDiv[i])].append(jobs[i])
+    return (max(makespan),jobList)    
 
 def IP(convertedJobs: List[float], numbrOfMachines:int, f: Callable)->List[List[float]]:
     #this function does not work yet!!!!!!!!!
     """
     "partition the  converted jobs into numbrOfMachines parts in an optimal way such that we minimize sum(f(C_i))"
     >>> IP([10,15,10,10,15],2,lambda x:x**2)
-    [[10, 15], [10, 10, 15]]
+    [[10, 10, 10], [15, 15]]
     """
+    curMin=float("inf")
+    for i in range(numbrOfMachines**len(convertedJobs)):
+        curDiv=numberToBase(i,numbrOfMachines,len(convertedJobs))
+        divResult=calculateMaxInDiv(curDiv,numbrOfMachines,convertedJobs)
+        if divResult[0]<curMin:
+            curMin=divResult[0]
+            minDiv=divResult[1]
     # >>> IP([124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642],2,lambda x:x**2)
     # [[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]]
-    partition=sublist_creator(convertedJobs,numbrOfMachines)
+    #partition=sublist_creator(convertedJobs,numbrOfMachines)
     # print("partition",partition)
     
-    return partition
+    return minDiv
     
 
 def deconvertJobs(originalJobs,partition: List[List[any]], L: float, lambda_star:int, SmallJobs:List[any],valueof:Callable=ValOf)->List[List[any]]:
@@ -230,7 +260,7 @@ def deconvertJobs(originalJobs,partition: List[List[any]], L: float, lambda_star
         for i,job in machine:
             if ValOf(job)>L/lambda_star:
                 results = [t[1] for t in originalJobs if t[0] == i]
-                deconvertPartition[index].append((i,results[0])) #BUG!!!!!!!!!!!!
+                deconvertPartition[index].append((i,results[0])) 
             else:
                 #print(numberOfSmallJobsPerM[index])
                 numberOfSmallJobsPerM[index]+=1  
@@ -264,14 +294,17 @@ if __name__ == "__main__":
     print(doctest.testmod()) 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+    
     # ConvertJobs([124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],500000,500)
     # ConvertJobs([100,200,300,400],500,500)
-    jobs=[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642]
-    ConvertJobs([1,2,3,4],5,2)
-    #print(deconvertJobs([(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)],[[(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)]],70,10,[(8,1)]))
-   
-   
-   
+    # jobs=[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642]
+    # ConvertJobs([1,2,3,4],5,2)
+    # #print(deconvertJobs([(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)],[[(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)]],70,10,[(8,1)]))
+    # for i in range(32):
+        
+    #     div=numberToBase(i,2,5)
+    #     ans=calculateMaxInDiv(div,2,[1,2,3,4,5])
+    #     print(div,ans)
    
    
    
