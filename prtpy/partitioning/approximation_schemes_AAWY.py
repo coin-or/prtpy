@@ -1,11 +1,14 @@
 
 from ast import Call
+from asyncio import Queue
 from cgitb import small
 from itertools import repeat
 import math
+import queue
+import threading
 from typing import Callable
 from typing import List
-
+import concurrent.futures
 from numpy import append, number, obj2sctype as obj
 
 from prtpy import bins
@@ -216,6 +219,17 @@ def calculateMaxInDiv(curDiv,base, jobs):
         jobList[int(curDiv[i])].append(jobs[i])
     return (max(makespan),jobList)    
 
+def loopForDivision(start,end, base, jobs):
+    curMin=float("inf")
+    minDiv=[]
+    for i in range(start,end):
+        curDiv=numberToBase(i,base,len(jobs))
+        divResult=calculateMaxInDiv(curDiv,base,jobs)
+        if divResult[0]<curMin:
+            curMin=divResult[0]
+            minDiv=divResult[1]
+    return(curMin,minDiv)        
+
 def IP(convertedJobs: List[float], numbrOfMachines:int, f: Callable)->List[List[float]]:
     #this function does not work yet!!!!!!!!!
     """
@@ -223,13 +237,36 @@ def IP(convertedJobs: List[float], numbrOfMachines:int, f: Callable)->List[List[
     >>> IP([10,15,10,10,15],2,lambda x:x**2)
     [[10, 10, 10], [15, 15]]
     """
-    curMin=float("inf")
-    for i in range(numbrOfMachines**len(convertedJobs)):
-        curDiv=numberToBase(i,numbrOfMachines,len(convertedJobs))
-        divResult=calculateMaxInDiv(curDiv,numbrOfMachines,convertedJobs)
-        if divResult[0]<curMin:
-            curMin=divResult[0]
-            minDiv=divResult[1]
+    divisions=numbrOfMachines**len(convertedJobs)
+    # t1 = threading.Thread(target = loopForDivision ,args = [0,int(divisions/4), numbrOfMachines, convertedJobs] )
+    # t2 = threading.Thread(target = loopForDivision ,args = [int(divisions/4),int(divisions/2), numbrOfMachines, convertedJobs] )
+    # t3 = threading.Thread(target = loopForDivision ,args = [int(divisions/2),int(divisions/4)*3, numbrOfMachines, convertedJobs] )
+    # t4 = threading.Thread(target = loopForDivision ,args = [int(divisions/4)*3,divisions, numbrOfMachines, convertedJobs] )
+   
+    with concurrent.futures.ThreadPoolExecutor(8) as exect:
+        results =[ exect.submit(loopForDivision , 0,                 int(divisions/8), numbrOfMachines, convertedJobs) ,
+                   exect.submit(loopForDivision , int(divisions/8),  int(divisions/4), numbrOfMachines, convertedJobs),
+                   exect.submit(loopForDivision , int(divisions/4),  int(divisions/8)*3, numbrOfMachines, convertedJobs),
+                   exect.submit(loopForDivision , int(divisions/8)*3,int(divisions/2), numbrOfMachines, convertedJobs),
+                   exect.submit(loopForDivision , int(divisions/2),  int(divisions/8)*5,numbrOfMachines, convertedJobs) ,
+                   exect.submit(loopForDivision , int(divisions/8)*5,int(divisions/8)*6, numbrOfMachines, convertedJobs),
+                   exect.submit(loopForDivision , int(divisions/8)*6,int(divisions/8)*7, numbrOfMachines, convertedJobs),
+                   exect.submit(loopForDivision , int(divisions/8)*7,divisions, numbrOfMachines, convertedJobs)
+        ]
+        curMin=float("inf")
+        minDiv=[]
+        for res in concurrent.futures.as_completed(results):
+            if res.result()[0]<curMin:
+                curMin=res.result()[0]
+                minDiv=res.result()[1]
+
+    # curMin=float("inf")
+    # for i in range(numbrOfMachines**len(convertedJobs)):
+    #     curDiv=numberToBase(i,numbrOfMachines,len(convertedJobs))
+    #     divResult=calculateMaxInDiv(curDiv,numbrOfMachines,convertedJobs)
+    #     if divResult[0]<curMin:
+    #         curMin=divResult[0]
+    #         minDiv=divResult[1]
     # >>> IP([124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642],2,lambda x:x**2)
     # [[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]]
     #partition=sublist_creator(convertedJobs,numbrOfMachines)
@@ -294,7 +331,14 @@ if __name__ == "__main__":
     print(doctest.testmod()) 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
-    
+    #list(range(10))
+    import time
+    for i in range(5,16):
+        start = time.perf_counter()
+        print(mainAlgorithm(BinsKeepingContents(3),list(range(1,i)),0.1, lambda x:x**2,ValOf))
+        finish = time.perf_counter()
+        print(f'Finished in {round(finish-start,2)} second(s)')
+
     # ConvertJobs([124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],500000,500)
     # ConvertJobs([100,200,300,400],500,500)
     # jobs=[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642]
