@@ -1,6 +1,7 @@
 import functools
 from itertools import chain, combinations
 from typing import Generator, Tuple
+from collections.abc import Iterator
 
 
 def _power_set(numbers: list[int]) -> chain[Tuple[int, ...]]:
@@ -32,11 +33,45 @@ def _compere(set1, set2):
     return 0
 
 
+class hn_wrapper(Iterator):
+    '''
+    wrapper that check if iterator has next
+    '''
+
+    def __init__(self, it):
+        self.it = iter(it)
+        self._has_next = None
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._has_next:
+            result = self._the_next
+        else:
+            result = next(self.it)
+        self._has_next = None
+        return result
+
+    def has_next(self):
+        if self._has_next is None:
+            try:
+                self._the_next = next(self.it)
+            except StopIteration:
+                self._has_next = False
+            else:
+                self._has_next = True
+        return self._has_next
+
+
 def undominated_generator(bin_size: int, numbers: list[int], b_chunks_size: int) -> Generator[Tuple[int, ...], None, None]:
     '''
     Generate in chunks of b sized, then sort them by _compere function
     Bigger chunk size can remove more duplications and sort better but takes more time
     '''
+    if len(numbers) == 0:
+        return
+
     # Init variables
     sorted_numbers = sorted(numbers, reverse=True)
     biggest = sorted_numbers.pop(0)
@@ -72,3 +107,10 @@ if __name__ == "__main__":
     print(_compere((10, 1), (11,)))  # len -1
     print(_compere((10, 3, 2), (10, 4, 1)))  # first 1
     print(_compere((10, 2, 1, 1), (10, 3, 1)))  # len -1
+    possible_undominated_generator = undominated_generator(
+        6, [1, 2, 3, 4, 5], 50)
+    print(next(possible_undominated_generator))
+    print(next(possible_undominated_generator))
+    possible_undominated_generator = undominated_generator(6, [], 50)
+    print(next(possible_undominated_generator))
+    print(next(possible_undominated_generator))
