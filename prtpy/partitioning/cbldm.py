@@ -7,11 +7,13 @@ https://arxiv.org/abs/cs/9903011
 The algorithm gets a list of numbers and returns a partition with
 the smallest sum difference between 2 groups the list is divided to.
 The algorithm runs until it finds the optimal partition, or it runs out of time.
+
+implemented by Eli Belkind 3.6.22
 """
 import sys
 from typing import Callable, List, Any
 import numpy as np
-from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
+from prtpy import Bins, BinsKeepingContents
 import time
 import math
 
