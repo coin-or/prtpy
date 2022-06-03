@@ -7,6 +7,8 @@ https://arxiv.org/abs/cs/9903011
 The algorithm gets a list of numbers and returns a partition with
 the smallest sum difference between 2 groups the list is divided to.
 The algorithm runs until it finds the optimal partition, or it runs out of time.
+
+LIMITATIONS: Due to recursion depth limit, it can handle at most 990 items.
 """
 import sys
 from typing import Callable, List, Any
@@ -49,6 +51,10 @@ def cbldm(
     [[4, 6, 5], [8, 7]]
     >>> partition(algorithm=cbldm, numbins=2, items=[4,1,1,1,1], time_in_seconds=1, partition_difference=1)
     [[1, 1, 1], [4, 1]]
+    >>> partition(algorithm=cbldm, numbins=2, items=range(100), time_in_seconds=1, outputtype=out.Sums)
+    [2475.0, 2475.0]
+    >>> partition(algorithm=cbldm, numbins=2, items=range(990), time_in_seconds=1, outputtype=out.Sums)
+    [244777.0, 244778.0]
 
     >>> partition(algorithm=cbldm, numbins=3, items=[8,7,6,5,4], time_in_seconds=1, partition_difference=1)
     Traceback (most recent call last):
@@ -70,9 +76,6 @@ def cbldm(
     Traceback (most recent call last):
         ...
     ValueError: items must be none negative
-
-    >>> partition(algorithm=cbldm, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['g', 'd', 'c', 'a'], ['f', 'b', 'e']]
     """
     start = time.perf_counter()
     if bins.num != 2:
@@ -179,6 +182,8 @@ class CBLDM_algo:
 
 if __name__ == "__main__":
     import doctest
-
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+
+    from prtpy import partition
+    print(partition(algorithm=cbldm, numbins=2, items=range(990), time_in_seconds=1, outputtype=out.Sums))
