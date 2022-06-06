@@ -18,8 +18,8 @@ import time
 import math
 
 
-def cbldm(
-        bins: Bins,
+def cbldm(                  # items size can be no more than 990 due to stack limitations
+        bins: Bins,         # max length of items can vary from computer to computer
         items: List[float],
         valueof: Callable[[Any], float] = lambda x: x,
         time_in_seconds: float = np.inf,
@@ -38,7 +38,7 @@ def cbldm(
     >>> cbldm(BinsKeepingContents(2), items=[4,1,1,1,1], time_in_seconds=1, partition_difference=1).bins
     [[1, 1, 1], [4, 1]]
 
-    >>> from prtpy import partition
+    >>> from prtpy import partition, out
     >>> partition(algorithm=cbldm, numbins=2, items=[10], time_in_seconds=1)
     [[], [10]]
     >>> partition(algorithm=cbldm, numbins=2, items=[10,0], time_in_seconds=1, partition_difference=3)
@@ -75,6 +75,15 @@ def cbldm(
 
     >>> partition(algorithm=cbldm, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['g', 'd', 'c', 'a'], ['f', 'b', 'e']]
+
+    >>> rng = np.random.default_rng(1)
+    >>> items = rng.integers(1, 1000, 100)
+    >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums)
+    [25390.0, 25390.0]
+
+    >>> items = rng.integers(1, 1000, 989)
+    >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums, time_in_seconds=1)
+    [248181.0, 248182.0]
     """
     start = time.perf_counter()
     if bins.num != 2:

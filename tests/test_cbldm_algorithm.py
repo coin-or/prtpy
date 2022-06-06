@@ -1,10 +1,25 @@
+import numpy as np
+
 import prtpy, unittest, itertools
+"""
+Tests for the implementation of anytime balanced number partition form:
+A complete anytime algorithm for balanced number partitioning
+by Stephan Mertens 1999
+https://arxiv.org/abs/cs/9903011
+
+The algorithm gets a list of numbers and returns a partition with
+the smallest sum difference between 2 groups the list is divided to.
+The algorithm runs until it finds the optimal partition, or it runs out of time.
+
+implemented by Eli Belkind 3.6.22
+"""
+
 import sys
 
 
 class TestCBLDMAlgorithms(unittest.TestCase):
 
-    def _test_algorithm(self, items, expected, time=1, delta=sys.maxsize, equal=True):
+    def _test_algorithm(self, items, expected, time=np.inf, delta=sys.maxsize, equal=True):
         algorithm = prtpy.partitioning.cbldm
         result = prtpy.partition(algorithm=algorithm, items=items, numbins=2, outputtype=prtpy.out.Sums, time_in_seconds=time, partition_difference=delta)
         if equal:
@@ -28,6 +43,11 @@ class TestCBLDMAlgorithms(unittest.TestCase):
         self._test_algorithm(items={'a':6, 'b':6, 'c':5, 'd':5, 'e':5}, expected=3, delta=1)  # [[6,6], [5,5,5]]
         self._test_algorithm(items={'a':4, 'b':1, 'c':1, 'd':1, 'e':1}, expected=0)  # [[1,1,1,1], [4]]
         self._test_algorithm(items={'a':1, 'b':1, 'c':1, 'd':1, 'e':1, 'f':1, 'g':1, 'i':1, 'h':1, 'q':1}, expected=0)
+        rng = np.random.default_rng(1)
+        items = rng.integers(1, 1000, 100)
+        self._test_algorithm(items=items, expected=0, time=1)
+        items = rng.integers(1, 1000, 969)
+        self._test_algorithm(items=items, expected=0, time=1)
 
     def test_exceptions(self):
         algorithm = prtpy.partitioning.cbldm
