@@ -46,8 +46,8 @@ class TestCBLDMAlgorithms(unittest.TestCase):
         rng = np.random.default_rng(1)
         items = rng.integers(1, 1000, 100)
         self._test_algorithm(items=items, expected=0, time=1)
-        items = rng.integers(1, 1000, 969)
-        self._test_algorithm(items=items, expected=0, time=1)
+        items = rng.integers(1, 1000, 899)
+        self._test_algorithm(items=items, expected=1, time=1)
 
     def test_exceptions(self):
         algorithm = prtpy.partitioning.cbldm

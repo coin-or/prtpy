@@ -18,7 +18,7 @@ import time
 import math
 
 
-def cbldm(                  # items size can be no more than 990 due to stack limitations
+def cbldm(                  # max items length can be between 900 and 1000 due to stack limitations
         bins: Bins,         # max length of items can vary from computer to computer
         items: List[float],
         valueof: Callable[[Any], float] = lambda x: x,
@@ -52,27 +52,6 @@ def cbldm(                  # items size can be no more than 990 due to stack li
     >>> partition(algorithm=cbldm, numbins=2, items=[4,1,1,1,1], time_in_seconds=1, partition_difference=1)
     [[1, 1, 1], [4, 1]]
 
-    >>> partition(algorithm=cbldm, numbins=3, items=[8,7,6,5,4], time_in_seconds=1, partition_difference=1)
-    Traceback (most recent call last):
-        ...
-    ValueError: number of bins must be 2
-    >>> partition(algorithm=cbldm, numbins=2, items=[8,7,6,5,4], time_in_seconds=-1, partition_difference=1)
-    Traceback (most recent call last):
-        ...
-    ValueError: time_in_seconds must be positive
-    >>> partition(algorithm=cbldm, numbins=2, items=[8,7,6,5,4], time_in_seconds=1, partition_difference=-1)
-    Traceback (most recent call last):
-        ...
-    ValueError: partition_difference must be a complete number and >= 1
-    >>> partition(algorithm=cbldm, numbins=2, items=[8,7,6,5,4], time_in_seconds=1, partition_difference=1.5)
-    Traceback (most recent call last):
-        ...
-    ValueError: partition_difference must be a complete number and >= 1
-    >>> partition(algorithm=cbldm, numbins=2, items=[8,7,6,5,-4], time_in_seconds=1, partition_difference=1)
-    Traceback (most recent call last):
-        ...
-    ValueError: items must be none negative
-
     >>> partition(algorithm=cbldm, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['g', 'd', 'c', 'a'], ['f', 'b', 'e']]
 
@@ -81,9 +60,9 @@ def cbldm(                  # items size can be no more than 990 due to stack li
     >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums)
     [25390.0, 25390.0]
 
-    >>> items = rng.integers(1, 1000, 989)
+    >>> items = rng.integers(1, 1000, 899)
     >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums, time_in_seconds=1)
-    [248181.0, 248182.0]
+    [225368.0, 225369.0]
     """
     start = time.perf_counter()
     if bins.num != 2:
