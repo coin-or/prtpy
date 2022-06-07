@@ -14,13 +14,12 @@
 import copy
 import itertools
 from typing import Callable, List
-
-import numpy as np
-
 from prtpy import Bins
 from prtpy.bins import BinsKeepingContents
-from prtpy.objectives import get_complementary
+from prtpy.partitioning.ckk import ckk
 from prtpy.partitioning.rnp import rnp
+from prtpy.utils import base_check_bins, is_all_lists_are_different, all_in, get_best_best_k_combination, max_largest, \
+    get_best_partition
 
 
 def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -29,53 +28,52 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> list(irnp(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).sums)
-    [32.0, 36.0]
+    [36.0, 32.0]
 
     >>> irnp(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).bins
-    [[95, 15, 25], [75, 85, 5]]
+    [[85, 75], [95, 25, 15, 5]]
 
     >>> irnp(BinsKeepingContents(3), items=[5, 8, 6, 4, 7]).bins
-    [[4, 7], [5, 6], [8]]
+    [[8], [7, 4], [6, 5]]
 
-    >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)  # need to debug
-    [163.0, 140.0]
+    >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)
+    [100.0, 100.0, 100.0]
+
+    >>> rnp(BinsKeepingContents(2), items=[1, 6, 2, 3, 4, 7]).bins
+    [[7, 3, 2], [6, 4, 1]]
+
+    >>> rnp(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).bins
+    [[17, 11, 8], [18, 12, 2]]
+
+    >>> list(rnp(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).sums)
+    [160.0, 140.0]
+
+    >>> rnp(BinsKeepingContents(4), items=[3, 6, 13, 20, 30, 40, 73]).bins
+    [[73], [40], [30, 6], [20, 13, 3]]
+
+    >>> rnp(BinsKeepingContents(5), items=[1, 2, 3, 4, 5]).bins
+    [[1], [2], [3], [4], [5]]
+
+    >>> rnp(BinsKeepingContents(2), items=[1, 2]).bins
+    [[1], [2]]
+
+    >>> rnp(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
+    [[1, 6, 2, 3, 4, 7]]
+
+    >>> rnp(BinsKeepingContents(0), items=[number for number in range(10)]).bins
+    []
 
     """
     k = bins.num
-    if k == 0:
+    bins, flag = base_check_bins(bins=bins, items=items, valueof=valueof)
+    if flag:
         return bins
-    elif k == 1:
-        return [bins.add_item_to_bin(item=item, bin_index=0) for item in items]
-
-    rnp_bins = list(rnp(bins, items, valueof="list"))
-    optimal_number_separately = get_best_partition_with_number_separately(items)
-    best_partition = min(rnp_bins, optimal_number_separately, key=diff_sums)
-
-    for index, partition in enumerate(best_partition):
-        for item in partition:
-            bins.add_item_to_bin(item=item, bin_index=index)
-    return bins
-
-
-def diff_sums(items: list) -> int:
-    sum_diff = 0
-    min_diff = np.inf
-    for item in items:
-        sum_diff += sum(item)
-        if min_diff > sum(item):
-            min_diff = sum(item)
-    return (sum_diff - min_diff) / len(items)
-
-
-def get_best_partition_with_number_separately(items: list):
-    differences = {}
-    for item in items:
-        temp_items = copy.copy(items)
-        temp_items.remove(item)
-        diff = abs(sum(temp_items) - item)
-        differences[item] = diff
-    best_item = min(differences, key=differences.get)
-    return [[best_item], get_complementary(items=items, sub_items=[best_item])]
+    items.sort(reverse=True, key=valueof)
+    max_largest_bins = max_largest(bins=copy.deepcopy(bins), items=items, valueof=valueof)
+    rnp_bins = rnp(bins=copy.deepcopy(bins), items=items, valueof=valueof)
+    ckk_bins = ckk(bins=copy.deepcopy(bins), items=items, valueof=valueof)
+    perfect_solution = get_best_partition([max_largest_bins, rnp_bins, ckk_bins], k)
+    return perfect_solution
 
 
 if __name__ == "__main__":
