@@ -1,7 +1,10 @@
+from dataclasses import dataclass
 import functools
 from itertools import chain, combinations
-from typing import Generator, Tuple
+from typing import Generator, List, Tuple
 from collections.abc import Iterator
+
+from prtpy.bins import Bins
 
 
 def _power_set(numbers: list[int]) -> chain[Tuple[int, ...]]:
@@ -62,6 +65,16 @@ class hn_wrapper(Iterator):
             else:
                 self._has_next = True
         return self._has_next
+
+
+@dataclass
+class ImprovedBinBranch:
+    items: List
+    bins: Bins
+    bin_index: int
+    generator: hn_wrapper
+    # somthing about pos in tree
+    depth: int
 
 
 def undominated_generator(bin_size: int, numbers: list[int], b_chunks_size: int) -> Generator[Tuple[int, ...], None, None]:

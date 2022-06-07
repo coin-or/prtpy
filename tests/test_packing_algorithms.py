@@ -53,17 +53,17 @@ class TestPackingAlgorithms(unittest.TestCase):
 
         bins = outputtype.Partition.create_empty_bins(0)
 
-        result = IBC.bin_packing(bins, 10, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        result = IBC.improved_bin_completion(bins, 10, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
         assert (result==[[1, 2, 3, 4], [5], [4, 6], [3, 7], [2, 8], [1, 9], [10]])
 
         bins = outputtype.Partition.create_empty_bins(0)
 
-        result = IBC.bin_packing(bins, 10, [10, 10, 10])
+        result = IBC.improved_bin_completion(bins, 10, [10, 10, 10])
         assert (result==[[10], [10], [10]])
 
         bins = outputtype.Partition.create_empty_bins(0)
         
-        result = IBC.bin_packing(bins, 0, [10]) # TODO: choose what to do on error like this
+        result = IBC.improved_bin_completion(bins, 0, [10]) # TODO: choose what to do on error like this
         assert (result==[0])
 
 if __name__ == "__main__":
