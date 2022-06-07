@@ -12,9 +12,15 @@
     Email: kfir.goldfarb@msmail.ariel.ac.il
 """
 import itertools
+import random
+from copy import deepcopy
 from typing import Callable, List
-from prtpy import outputtypes as out, Bins, BinsKeepingContents
-from prtpy.objectives import get_complementary
+
+import numpy as np
+
+from prtpy import Bins, BinsKeepingContents
+from prtpy.partitioning.ckk import ckk
+from prtpy.utils import base_check_bins, all_in, is_all_lists_are_different, get_best_best_k_combination
 
 
 def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -23,61 +29,53 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> rnp(BinsKeepingContents(2), items=[1, 6, 2, 3, 4, 7]).bins
-    [[1, 6, 4], [2, 3, 7]]
+    [[7, 3, 2], [6, 4, 1]]
 
     >>> rnp(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).bins
-    [[18, 12, 2], [17, 11, 8]]
+    [[17, 11, 8], [18, 12, 2]]
 
     >>> list(rnp(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).sums)
-    [135.0, 165.0]
+    [160.0, 140.0]
 
-    >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)  # need to debug
-    [163.0, 140.0]
+    >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)
+    [100.0, 100.0, 100.0]
+
+    >>> rnp(BinsKeepingContents(4), items=[3, 6, 13, 20, 30, 40, 73]).bins
+    [[73], [40], [30, 6], [20, 13, 3]]
+
+    >>> rnp(BinsKeepingContents(5), items=[1, 2, 3, 4, 5]).bins
+    [[1], [2], [3], [4], [5]]
+
+    >>> rnp(BinsKeepingContents(2), items=[1, 2]).bins
+    [[1], [2]]
+
+    >>> rnp(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
+    [[1, 6, 2, 3, 4, 7]]
+
+    >>> rnp(BinsKeepingContents(0), items=[number for number in range(10)]).bins
+    []
 
     """
     k = bins.num
-    if k == 0:
+    bins, flag = base_check_bins(bins=bins, items=items, valueof=valueof)
+    if flag:
         return bins
-    elif k == 1:
-        return [bins.add_item_to_bin(item=item, bin_index=0) for item in items]
 
-    # even
-    if k % 2 == 0:  # work very good
-        items_combinations = [i for i in itertools.combinations(items, int(len(items) / 2))]
-        differences = {}
-        for items_combination in items_combinations:
-            complementary_set = get_complementary(items, items_combination)
-            diff = abs(sum(items_combination) - sum(complementary_set))
-            differences[items_combination] = diff
-        best_items = min(differences, key=differences.get)
-        if valueof == "list":
-            return list(best_items), list(get_complementary(items, best_items))
-        [bins.add_item_to_bin(item=item, bin_index=0) for item in best_items]
-        [bins.add_item_to_bin(item=item, bin_index=1) for item in get_complementary(items, best_items)]
+    if k == 2:
+        return ckk(bins=bins, items=items, valueof=valueof)
 
-    # odd and k >= 3
-    else:  # TODO - @kggold4, not always working properly need to debug
-        items_combinations_1 = [i for i in itertools.combinations(items, 1)]
-        items_combinations_2 = [i for i in itertools.combinations(items, 2)]
-        items_combinations_k = [i for i in itertools.combinations(items, k)]
-        differences = {}
+    items.sort(reverse=True, key=valueof)
 
-        for i, j, q in zip(items_combinations_1, items_combinations_2, items_combinations_k):
-            a = i
-            b = get_complementary(a, j)
-            c = get_complementary(b, q)
-            diff = abs(sum(a) - sum(b)) + abs(sum(a) - sum(c)) + abs(sum(b) - sum(c))
-            differences[a] = diff
-        best_items = min(differences, key=differences.get)
-        [bins.add_item_to_bin(item=item, bin_index=1) for item in best_items]
-        best_items_2 = get_complementary(items, best_items)
-        [bins.add_item_to_bin(item=item, bin_index=2) for item in best_items_2]
-        [bins.add_item_to_bin(item=item, bin_index=3) for item in
-         get_complementary(items, list(best_items) + list(best_items_2))]
+    all_combinations = []
+    for i in range(1, len(items) - k + 1):
+        all_combinations.extend([list(combination) for combination in itertools.combinations(items, i)])
+    all_k_combinations = [list(combination) for combination in itertools.combinations(all_combinations, k) if
+                          is_all_lists_are_different(combination) and all_in(combination, items)]
+    best_k_combination = get_best_best_k_combination(k_combinations=all_k_combinations)
 
-        if valueof == "list":
-            return list(best_items), best_items_2, list(best_items) + list(best_items_2)
-
+    for index, combination_items in enumerate(best_k_combination):
+        for item in combination_items:
+            bins.add_item_to_bin(item=item, bin_index=index)
     return bins
 
 

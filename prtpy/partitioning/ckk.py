@@ -16,6 +16,7 @@ import numpy as np
 from typing import Callable, List
 from itertools import count, permutations
 from prtpy import Bins, BinsKeepingContents
+from prtpy.utils import base_check_bins
 
 
 def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -44,14 +45,28 @@ def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> list(ckk(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).bins)
     [[95, 5], [85, 15], [75, 25]]
 
+    >>> ckk(BinsKeepingContents(5), items=[1, 2, 3, 4, 5]).bins
+    [[1], [2], [3], [4], [5]]
+
+    >>> ckk(BinsKeepingContents(5), items=[1,9,8,2,3,7,6,5,4]).bins
+    [[8, 1], [7, 2], [6, 3], [5, 4], [9]]
+
+    >>> ckk(BinsKeepingContents(5), items=[1,9,8,2,3,7,6,5,4]).sums
+    array([9., 9., 9., 9., 9.])
+
+    >>> ckk(BinsKeepingContents(2), items=[1, 2]).bins
+    [[1], [2]]
+
+    >>> ckk(BinsKeepingContents(0), items=[number for number in range(10)]).bins
+    []
+
     """
     k = bins.num
-    if k == 0:
+    bins, flag = base_check_bins(bins=bins, items=items, valueof=valueof)
+    if flag:
         return bins
-    elif k == 1:
-        for item in items:
-            bins.add_item_to_bin(item=item, bin_index=0)
-        return bins
+    items.sort(reverse=True, key=valueof)
+
     items = sorted(items, key=valueof)
     partition = heuristic(items=items, k=k)
     result = [p[0] for p in partition]

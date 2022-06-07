@@ -18,6 +18,7 @@
 import copy
 from typing import Callable, List
 from prtpy import Bins, BinsKeepingContents
+from prtpy.utils import base_check_bins
 
 
 def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -37,25 +38,32 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> list(kk(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).sums)
     [37.0, 31.0]
 
+    >>> kk(BinsKeepingContents(2), items=[3, 6, 13, 20, 30, 40, 73]).bins
+    [[73, 13, 6], [40, 30, 20, 3]]
+
+    >>> kk(BinsKeepingContents(2), items=[1, 2]).bins
+    [[1], [2]]
+
     >>> kk(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
     [[1, 6, 2, 3, 4, 7]]
 
-    >>> kk(BinsKeepingContents(2),items=[3, 6, 13, 20, 30, 40, 73]).bins
-    [[73, 13, 6], [40, 30, 20, 3]]
+    >>> kk(BinsKeepingContents(0), items=[number for number in range(10)]).bins
+    []
 
     """
     k = bins.num
-    if k == 0:
+    bins, flag = base_check_bins(bins=bins, items=items, valueof=valueof)
+    if flag:
         return bins
-    elif k == 1:
-        for item in items:
-            bins.add_item_to_bin(item=item, bin_index=0)
-        return bins
+    items.sort(reverse=True, key=valueof)
+
+    if k > 2:
+        raise ValueError(f"KK algorithm is capable with k <= 2, got {k}")
 
     difference_sets, original_items = kk_heuristic(items=items, valueof=valueof)
 
     A, B = [], []
-    # difference_sets.reverse()
+
     while len(difference_sets) > 0:
         difference_set = difference_sets[0]
         while len(difference_set) > 0:
