@@ -1,0 +1,12 @@
+<!-- First step: define <div class="form-group"> for each field, with two lines: .label and the field itself. -->
+<!-- Second step: add error-check to each field. -->
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="">  <!-- action "" means to return to the same page at submit.-->
+            {{ form.hidden_tag() }}
+            <p>{{ form.spread_sheet_url.label }} {{ form.spread_sheet_url(size=20) }}</p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    </div>
+{% endblock content %}

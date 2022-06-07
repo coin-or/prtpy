@@ -174,6 +174,9 @@ class BinsKeepingSums(Bins):
         return self
 
     def combinations(self, other_bins:Bins) -> Iterator[Bins]:
+        if self.num != other_bins.num:
+            raise ValueError
+
         yielded = set()
         for permutation in permutations(self.sums, self.num):
             new_sums = sorted(p + l for p, l in zip(permutation, other_bins.sums))
@@ -279,6 +282,9 @@ class BinsKeepingContents(BinsKeepingSums):
         return self
 
     def combinations(self, other_bins:Bins) -> Iterator[Bins]:
+        if self.num != other_bins.num:
+            raise ValueError
+
         yielded = set()
         for permutation in permutations(self.bins, self.num):
             new_bins = sorted(sorted(p + l) for p, l in zip(permutation, other_bins.bins))
