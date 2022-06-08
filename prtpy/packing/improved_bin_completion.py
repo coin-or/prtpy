@@ -14,7 +14,7 @@ from prtpy.packing.bc_utilities import *
 import copy
 from prtpy.bins import BinsKeepingContents
 from ibc_util import undominated_generator, hn_wrapper
-from prtpy.packing.ibc_util import ImprovedBinBranch
+from prtpy.packing.ibc_util import ImprovedBinBranch, Stack
 from queue import PriorityQueue
 from queue import Queue
 
@@ -65,20 +65,21 @@ def improved_bin_completion(
     # We create our main branch which will be the first arrangement with empty bins and index 0.
     # Every branch will be a certain state of bin arrangements and items left to arrange.
     # If we finished working on a branch, and we didn't get a good solution, we move on to the next branch.
-    main_branch = ImprovedBinBranch(sorted_items, bins, bin_index=0, depth=0, generator=hn_wrapper(
+    main_branch = ImprovedBinBranch(sorted_items, bins, bin_index=0, last_out_bin_size=binsize, generator=hn_wrapper(
         undominated_generator(bin_size=binsize, numbers=sorted_items, b_chunks_size=chunk_size)))
 
     # -- lazy DFS
     if LDS:
-        # TODO: Implement this
         branches = PriorityQueue()
-        branches.put((0, main_branch))
+        branches.put((1, main_branch))
     else:
-        branches = Queue()  # Queue is slow - array is 15% better
-        branches.put((0, main_branch))
+        branches = Stack()
+        branches.put((1, main_branch))
 
     while not branches.empty():
         # cb = current branch
+        cb: ImprovedBinBranch
+        cb_priority: int
         cb_priority, cb = branches.get()
 
         # if he has next then add the next child
@@ -88,6 +89,13 @@ def improved_bin_completion(
             child_bins: Bins = copy.deepcopy(cb.bins)
             child_bins.add_empty_bins()
 
+            priority = cb_priority
+            if LDS:
+                last_sum = cb.last_out_bin_size
+                now_sum = sum(num_for_bin)
+                priority += (1 if last_sum > now_sum else 0)
+                cb.last_out_bin_size = now_sum
+
             for item in num_for_bin:
                 child_bins.add_item_to_bin(item, cb.bin_index)
 
@@ -96,9 +104,10 @@ def improved_bin_completion(
             for num in num_for_bin:
                 child_items.remove(num)
 
-            child = ImprovedBinBranch(child_items, child_bins, bin_index=cb.bin_index + 1, depth=cb.depth + 1, generator=hn_wrapper(
+            child = ImprovedBinBranch(child_items, child_bins, bin_index=cb.bin_index + 1, last_out_bin_size=binsize, generator=hn_wrapper(
                 undominated_generator(bin_size=binsize, numbers=child_items, b_chunks_size=chunk_size)))
-            branches.put((0, child))
+
+            branches.put((priority, child))
 
             continue
     # -- lazy DFS
@@ -154,3 +163,10 @@ if __name__ == "__main__":
             BinsKeepingContents(), binsize=100, items=arr))
     end = time()
     print(f"my elapsed: {end - start}")
+
+    start = time()
+    for _ in range(1):
+        print(improved_bin_completion(
+            BinsKeepingContents(), binsize=100, items=arr, LDS=True))
+    end = time()
+    print(f"my elapsed LDS: {end - start}")

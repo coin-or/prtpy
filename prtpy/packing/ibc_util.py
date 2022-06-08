@@ -73,8 +73,10 @@ class ImprovedBinBranch:
     bins: Bins
     bin_index: int
     generator: hn_wrapper
-    # somthing about pos in tree
-    depth: int
+    last_out_bin_size: int
+
+    def __lt__(self, other):
+        return False
 
 
 def undominated_generator(bin_size: int, numbers: list[int], b_chunks_size: int) -> Generator[Tuple[int, ...], None, None]:
@@ -127,3 +129,17 @@ if __name__ == "__main__":
     possible_undominated_generator = undominated_generator(6, [], 50)
     print(next(possible_undominated_generator))
     print(next(possible_undominated_generator))
+
+
+class Stack:
+    def __init__(self) -> None:
+        self.stack = []
+
+    def put(self, arg):
+        self.stack.append(arg)
+
+    def get(self):
+        return self.stack.pop()
+
+    def empty(self):
+        return len(self.stack) == 0
