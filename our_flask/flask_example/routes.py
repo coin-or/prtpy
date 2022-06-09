@@ -15,7 +15,7 @@ def loginform():
         return render_template('submit.html', form=form)
     else:
         url = form.spread_sheet_url.data
-        account = gspread.service_account("flask_example/credentials.json")
+        account = gspread.service_account("credentials.json")
         spreadsheet = account.open_by_url(url)
 
         input = spreadsheet.worksheet("Input")
