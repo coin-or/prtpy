@@ -4,6 +4,7 @@
 {% block content %}
     <div class="content-section">
         <form method="POST" action="">  <!-- action "" means to return to the same page at submit.-->
+           <a href="https://docs.google.com/spreadsheets/d/10jSIOFba6vjk1U-C7N6p-8LHTXeFFch8Ui68MOXoUa4/edit#gid=0" target="_blank">Press here to edit the input file </a>
             {{ form.hidden_tag() }}
             <p>{{ form.spread_sheet_url.label }} {{ form.spread_sheet_url(size=20) }}</p>
             <p>{{ form.submit() }}</p>
