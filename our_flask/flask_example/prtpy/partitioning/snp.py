@@ -23,7 +23,6 @@ from typing import Callable, List, Any
 from flask_example.prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
 from flask_example.prtpy.partitioning.kk import kk
 import numpy as np
-from flask_example.prtpy import partition
 from flask_example.prtpy.partitioning.ckk import best_ckk_partition
 from flask_example.prtpy.partitioning.utils import InExclusionBinTree
 
