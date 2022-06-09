@@ -4,7 +4,7 @@ Define the various available output formats for a partition algorithm.
 
 from abc import ABC
 from typing import Any, List
-from prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
+from flask_example.prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
 
 
 class OutputType(ABC):
