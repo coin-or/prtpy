@@ -24,8 +24,8 @@ def loginform():
         input_list = [{'bins': int(bins), 'items': [int(item) for item in items.split(',')]}
                       for bins, items in input.get_all_values()[1:]]
 
-        from prtpy.partitioning.snp import snp
-        from prtpy.partitioning import partition
+        from flask_example.prtpy.partitioning.snp import snp
+        from flask_example.prtpy.partitioning import partition
 
         output_rows = []
         for row in input_list:

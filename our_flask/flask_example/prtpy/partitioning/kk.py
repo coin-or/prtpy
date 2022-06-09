@@ -4,7 +4,7 @@ Authors: Jonathan Escojido & Samuel Harroch
 Since = 03-2022
 """
 from typing import Callable, List, Any
-from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
+from flask_example.prtpy import  Bins, BinsKeepingContents, BinsKeepingSums
 import heapq
 from itertools import count
 
@@ -38,18 +38,18 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
 
     return final_partition
 
-
-if __name__ == '__main__':
-    from prtpy import partition
-
-    print( partition(algorithm=kk, numbins=5, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}) )
-    print(partition(algorithm=kk, numbins=4, items=[1,2,3,3,5,9,9]))
-    print(kk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]))
-
-    print(kk(BinsKeepingContents(3), items=[8, 6, 5, 7, 4]).bins)
-    print(kk(BinsKeepingContents(4), items=[8, 7, 6, 5, 4]).bins)
-
-    print(kk(BinsKeepingContents(3), items=[8, 6, 5, 3, 2, 2, 1]).bins)
-    print(kk(BinsKeepingContents(3), items=[1, 3, 3, 4, 4, 5, 5, 5]).bins)
-
-    print(kk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]).bins)
+#
+# if __name__ == '__main__':
+#     from prtpy import partition
+#
+#     print( partition(algorithm=kk, numbins=5, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}) )
+#     print(partition(algorithm=kk, numbins=4, items=[1,2,3,3,5,9,9]))
+#     print(kk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]))
+#
+#     print(kk(BinsKeepingContents(3), items=[8, 6, 5, 7, 4]).bins)
+#     print(kk(BinsKeepingContents(4), items=[8, 7, 6, 5, 4]).bins)
+#
+#     print(kk(BinsKeepingContents(3), items=[8, 6, 5, 3, 2, 2, 1]).bins)
+#     print(kk(BinsKeepingContents(3), items=[1, 3, 3, 4, 4, 5, 5, 5]).bins)
+#
+#     print(kk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]).bins)

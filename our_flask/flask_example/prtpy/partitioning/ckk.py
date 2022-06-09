@@ -6,7 +6,7 @@ from math import inf
 from time import time
 from typing import Iterator, List, Tuple
 from typing import Callable, List, Any
-from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
+from flask_example.prtpy import  Bins, BinsKeepingContents, BinsKeepingSums
 import heapq
 from itertools import count
 
