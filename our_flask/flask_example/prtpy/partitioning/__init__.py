@@ -12,7 +12,7 @@ import numpy as np
 from flask_example.prtpy import outputtypes as out, objectives as obj
 from typing import Callable, List, Any
 
-from flask_example.prtpy.partitioning.greedy import greedy
+# from flask_example.prtpy.partitioning.greedy import greedy
 
 
 def partition(
