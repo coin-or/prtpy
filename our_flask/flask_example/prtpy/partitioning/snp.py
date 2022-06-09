@@ -20,7 +20,7 @@ Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
 """
 
 from typing import Callable, List, Any
-from flask_example.prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
+from flask_example.prtpy.bins import  Bins, BinsKeepingContents
 from flask_example.prtpy.partitioning.kk import kk
 import numpy as np
 from flask_example.prtpy.partitioning.ckk import best_ckk_partition

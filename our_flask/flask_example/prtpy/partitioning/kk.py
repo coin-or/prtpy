@@ -4,7 +4,7 @@ Authors: Jonathan Escojido & Samuel Harroch
 Since = 03-2022
 """
 from typing import Callable, List, Any
-from flask_example.prtpy import  Bins, BinsKeepingContents, BinsKeepingSums
+from flask_example.prtpy.bins import  Bins, BinsKeepingContents, BinsKeepingSums
 import heapq
 from itertools import count
 
