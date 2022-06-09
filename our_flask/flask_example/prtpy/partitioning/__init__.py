@@ -9,10 +9,10 @@ such as: a list of values, and a dict that maps an item to its value.
 """
 import numpy as np
 
-from prtpy import outputtypes as out, objectives as obj
+from flask_example.prtpy import outputtypes as out, objectives as obj
 from typing import Callable, List, Any
 
-from prtpy.partitioning.greedy import greedy
+from flask_example.prtpy.partitioning.greedy import greedy
 
 
 def partition(
@@ -46,22 +46,22 @@ def partition(
 
     :return: a partition, or a list of sums - depending on outputtype.
 
-    >>> import prtpy
-    >>> dp = prtpy.partitioning.dynamic_programming
-    >>> import numpy as np
-    >>> partition(algorithm=dp, numbins=2, items=[1,2,3,3,5,9,9])
-    [[2, 5, 9], [1, 3, 3, 9]]
-    >>> partition(algorithm=dp, numbins=3, items=[1,2,3,3,5,9,9])
-    [[2, 9], [1, 9], [3, 3, 5]]
-    >>> partition(algorithm=dp, numbins=2, items=np.array([1,2,3,3,5,9,9]), outputtype=out.Sums)
-    (16, 16)
-    >>> int(partition(algorithm=dp, numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.LargestSum))
-    11
-    >>> partition(algorithm=dp, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['b', 'e', 'f'], ['a', 'c', 'd', 'g']]
-    >>> partition(algorithm=dp, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['b', 'g'], ['a', 'f'], ['c', 'd', 'e']]
-    """
+    # >>> import prtpy
+    # >>> dp = prtpy.partitioning.dynamic_programming
+    # >>> import numpy as np
+    # >>> partition(algorithm=dp, numbins=2, items=[1,2,3,3,5,9,9])
+    # [[2, 5, 9], [1, 3, 3, 9]]
+    # >>> partition(algorithm=dp, numbins=3, items=[1,2,3,3,5,9,9])
+    # [[2, 9], [1, 9], [3, 3, 5]]
+    # >>> partition(algorithm=dp, numbins=2, items=np.array([1,2,3,3,5,9,9]), outputtype=out.Sums)
+    # (16, 16)
+    # >>> int(partition(algorithm=dp, numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.LargestSum))
+    # 11
+    # >>> partition(algorithm=dp, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    # [['b', 'e', 'f'], ['a', 'c', 'd', 'g']]
+    # >>> partition(algorithm=dp, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    # [['b', 'g'], ['a', 'f'], ['c', 'd', 'e']]
+    # """
     if isinstance(items, dict):  # items is a dict mapping an item to its value.
         item_names = items.keys()
         if valueof is None:
