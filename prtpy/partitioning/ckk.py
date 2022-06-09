@@ -1,6 +1,10 @@
 """
 Authors: Jonathan Escojido & Samuel Harroch
 Since = 03-2022
+
+Credit: based on code by Søren Fuglede Jørgensen in the numberpartitioning package:
+        https://github.com/fuglede/numberpartitioning/blob/master/src/numberpartitioning
+
 """
 from math import inf
 from time import time
@@ -9,17 +13,39 @@ from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
 import heapq
 from itertools import count
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def _possible_partition_difference_lower_bound(node: List[Tuple[int, int, Bins, List[int]]], numBins: int) -> int:
-    sizes_flattened = [size for partition in node for size in partition[3]]
-    max_sizes_flattened = max(sizes_flattened)
-    return -(max_sizes_flattened - (sum(sizes_flattened) - max_sizes_flattened) // (numBins - 1))
+    """
+    This function check if from the current node we can yield to a better partition or not by checking the
+    best difference we can reach from this node.
+    """
+    logger.info("the current node: ", node)
+
+    sums_flattened = [size for partition in node for size in partition[3]]
+    max_sums_flattened = max(sums_flattened)
+    logger.info(f"max sums sizes = {max_sums_flattened}, sum of all sums = {sum(sums_flattened)}")
+
+    return -(max_sums_flattened - (sum(sums_flattened) - max_sums_flattened) // (numBins - 1))
 
 
 def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best:float = -inf) -> Iterator[Bins]:
-    stack = [[]]  #: List[List[Tuple[int, int, Bins, List[int]]]]
-    yielded = set()
+    """
+    >>> from prtpy import partition
+    >>> for part in ckk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]): part
+    Bin #0: sum=7.0
+    Bin #1: sum=7.0
+    Bin #2: sum=9.0
+    Bin #3: sum=9.0
+    >>> for part in ckk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]): part.bins
+    [[1, 5], [3, 5], [3, 5], [4, 4]]
+    """
+    stack = [[]]
+
     heap_count = count()  # To avoid ambiguity in heaps
     for item in items:
         new_bins = bins.add_item_to_bin(item=item, bin_index=(bins.num - 1), inplace=False)
@@ -27,9 +53,15 @@ def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best:float 
         heapq.heappush(
             stack[0], (-valueof(item), next(heap_count), new_bins, new_bins.sums)
         )
-    # maybe insert here upper bound constraint : best = upper
+
+    logger.info(f"we create the stack - all stack items are possibles branches in the tree (we then combine them in all possible ways). "
+                f"The stack: {stack}")
+
     # best = -inf
     isBest = True if best == -inf else False
+    logger.info(f"isBest= {isBest}, "
+                f"True means we search for the best partition, "
+                f"False means we search for partitions with bounded difference.")
     while stack:
         partitions = stack.pop()
 
@@ -37,21 +69,30 @@ def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best:float 
         if _possible_partition_difference_lower_bound(partitions, bins.num) <= best:
             continue
 
+        logger.info(f"This partition/s could lead to a better partition found so far: {partitions}")
+
         # if could lead to legal partition
         if len(partitions) == 1:
+
             # diff and best are non-positives numbers
             diff = partitions[0][0]
 
+            logger.info(f"We arrive to a legal partition. Is it better than the best one found so far?\n"
+                        f"is this partition diff ={-diff} < from the best one = {-best} ?")
+
             if diff > best: # consolidate if geq
+                logger.info("We found a better partition!!! Continue to search for better partitions....")
                 if isBest:
                     best = diff
                 _, _, final_partition, final_sums = partitions[0]
                 yield final_partition
 
                 if diff == 0:
+                    logger.info("Perfect partition is found!!!")
                     return
             continue
 
+        logger.info("Combine between the partitions in order to create legal partition.")
         # continue create legal part
         _, _, bin1, bin1_sums = heapq.heappop(partitions)
         _, _, bin2, bin2_sums = heapq.heappop(partitions)
@@ -126,16 +167,11 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
 
 
 if __name__ == '__main__':
-    # lst = [4,5,6,7,8,9]
-    # items = {"a": 1, "b": 2, "c": 3, "d": 3, "e": 5, "f": 9, "g": 9}
-    #
-    # from prtpy import partition
-    # print(partition(algorithm=best_ckk_partition, numbins=3, items=items))
-    #
-    # # [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
-    # print(partition(algorithm=best_ckk_partition, numbins=3, items=items, outputtype=out.Sums))
-    start = time()
-    for part in ckk(BinsKeepingContents(4),
-              items=[1,3,3,4,4,5,5,5],best=-5):
-        print(part.bins)
-    print(time() - start)
+
+    # logger.setLevel(logging.INFO)
+    # logger.addHandler(logging.StreamHandler())
+
+    import doctest
+
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))

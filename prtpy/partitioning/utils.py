@@ -2,6 +2,12 @@
 Authors: Jonathan Escojido & Samuel Harroch
 
 Since = 03-2022
+This class represent an inclusion-exclusion binary tree, in which leaf nodes represent
+all possible subsets. Each level of the tree corresponds to a
+particular number, and at each branch we either include the
+corresponding number in the subset, or exclude it. For example, the left subtree of the root contains all subsets that include
+the first number, and the right subtree of the root contains all
+subsets that exclude the first number
 """
 
 from typing import List, Generator, Callable
@@ -39,6 +45,35 @@ class InExclusionBinTree:
                            remaining_numbers=parent.remaining_numbers[1:])
 
     def generate_tree(self) -> Generator:
+        """
+        >>> items = {"a": 1, "b": 2, "c": 3, "d": 3, "e": 5, "f": 9, "g": 9}
+        >>> item_names = items.keys()
+        >>> valueof = items.__getitem__
+        >>> t = InExclusionBinTree(item_names, valueof, upper_bound=10, lower_bound=7)
+        >>> for bounded_set in t.generate_tree(): bounded_set
+        ['f', 'a']
+        ['f']
+        ['g', 'a']
+        ['g']
+        ['e', 'c', 'b']
+        ['e', 'c', 'a']
+        ['e', 'c']
+        ['e', 'd', 'b']
+        ['e', 'd', 'a']
+        ['e', 'd']
+        ['e', 'b', 'a']
+        ['e', 'b']
+        ['c', 'd', 'b', 'a']
+        ['c', 'd', 'b']
+        ['c', 'd', 'a']
+        >>> items = [4,5,6,7,8]
+        >>> t = InExclusionBinTree(items, lambda x: x, upper_bound=10, lower_bound=7)
+        >>> for bounded_set in t.generate_tree(): bounded_set
+        [8]
+        [7]
+        [6, 4]
+        [5, 4]
+        """
         current_node = self.root
         return self.rec_generate_tree(current_node)
 
@@ -60,10 +95,7 @@ class InExclusionBinTree:
 
 
 if __name__ == '__main__':
-    items = {"a": 1, "b": 2, "c": 3, "d": 3, "e": 5, "f": 9, "g": 9}
-    item_names = items.keys()
-    valueof = items.__getitem__
+    import doctest
 
-    t = InExclusionBinTree(item_names, valueof, upper_bound=10, lower_bound=7)
-    for s in t.generate_tree():
-        print(s)
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))

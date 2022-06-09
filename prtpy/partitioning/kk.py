@@ -1,7 +1,8 @@
 """
 Authors: Jonathan Escojido & Samuel Harroch
-
 Since = 03-2022
+Credit: based on code by Søren Fuglede Jørgensen in the numberpartitioning package:
+           https://github.com/fuglede/numberpartitioning/blob/master/src/numberpartitioning
 """
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
@@ -10,6 +11,21 @@ from itertools import count
 
 
 def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
+    """
+    >>> from prtpy import partition
+    >>> partition(algorithm=kk, numbins=5, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    [['c', 'a'], ['e'], ['d', 'b'], ['g'], ['f']]
+    >>> partition(algorithm=kk, numbins=4, items=[1,2,3,3,5,9,9])
+    [[5, 2], [3, 3, 1], [9], [9]]
+    >>> kk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9])
+    Bin #0: sum=7.0
+    Bin #1: sum=7.0
+    Bin #2: sum=9.0
+    Bin #3: sum=9.0
+    >>> kk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]).bins
+    [[1, 5], [3, 5], [3, 5], [4, 4]]
+
+    """
     partitions = []  # : List[(int, int, Partition, List[int])]
     heap_count = count()  # To avoid ambiguity in heap
 
@@ -40,16 +56,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
 
 
 if __name__ == '__main__':
-    from prtpy import partition
+    import doctest
 
-    print( partition(algorithm=kk, numbins=5, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}) )
-    print(partition(algorithm=kk, numbins=4, items=[1,2,3,3,5,9,9]))
-    print(kk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]))
-
-    print(kk(BinsKeepingContents(3), items=[8, 6, 5, 7, 4]).bins)
-    print(kk(BinsKeepingContents(4), items=[8, 7, 6, 5, 4]).bins)
-
-    print(kk(BinsKeepingContents(3), items=[8, 6, 5, 3, 2, 2, 1]).bins)
-    print(kk(BinsKeepingContents(3), items=[1, 3, 3, 4, 4, 5, 5, 5]).bins)
-
-    print(kk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]).bins)
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))
