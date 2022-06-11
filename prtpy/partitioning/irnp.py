@@ -11,15 +11,13 @@
     Date: 26/04/2022
     Email: kfir.goldfarb@msmail.ariel.ac.il
 """
-import copy
 import itertools
 from typing import Callable, List
 from prtpy import Bins
 from prtpy.bins import BinsKeepingContents
-from prtpy.partitioning.ckk import ckk
 from prtpy.partitioning.rnp import rnp
-from prtpy.utils import base_check_bins, is_all_lists_are_different, all_in, get_best_best_k_combination, max_largest, \
-    get_best_partition, calculate_diff, get_sum_of_max_subset, get_largest_number
+from prtpy.utils import base_check_bins, is_all_lists_are_different, all_in, get_best_best_k_combination, \
+    calculate_diff, get_sum_of_max_subset, get_largest_number
 
 
 def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -36,31 +34,37 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> irnp(BinsKeepingContents(3), items=[5, 8, 6, 4, 7]).bins
     [[8], [7, 4], [6, 5]]
 
-    >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)
+    >>> list(irnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)
     [100.0, 100.0, 100.0]
 
-    >>> rnp(BinsKeepingContents(2), items=[1, 6, 2, 3, 4, 7]).bins
-    [[7, 3, 2], [6, 4, 1]]
+    >>> irnp(BinsKeepingContents(2), items=[1, 6, 2, 3, 4, 7]).bins
+    [[7, 4], [6, 3, 2, 1]]
 
-    >>> rnp(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).bins
-    [[17, 11, 8], [18, 12, 2]]
+    >>> irnp(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).bins
+    [[18, 17], [12, 11, 8, 2]]
 
-    >>> list(rnp(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).sums)
+    >>> list(irnp(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).sums)
     [160.0, 140.0]
 
-    >>> rnp(BinsKeepingContents(4), items=[3, 6, 13, 20, 30, 40, 73]).bins
-    [[73], [40], [30, 6], [20, 13, 3]]
+    >>> irnp(BinsKeepingContents(4), items=[3, 6, 13, 20, 30, 40, 73]).bins
+    [[73], [40], [30], [20, 13, 6, 3]]
 
-    >>> rnp(BinsKeepingContents(5), items=[1, 2, 3, 4, 5]).bins
+    >>> irnp(BinsKeepingContents(3), items=[1, 2, 3, 4, 5, 6]).bins
+    [[6, 1], [5, 2], [4, 3]]
+
+    >>> list(irnp(BinsKeepingContents(3), items=[1, 2, 3, 4, 5, 6]).sums)
+    [7.0, 7.0, 7.0]
+
+    >>> irnp(BinsKeepingContents(5), items=[1, 2, 3, 4, 5]).bins
     [[1], [2], [3], [4], [5]]
 
     >>> rnp(BinsKeepingContents(2), items=[1, 2]).bins
     [[1], [2]]
 
-    >>> rnp(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
+    >>> irnp(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
     [[1, 6, 2, 3, 4, 7]]
 
-    >>> rnp(BinsKeepingContents(0), items=[number for number in range(10)]).bins
+    >>> irnp(BinsKeepingContents(0), items=[number for number in range(10)]).bins
     []
 
     """
@@ -88,7 +92,7 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
                 flag = True
                 break
 
-    # working as irnp by take the optimal k combination
+    # working as irnp by take the not optimal k combination
     if not flag:
         best_k_combination = get_best_best_k_combination(k_combinations=all_k_combinations)
 
