@@ -25,6 +25,16 @@ def base_check_bins(bins: Bins, items: List[any], valueof: Callable = lambda x: 
     return bins, flag
 
 
+def calculate_diff(items):
+    diff_sum = 0
+    for combination in itertools.combinations(items, 2):
+        if len(combination[0]) == 0 or len(combination[1]) == 0:
+            break
+        else:
+            diff_sum += abs(sum(combination[0]) - sum(combination[1]))
+    return diff_sum
+
+
 def get_best_best_k_combination(k_combinations):
     best_combination = []
     minimum_diff = np.inf
@@ -42,6 +52,36 @@ def get_best_best_k_combination(k_combinations):
             minimum_diff = diff_sum
             best_combination = k_combination
     return best_combination
+
+
+def get_sum_of_max_subset(combination):
+    """
+    >>> get_sum_of_max_subset(combination=[[5, 6], [1, 3], [2, 20]])
+    22
+    """
+    if len(combination) == 0:
+        return 0
+    max_subset = combination[0]
+    max_sum = 0
+    for combination_set in combination:
+        if sum(combination_set) > max_sum:
+            max_sum = sum(combination_set)
+            max_subset = combination_set
+    return sum(max_subset)
+
+
+def get_largest_number(combination):
+    """
+    >>> get_largest_number(combination=[[5, 6], [1, 3], [2, 20]])
+    20
+    """
+    if len(combination) == 0:
+        return 0
+    max_number = 0
+    for combination_set in combination:
+        if max(combination_set) > max_number:
+            max_number = max(combination_set)
+    return max_number
 
 
 def all_in(sub_items: list, items) -> bool:

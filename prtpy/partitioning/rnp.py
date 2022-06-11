@@ -18,7 +18,7 @@ from typing import Callable, List
 
 import numpy as np
 
-from prtpy import Bins, BinsKeepingContents
+from prtpy import Bins, BinsKeepingContents, partition
 from prtpy.partitioning.ckk import ckk
 from prtpy.utils import base_check_bins, all_in, is_all_lists_are_different, get_best_best_k_combination
 
@@ -67,7 +67,7 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     items.sort(reverse=True, key=valueof)
 
     all_combinations = []
-    for i in range(1, len(items) - k + 1):
+    for i in range(1, len(items) - k + 2):
         all_combinations.extend([list(combination) for combination in itertools.combinations(items, i)])
     all_k_combinations = [list(combination) for combination in itertools.combinations(all_combinations, k) if
                           is_all_lists_are_different(combination) and all_in(combination, items)]
