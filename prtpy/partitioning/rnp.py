@@ -12,13 +12,9 @@
     Email: kfir.goldfarb@msmail.ariel.ac.il
 """
 import itertools
-import random
-from copy import deepcopy
 from typing import Callable, List
 
-import numpy as np
-
-from prtpy import Bins, BinsKeepingContents, partition
+from prtpy import Bins, BinsKeepingContents
 from prtpy.partitioning.ckk import ckk
 from prtpy.utils import base_check_bins, all_in, is_all_lists_are_different, get_best_best_k_combination
 
