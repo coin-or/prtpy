@@ -19,7 +19,7 @@ from prtpy.bins import BinsKeepingContents
 from prtpy.partitioning.ckk import ckk
 from prtpy.partitioning.rnp import rnp
 from prtpy.utils import base_check_bins, is_all_lists_are_different, all_in, get_best_best_k_combination, max_largest, \
-    get_best_partition
+    get_best_partition, calculate_diff, get_sum_of_max_subset, get_largest_number
 
 
 def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -28,7 +28,7 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> list(irnp(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).sums)
-    [36.0, 32.0]
+    [35.0, 33.0]
 
     >>> irnp(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).bins
     [[85, 75], [95, 25, 15, 5]]
@@ -69,11 +69,33 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     if flag:
         return bins
     items.sort(reverse=True, key=valueof)
-    max_largest_bins = max_largest(bins=copy.deepcopy(bins), items=items, valueof=valueof)
-    rnp_bins = rnp(bins=copy.deepcopy(bins), items=items, valueof=valueof)
-    ckk_bins = ckk(bins=copy.deepcopy(bins), items=items, valueof=valueof)
-    perfect_solution = get_best_partition([max_largest_bins, rnp_bins, ckk_bins], k)
-    return perfect_solution
+
+    all_combinations = []
+    for i in range(1, len(items) - k + 2):
+        all_combinations.extend([list(combination) for combination in itertools.combinations(items, i)])
+
+    flag = False
+    best_k_combination = []
+    all_k_combinations = []
+    for combination in itertools.combinations(all_combinations, k):
+        if is_all_lists_are_different(combination) and all_in(combination, items):
+            all_k_combinations.append(list(combination))
+
+            # found a optimal partition or maximum subset sum equals to largest number
+            if calculate_diff(combination) == 0 or get_sum_of_max_subset(combination) == get_largest_number(
+                    combination):
+                best_k_combination = combination
+                flag = True
+                break
+
+    # working as irnp by take the optimal k combination
+    if not flag:
+        best_k_combination = get_best_best_k_combination(k_combinations=all_k_combinations)
+
+    for index, combination_items in enumerate(best_k_combination):
+        for item in combination_items:
+            bins.add_item_to_bin(item=item, bin_index=index)
+    return bins
 
 
 if __name__ == "__main__":
