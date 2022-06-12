@@ -31,11 +31,11 @@ def improved_bin_completion(
 
     >>> from prtpy.bins import BinsKeepingContents
     >>> improved_bin_completion(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).bins
-    [[1, 2, 3, 3], [5], [9], [9]]
+    [[9], [9], [5, 3, 1], [3, 2]]
     >>> improved_bin_completion(BinsKeepingContents(), binsize=18, items=[1,2,3,3,5,9,9]).bins
-    [[1, 2, 3, 3, 5], [9, 9]]
-    >>> list(bin_packing(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).sums)
-    [9.0, 5.0, 9.0, 9.0]
+    [[9, 9], [5, 3, 3, 2, 1]]
+    >>> list(improved_bin_completion(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).sums)
+    [9.0, 9.0, 9.0, 5.0]
     """
    # Test if there is an item which is not a number OR larger than binsize.
     for item in items:
