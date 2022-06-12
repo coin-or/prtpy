@@ -92,10 +92,11 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
                 flag = True
                 break
 
-    # working as irnp by take the not optimal k combination
+    # working as irnp by taking the not optimal k combination
     if not flag:
         best_k_combination = get_best_best_k_combination(k_combinations=all_k_combinations)
 
+    # add solution to bins
     for index, combination_items in enumerate(best_k_combination):
         for item in combination_items:
             bins.add_item_to_bin(item=item, bin_index=index)
