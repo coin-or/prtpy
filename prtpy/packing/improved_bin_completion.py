@@ -13,8 +13,7 @@ from prtpy.packing import best_fit
 from prtpy.packing.bc_utilities import *
 import copy
 from prtpy.bins import BinsKeepingContents
-from ibc_util import undominated_generator, hn_wrapper
-from prtpy.packing.ibc_util import ImprovedBinBranch, Stack
+from prtpy.packing.ibc_util import ImprovedBinBranch, Stack, undominated_generator, hn_wrapper
 from queue import PriorityQueue
 from queue import Queue
 
