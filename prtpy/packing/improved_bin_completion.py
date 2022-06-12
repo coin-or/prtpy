@@ -11,11 +11,10 @@
 from typing import Callable, Any
 from prtpy.packing import best_fit
 from prtpy.packing.bc_utilities import *
-import copy
 from prtpy.bins import BinsKeepingContents
 from prtpy.packing.ibc_util import ImprovedBinBranch, Stack, undominated_generator, hn_wrapper
+import copy
 from queue import PriorityQueue
-from queue import Queue
 
 
 def improved_bin_completion(
@@ -31,9 +30,9 @@ def improved_bin_completion(
     The IBC algorithm pack the items to the fewest number of bins sized binsize.
 
     >>> from prtpy.bins import BinsKeepingContents
-    >>> bin_packing(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).bins
+    >>> improved_bin_completion(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).bins
     [[1, 2, 3, 3], [5], [9], [9]]
-    >>> bin_packing(BinsKeepingContents(), binsize=18, items=[1,2,3,3,5,9,9]).bins
+    >>> improved_bin_completion(BinsKeepingContents(), binsize=18, items=[1,2,3,3,5,9,9]).bins
     [[1, 2, 3, 3, 5], [9, 9]]
     >>> list(bin_packing(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).sums)
     [9.0, 5.0, 9.0, 9.0]
