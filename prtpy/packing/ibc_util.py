@@ -79,7 +79,7 @@ class ImprovedBinBranch:
         return False
 
 
-def undominated_generator(bin_size: int, numbers: list[int], b_chunks_size: int) -> Generator:
+def undominated_generator(bin_size: int, numbers: List[int], b_chunks_size: int) -> Generator:
     '''
     Generate in chunks of b sized, then sort them by _compere function
     Bigger chunk size can remove more duplications and sort better but takes more time
@@ -107,7 +107,7 @@ def undominated_generator(bin_size: int, numbers: list[int], b_chunks_size: int)
 
             if sum(tmp) <= bin_size:
                 b.add(tmp)
-        b_list: list[Tuple[int, ...]] = sorted(list(b), key=functools.cmp_to_key(
+        b_list: List[Tuple[int, ...]] = sorted(list(b), key=functools.cmp_to_key(
             _compere), reverse=True)
         for option in b_list:
             yield option
