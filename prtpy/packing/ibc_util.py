@@ -79,7 +79,7 @@ class ImprovedBinBranch:
         return False
 
 
-def undominated_generator(bin_size: int, numbers: list(int), b_chunks_size: int) -> Generator:
+def undominated_generator(bin_size: int, numbers: list[int], b_chunks_size: int) -> Generator:
     '''
     Generate in chunks of b sized, then sort them by _compere function
     Bigger chunk size can remove more duplications and sort better but takes more time
