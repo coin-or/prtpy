@@ -30,6 +30,11 @@ class partitioning:
 
     from prtpy.partitioning.cbldm import cbldm
 
+    from prtpy.partitioning.kk import kk
+    from prtpy.partitioning.ckk import ckk
+    from prtpy.partitioning.rnp import rnp
+    from prtpy.partitioning.irnp import irnp
+
 
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing
