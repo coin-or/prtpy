@@ -32,6 +32,7 @@ class partitioning:
     from prtpy.partitioning.ckk import ckk
     from prtpy.partitioning.rnp import rnp
     from prtpy.partitioning.irnp import irnp
+    from prtpy.partitioning.cbldm import cbldm
 
 
 class packing:
