@@ -5,7 +5,7 @@ import unittest
 algorithm = bin_completion.bin_completion
 
 
-class TestImprovedBinCompletion(unittest.TestCase):
+class TestBinCompletion(unittest.TestCase):
 
     # In this test we will check cases where we need only 1 bin to store the items:
     def test_fits_one_bin(self):
