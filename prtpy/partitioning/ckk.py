@@ -66,10 +66,9 @@ def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     if flag:
         return bins
     items.sort(reverse=True, key=valueof)
-
-    items = sorted(items, key=valueof)
     partition = heuristic(items=items, k=k)
     result = [p[0] for p in partition]
+
     for index, p in enumerate(sorted(result[0], key=sum, reverse=True)):
         for n in sorted(p, reverse=True):
             bins.add_item_to_bin(item=n, bin_index=index)
@@ -84,9 +83,7 @@ def heuristic(items: List[any], k: int = 2):
         r: List[List[int]] = [[number]]
         this_partition = l + r
         this_sizes: List[int] = [0] * (k - 1) + [number]
-        heapq.heappush(
-            stack[0], (-number, next(heap_count), this_partition, this_sizes)
-        )
+        heapq.heappush(stack[0], (-number, next(heap_count), this_partition, this_sizes))
     best = -np.inf
     while stack:
         partitions = stack.pop()
@@ -98,8 +95,6 @@ def heuristic(items: List[any], k: int = 2):
                 best = num
                 _, _, final_partition, final_sums = partitions[0]
                 yield final_partition, final_sums
-                if num == 0:
-                    return
             continue
         _, _, p1, p1_sum = heapq.heappop(partitions)
         _, _, p2, p2_sum = heapq.heappop(partitions)
@@ -107,9 +102,7 @@ def heuristic(items: List[any], k: int = 2):
         for new_partition, new_sizes in _combine_partitions(p1, p2):
             tmp_partitions = partitions[:]
             diff = max(new_sizes) - min(new_sizes)
-            heapq.heappush(
-                tmp_partitions, (-diff, next(heap_count), new_partition, new_sizes)
-            )
+            heapq.heappush(tmp_partitions, (-diff, next(heap_count), new_partition, new_sizes))
             tmp_stack_extension.append(tmp_partitions)
         stack.extend(sorted(tmp_stack_extension))
 
