@@ -21,18 +21,7 @@ from heapq import heapreplace
 # written by Noga Alon, Yossi Aza, Gerhard J. Woeginger and Tal Yadid.
 # This implementation is not exactly the way is described in the article since many of their's so calles "fixed" variables are too large to handle.
 # This implementation was written by Edut Cohen during the course "Research Algorithms" by Erel Segal Halevy.
-
-def sublist_creator(x, n, sort=True):
-    bins = [[0] for _ in range(n)]
-    if sort:
-        x = sorted(x, key = ValOf)
-    for job in x:
-            least = bins[0]
-            least[0] += ValOf(job)
-            least.append(job)
-            heapreplace(bins, least)                 
-        
-    return [x[1:] for x in bins]
+# 14.6.2022
 
 def CalcLambda_star(f:Callable,epsilon:float)->int:
     """
@@ -96,11 +85,14 @@ def mainAlgorithm( bins: Bins, #bin is a machine
     Bin #0: [(1, 10), (2, 10)], sum=20.0
     Bin #1: [(3, 10)], sum=10.0
 
-    Example 1: 
     >>> mainAlgorithm(BinsKeepingContents(2),[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],0.1,lambda x:x**2)
     Bin #0: [(2, 34000), (11, 65432), (10, 78900), (1, 124000), (9, 200101)], sum=502433.0
     Bin #1: [(14, 17642), (8, 23047), (6, 43124), (13, 52422), (3, 54768), (5, 89765), (12, 101436), (4, 115256), (7, 107)], sum=497567.0
     
+    >>> mainAlgorithm(BinsKeepingSums(2),[426,666,846,8500,3300,1546,985,103,674,131,124,564,135],0.5,lambda x:x)
+    Bin #0: sum=8603.0
+    Bin #1: sum=8443.0
+                      
     
     """    
      
