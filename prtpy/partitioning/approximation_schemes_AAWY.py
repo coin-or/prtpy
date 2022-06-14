@@ -1,18 +1,13 @@
 
-from ast import Call
-from asyncio import Queue
-from cgitb import small
 from itertools import repeat
 import math
-import queue
-import threading
+
 from typing import Callable
 from typing import List
-import concurrent.futures
 from numpy import append, number, obj2sctype as obj
 
-from prtpy import bins
-from prtpy import objectives as obj, Bins, partitioning
+
+from prtpy import objectives as obj, Bins
 
 from prtpy.bins import BinsKeepingContents
 
@@ -22,24 +17,15 @@ from prtpy.bins import BinsKeepingSums
 
 from heapq import heapreplace
 
-
+# This algorithm is based on the algorithm shown in the article "Approximation Schemes for Scheduling on Parallel Machines"
+# written by Noga Alon, Yossi Aza, Gerhard J. Woeginger and Tal Yadid.
+# This implementation is not exactly the way is described in the article since many of their's so calles "fixed" variables are too large to handle.
+# This implementation was written by Edut Cohen during the course "Research Algorithms" by Erel Segal Halevy.
 
 def sublist_creator(x, n, sort=True):
     bins = [[0] for _ in range(n)]
     if sort:
         x = sorted(x, key = ValOf)
-    # if isinstance(x[0], int):
-    #     for job in x:
-    #         least = bins[0]
-    #         least[0] += job
-    #         least.append(job)
-    #         heapreplace(bins, least)
-    # else:
-    #     for (i, job) in x:
-    #         least = bins[0]
-    #         least[0] += job
-    #         least.append((i,job))
-    #         heapreplace(bins, least)  
     for job in x:
             least = bins[0]
             least[0] += ValOf(job)
@@ -114,16 +100,10 @@ def mainAlgorithm( bins: Bins, #bin is a machine
     >>> mainAlgorithm(BinsKeepingContents(2),[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],0.1,lambda x:x**2)
     Bin #0: [(2, 34000), (11, 65432), (10, 78900), (1, 124000), (9, 200101)], sum=502433.0
     Bin #1: [(14, 17642), (8, 23047), (6, 43124), (13, 52422), (3, 54768), (5, 89765), (12, 101436), (4, 115256), (7, 107)], sum=497567.0
-    """    
     
-    # Example 2: 
-    # >>> mainAlgorithm(0.5,[426,666,846,8500,3300,1546,985,103,674,131,124,564,135],2,lambda x:x)
-    # [[426,666,846,8500,3300,1546,985,103,674,131,124,564,135][]]
-
-    # Example 3:
-    # >>> mainAlgorithm(0.5,[107,7502,684,12123,450,4663,1985,4102,1052,407,310,113,200,23,1012,41,126,5100],4,lambda x:x**2)
-    # [[107,4663,1985,4102,407,113],[7502,23,1012,41,5100],[684,450,1052,310,200,126],[12123]]
-                            
+    
+    """    
+     
     bins.set_valueof(ValOf)                
     if isinstance(items[0],int):
         items=list(enumerate(items,1))
@@ -231,47 +211,22 @@ def loopForDivision(start,end, base, jobs):
     return(curMin,minDiv)        
 
 def IP(convertedJobs: List[float], numbrOfMachines:int, f: Callable)->List[List[float]]:
-    #this function does not work yet!!!!!!!!!
     """
     "partition the  converted jobs into numbrOfMachines parts in an optimal way such that we minimize sum(f(C_i))"
     >>> IP([10,15,10,10,15],2,lambda x:x**2)
     [[10, 10, 10], [15, 15]]
+    >>> IP([124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642],2,lambda x:x**2)
+    [[115256, 43124, 1000, 23048, 200102, 65432, 52422], [124000, 34000, 54768, 89766, 78900, 101436, 17642]]
     """
-    divisions=numbrOfMachines**len(convertedJobs)
-    # t1 = threading.Thread(target = loopForDivision ,args = [0,int(divisions/4), numbrOfMachines, convertedJobs] )
-    # t2 = threading.Thread(target = loopForDivision ,args = [int(divisions/4),int(divisions/2), numbrOfMachines, convertedJobs] )
-    # t3 = threading.Thread(target = loopForDivision ,args = [int(divisions/2),int(divisions/4)*3, numbrOfMachines, convertedJobs] )
-    # t4 = threading.Thread(target = loopForDivision ,args = [int(divisions/4)*3,divisions, numbrOfMachines, convertedJobs] )
-   
-    with concurrent.futures.ThreadPoolExecutor(8) as exect:
-        results =[ exect.submit(loopForDivision , 0,                 int(divisions/8), numbrOfMachines, convertedJobs) ,
-                   exect.submit(loopForDivision , int(divisions/8),  int(divisions/4), numbrOfMachines, convertedJobs),
-                   exect.submit(loopForDivision , int(divisions/4),  int(divisions/8)*3, numbrOfMachines, convertedJobs),
-                   exect.submit(loopForDivision , int(divisions/8)*3,int(divisions/2), numbrOfMachines, convertedJobs),
-                   exect.submit(loopForDivision , int(divisions/2),  int(divisions/8)*5,numbrOfMachines, convertedJobs) ,
-                   exect.submit(loopForDivision , int(divisions/8)*5,int(divisions/8)*6, numbrOfMachines, convertedJobs),
-                   exect.submit(loopForDivision , int(divisions/8)*6,int(divisions/8)*7, numbrOfMachines, convertedJobs),
-                   exect.submit(loopForDivision , int(divisions/8)*7,divisions, numbrOfMachines, convertedJobs)
-        ]
-        curMin=float("inf")
-        minDiv=[]
-        for res in concurrent.futures.as_completed(results):
-            if res.result()[0]<curMin:
-                curMin=res.result()[0]
-                minDiv=res.result()[1]
-
-    # curMin=float("inf")
-    # for i in range(numbrOfMachines**len(convertedJobs)):
-    #     curDiv=numberToBase(i,numbrOfMachines,len(convertedJobs))
-    #     divResult=calculateMaxInDiv(curDiv,numbrOfMachines,convertedJobs)
-    #     if divResult[0]<curMin:
-    #         curMin=divResult[0]
-    #         minDiv=divResult[1]
-    # >>> IP([124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642],2,lambda x:x**2)
-    # [[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]]
-    #partition=sublist_creator(convertedJobs,numbrOfMachines)
-    # print("partition",partition)
     
+    curMin=float("inf")
+    for i in range(numbrOfMachines**len(convertedJobs)):
+        curDiv=numberToBase(i,numbrOfMachines,len(convertedJobs))
+        divResult=calculateMaxInDiv(curDiv,numbrOfMachines,convertedJobs)
+        if divResult[0]<curMin:
+            curMin=divResult[0]
+            minDiv=divResult[1]
+   
     return minDiv
     
 
@@ -282,14 +237,10 @@ def deconvertJobs(originalJobs,partition: List[List[any]], L: float, lambda_star
     >>> deconvertJobs([(1,1),(2,2),(3,3),(4,4)],[[(3, 3.75), (-1, 2.5)],[(4, 5.0), (-1, 2.5)]],5,2,[(1, 1), (2, 2)])
     [[(3, 3), (1, 1)], [(4, 4), (2, 2)]]
     """
-    # >>> deconvertJobs([[124000,54768,89766,78900,101436,52422,17642],[34000,115256,43124,1000,23048,200102,65432]], 500000,500)
-    [[124000,54768,89765,78900,101436,52422,17642],[34000,115256,43124,107,23047,200101,65432]]
-    #deconvertPartition=[[]]*len(partition)
+    
     deconvertPartition = [[] for _ in partition]
     numberOfSmallJobsPerM=[0]*len(partition)
     numberOfMachines=len(partition)
-    # for i in range(numberOfMachines):
-    #     numberOfSmallJobsPerM.append(0)
     numberOfSmallJobs=0 
     index=0   
     for machine in partition:
@@ -331,35 +282,5 @@ if __name__ == "__main__":
     print(doctest.testmod()) 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
-    #list(range(10))
-    import time
-    for i in range(5,16):
-        start = time.perf_counter()
-        print(mainAlgorithm(BinsKeepingContents(3),list(range(1,i)),0.1, lambda x:x**2,ValOf))
-        finish = time.perf_counter()
-        print(f'Finished in {round(finish-start,2)} second(s)')
-
-    # ConvertJobs([124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],500000,500)
-    # ConvertJobs([100,200,300,400],500,500)
-    # jobs=[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642]
-    # ConvertJobs([1,2,3,4],5,2)
-    # #print(deconvertJobs([(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)],[[(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,69), (8,1)]],70,10,[(8,1)]))
-    # for i in range(32):
-        
-    #     div=numberToBase(i,2,5)
-    #     ans=calculateMaxInDiv(div,2,[1,2,3,4,5])
-    #     print(div,ans)
-   
-   
-   
-   
-   
-   # [124000,34000,54768,115256,89766,43124,1000,23048,200102,78900,65432,101436,52422,17642]
-    #eps=0.1   
-    #mainAlgorithm(BinsKeepingContents(2),[124000,34000,54768,115256,89765,43124,107,23047,200101,78900,65432,101436,52422,17642],0.1, lambda x:x**2)
-    #print(sublist_creator([(0,2),(2,3),(5,1)],1))
-    #print(ConvertJobs([(1,10),(2,20),(3,30),(4,40),(5,50),(6,60),(7,70)],70,10))
-    #print(sumSplit([4,1,8,6]))
-    #for i in range(100):
-    #mainAlgorithm(BinsKeepingContents(2),[10,10,10],eps, lambda x:x**2,ValOf)
-     #   eps+=0.01
+    
+    
