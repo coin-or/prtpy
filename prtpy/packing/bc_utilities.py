@@ -10,16 +10,16 @@ from itertools import combinations, product
 from typing import List, Iterable
 import logging
 from prtpy.bins import Bins, BinsKeepingContents
+from dataclasses import dataclass
 
 
 # A simple class to store a state of bins arrangement.
 # We keep the current bin arrangement and index of the next bin, as well as the items left to arrange in those bins.
+@dataclass
 class BinBranch:
-    def __init__(self, items: List, bins: Bins, bin_index: int):
-        self.items = items
-        self.bins = bins
-        self.bin_index = bin_index
-
+    items: List
+    bins: Bins
+    bin_index: int
 
 # Returns a new list which is a copy of 'original' but without the items in 'to_remove' if they existed.
 def list_without_items(original: List, to_remove: Iterable) -> List:
@@ -121,7 +121,8 @@ def find_all_bin_arrangements(items: List, num_of_sublists: int):
 # and checks if each list in the arrangement fits the corresponding item in the same index
 def check_fits(items: List[int], arrangement: List[List]):
     if len(items) != len(arrangement):
-        raise ValueError(f"items list ({len(items)}) and arrangement ({len(arrangement)}) are not in the same size")
+        raise ValueError(
+            f"items list ({len(items)}) and arrangement ({len(arrangement)}) are not in the same size")
 
     for i in range(len(items)):
         if sum(arrangement[i]) > items[i]:
@@ -188,7 +189,6 @@ def is_dominant(list1: List, list2: List):
             return True
 
     return False
-
 
 
 def check_for_dominance(completions: List[List]):
@@ -336,7 +336,8 @@ def find_bin_completions(x: int, items: List, binsize: int):
 
     # We go through all combinations of items subsets of all sizes, that fits the bin containing x.
     for i in range(len(items) + 1):
-        feasible_completions = filter(lambda s: x + sum(s) <= binsize, combinations(items, i))
+        feasible_completions = filter(
+            lambda s: x + sum(s) <= binsize, combinations(items, i))
 
         # For every subset that fits the bin containing x, we find undominated pair of items to add to our completions.
         # When we take subset of size 1 and find a pair, it's like finding a triplet.
@@ -344,7 +345,8 @@ def find_bin_completions(x: int, items: List, binsize: int):
         for fc in feasible_completions:
             constant_elements_sum = x + sum(fc)
             items_left = list_without_items(items, fc)
-            undominated_pairs = find_undominated_pairs(constant_elements_sum, y, items_left, binsize)
+            undominated_pairs = find_undominated_pairs(
+                constant_elements_sum, y, items_left, binsize)
 
             # We add the undominated pairs to possible completions.
             # if none were found - we add the subset fc as a possible completions.
