@@ -26,7 +26,7 @@ from prtpy.partitioning.kk import kk
 import numpy as np
 from prtpy import partition
 from prtpy.partitioning.ckk import best_ckk_partition
-from prtpy.partitioning.utils import InExclusionBinTree
+from prtpy.utils import InExclusionBinTree
 
 
 def find_diff(l1: List, l2: List):
