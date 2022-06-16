@@ -1,3 +1,12 @@
+"""
+Authors: Jonathan Escojido & Samuel Harroch
+
+Since = 03-2022
+Tests for the SNP algorithms based on the article below.
+
+Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
+"""
+
 import unittest
 
 import prtpy

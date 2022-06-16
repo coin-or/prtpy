@@ -9,7 +9,6 @@ class TestPartitionAlgorithms(unittest.TestCase):
         items = [11,22]
         numbins = 2
         for algorithm in functions_in_class(prtpy.partitioning):
-            print(str(algorithm))
             result = prtpy.partition(algorithm=algorithm, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
             assert (result[0]==[11] and result[1]==[22] or result[0]==[22] and result[1]==[11])
 
