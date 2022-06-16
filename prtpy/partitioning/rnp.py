@@ -1,12 +1,16 @@
 """
     Partition the numbers using the recursive number partitioning algorithm
-    Taken help from:
 
-    Taken from the "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
-    By Richard E. Korf,
-    Algorithm number in Paper: 2.5
+    Taken help from:
+        "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
+        By Richard E. Korf,
+
+    Algorithm number in Paper:
+        2.5
+
     Paper link:
         http://citeseerx.ist.psu.edu/viewdoc/download?rep=rep1&type=pdf&doi=10.1.1.208.2132
+
     Author: Kfir Goldfarb
     Date: 26/04/2022
     Email: kfir.goldfarb@msmail.ariel.ac.il

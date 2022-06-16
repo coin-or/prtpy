@@ -1,19 +1,23 @@
 """
     Partition the numbers using the Karmarkar-karp heuristic partitioning algorithm
-    Taken help from:
 
-    Taken from the "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
-    By Richard E. Korf,
-    Algorithm number in Paper: 2.2
+    Taken from:
+        "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
+        By Richard E. Korf,
+
+    Algorithm number in Paper:
+        2.2
+
     Paper link:
         http://citeseerx.ist.psu.edu/viewdoc/download?rep=rep1&type=pdf&doi=10.1.1.208.2132
+
+    Take help from:
+        https://en.wikipedia.org/wiki/Largest_differencing_method#:~:text=The%20complete%20Karmarkar%E2%80%93Karp%20algorithm,constructing%20a%20tree%20of%20degree&text=In%20the%20case%20k%3D2,them%20in%20the%20same%20set).
+        http://web.cecs.pdx.edu/~bart/cs510ai/papers/korf-ckk.pdf
+
     Author: Kfir Goldfarb
     Date: 26/04/2022
     Email: kfir.goldfarb@msmail.ariel.ac.il
-
-    - help -
-    https://en.wikipedia.org/wiki/Largest_differencing_method#:~:text=The%20complete%20Karmarkar%E2%80%93Karp%20algorithm,constructing%20a%20tree%20of%20degree&text=In%20the%20case%20k%3D2,them%20in%20the%20same%20set).
-    http://web.cecs.pdx.edu/~bart/cs510ai/papers/korf-ckk.pdf
 """
 import copy
 from typing import Callable, List
@@ -87,6 +91,23 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
 
 
 def kk_heuristic(items: List[any], valueof: Callable = lambda x: x):
+    """
+    This function return an heuristic of items list for k = 2
+
+    For k=2, the main step (2) works as follows.
+        1. Take the two largest numbers in S, remove them from S, and insert their difference (this represents a decision to put each of these numbers in a different subset).
+        2. Proceed in this way until a single number remains. This single number is the difference in sums between the two subsets.
+
+    >>> kk_heuristic(items=[1, 2])
+    ([[1, 2], [1]], [1, 2])
+
+    >>> kk_heuristic(items=[4, 5, 6, 7, 8])
+    ([[4, 5, 6, 7, 8], [6, 5, 4, 1], [4, 1, 1], [3, 1], [2]], [4, 5, 6, 7, 8])
+
+    >>> kk_heuristic(items=[1, 2, 3, 4, 5, 6])
+    ([[1, 2, 3, 4, 5, 6], [4, 3, 2, 1, 1], [2, 1, 1, 1], [1, 1, 1], [1]], [1, 2, 3, 4, 5, 6])
+
+    """
     input_items = items[:]
     original_items = input_items[:]
     difference_sets = [[i for i in original_items]]

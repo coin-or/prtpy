@@ -1,12 +1,16 @@
 """
     Partition the items using the complete Karmarkar-Karp Heuristic partitioning algorithm
-    Taken help from:
 
-    Taken from the "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
-    By Richard E. Korf,
-    Algorithm number in Paper: 2.3
+    Taken help from:
+        "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
+        By Richard E. Korf,
+
+    Algorithm number in Paper:
+        2.3
+
     Paper link:
         http://citeseerx.ist.psu.edu/viewdoc/download?rep=rep1&type=pdf&doi=10.1.1.208.2132
+
     Author: Kfir Goldfarb
     Date: 26/04/2022
     Email: kfir.goldfarb@msmail.ariel.ac.il
@@ -66,7 +70,7 @@ def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     if flag:
         return bins
     items.sort(reverse=True, key=valueof)
-    partition = heuristic(items=items, k=k)
+    partition = ckk_heuristic(items=items, k=k)
     result = [p[0] for p in partition]
 
     for index, p in enumerate(sorted(result[0], key=sum, reverse=True)):
@@ -75,7 +79,25 @@ def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     return bins
 
 
-def heuristic(items: List[any], k: int = 2):
+def ckk_heuristic(items: List[any], k: int = 2):
+    """
+    This function return an heuristic of items list for k >= 2
+
+    For any k ≥ 2, the algorithm can be generalized in the following way:
+        1. Initially, for each number i in S, construct a k-tuple of subsets, in which one subset is {i} and the other k-1 subsets are empty.
+        2. In each iteration, select two k-tuples A and B in which the difference between the maximum and minimum sum is largest, and combine them in reverse order of sizes, i.e.: smallest subset in A with largest subset in B, second-smallest in A with second-largest in B, etc.
+        3. Proceed in this way until a single partition remains.
+
+    >>> [i for i in ckk_heuristic(items=[1, 2])]
+    [([[1], [2]], [1, 2])]
+
+    >>> [i for i in ckk_heuristic(items=[4, 5, 6, 7, 8])]
+    [([[4, 5, 7], [6, 8]], [16, 14]), ([[4, 5, 6], [7, 8]], [15, 15])]
+
+    >>> [i for i in ckk_heuristic(items=[1, 2, 3, 4, 5, 6])]
+    [([[1, 4, 5], [2, 3, 6]], [10, 11])]
+
+    """
     stack = [[]]
     heap_count = count()
     for number in items:
@@ -108,6 +130,9 @@ def heuristic(items: List[any], k: int = 2):
 
 
 def _combine_partitions(partition_1, partition_2):
+    """
+    This function return a combination between two partitions
+    """
     yielded = set()
     for permutation in permutations(partition_1, len(partition_1)):
         out = sorted(sorted(p + l) for p, l in zip(permutation, partition_2))
@@ -118,6 +143,9 @@ def _combine_partitions(partition_1, partition_2):
 
 
 def _possible_partition_difference_lower_bound(node, k: int) -> int:
+    """
+    This function return the possible partition difference lower bound of a node with size k
+    """
     sizes_flattened = [size for partition in node for size in partition[3]]
     max_sizes_flattened = max(sizes_flattened)
     return -(max_sizes_flattened - (sum(sizes_flattened) - max_sizes_flattened) // (k - 1))
@@ -128,3 +156,4 @@ if __name__ == "__main__":
 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+

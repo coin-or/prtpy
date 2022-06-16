@@ -17,7 +17,7 @@ from prtpy import Bins
 from prtpy.bins import BinsKeepingContents
 from prtpy.partitioning.rnp import rnp
 from prtpy.utils import base_check_bins, is_all_lists_are_different, all_in, get_best_best_k_combination, \
-    calculate_diff, get_sum_of_max_subset, get_largest_number
+    get_sum_of_max_subset, get_largest_number
 
 
 def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -86,7 +86,7 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
             all_k_combinations.append(list(combination))
 
             # found a optimal partition or maximum subset sum equals to largest number
-            if calculate_diff(combination) == 0 or get_sum_of_max_subset(combination) == get_largest_number(
+            if _calculate_diff(combination) == 0 or get_sum_of_max_subset(combination) == get_largest_number(
                     combination):
                 best_k_combination = combination
                 flag = True
@@ -101,6 +101,50 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
         for item in combination_items:
             bins.add_item_to_bin(item=item, bin_index=index)
     return bins
+
+
+def _calculate_diff(items):
+    """
+    This function get list of lists and return the different sum error between all the sub-lists
+
+    >>> _calculate_diff(items=([18, 11, 8], [17, 12, 2]))
+    6
+
+    >>> _calculate_diff(items=([95], [85, 75, 25, 15, 5]))
+    110
+
+    >>> _calculate_diff(items=([95, 15, 5], [85, 75, 25]))
+    70
+
+    >>> _calculate_diff(items=([8], [7, 4], [6, 5]))
+    6
+
+    >>> _calculate_diff(items=([4], [8, 5], [7, 6]))
+    18
+
+    >>> _calculate_diff(items=([95, 5], [85, 15], [75, 25]))
+    0
+
+    >>> _calculate_diff(items=([7, 2, 1], [6, 4, 3]))
+    3
+
+    >>> _calculate_diff(items=([18], [17, 12, 11, 8, 2]))
+    32
+
+    >>> _calculate_diff(items=([4], [6, 3], [5, 2, 1]))
+    10
+
+    >>> _calculate_diff(items=([6, 1], [5, 2], [4, 3]))
+    0
+
+    """
+    diff_sum = 0
+    for combination in itertools.combinations(items, 2):
+        if len(combination[0]) == 0 or len(combination[1]) == 0:
+            break
+        else:
+            diff_sum += abs(sum(combination[0]) - sum(combination[1]))
+    return diff_sum
 
 
 if __name__ == "__main__":
