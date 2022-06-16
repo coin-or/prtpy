@@ -132,3 +132,5 @@ dmypy.json
 
 # Old files
 *.old
+
+.idea
