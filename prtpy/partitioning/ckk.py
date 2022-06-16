@@ -35,6 +35,11 @@ def _possible_partition_difference_lower_bound(node: List[Tuple[int, int, Bins, 
 
 def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best:float = -inf) -> Iterator[Bins]:
     """
+    Iterator as mentions in CKK algorithms which return better partition than the one found so far.
+    best:  negative upper bound on the difference.
+            -inf (default): yield better partitions than the one found so far.
+           other: yield partitions with upper bound "best" on the difference.
+
     >>> from prtpy import partition
     >>> for part in ckk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]): part
     Bin #0: sum=7.0

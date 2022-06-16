@@ -27,6 +27,11 @@ class partitioning:
     from prtpy.partitioning.roundrobin import roundrobin
     from prtpy.partitioning.multifit import multifit as multifit
 
+    # Samuel & Jonathan modules
+    from prtpy.partitioning.kk import kk
+    from prtpy.partitioning.ckk import best_ckk_partition
+    from prtpy.partitioning.snp import snp
+
 
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing
