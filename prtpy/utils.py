@@ -244,7 +244,7 @@ def is_all_lists_are_different(list_of_lists) -> bool:
     for combinations in itertools.combinations(list_of_lists, 2):
         flag = set.isdisjoint(set(combinations[0]), set(combinations[1]))
         if not flag:
-            return False
+            break
     return flag
 
 
