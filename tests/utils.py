@@ -9,4 +9,5 @@ def functions_in_class(theclass):
         yield getattr(theclass, funcname)
 
 if __name__ == '__main__':
+
     [i for i in functions_in_class(prtpy.partitioning)]
