@@ -133,4 +133,8 @@ dmypy.json
 # Old files
 *.old
 
+<<<<<<< HEAD
 .idea
+=======
+temp.py
+>>>>>>> 26c654522c215cba3e03918ae32247506fa89931
