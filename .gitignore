@@ -132,4 +132,7 @@ dmypy.json
 # Old files
 *.old
 
-.idea
+# idea files
+.iws
+workspace.xml
+tasks.xml
