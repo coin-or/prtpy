@@ -133,4 +133,6 @@ dmypy.json
 # Old files
 *.old
 
+# idea files
+workspace.xml
 .idea

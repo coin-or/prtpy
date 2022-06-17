@@ -28,13 +28,19 @@ class partitioning:
     from prtpy.partitioning.roundrobin import roundrobin
     from prtpy.partitioning.multifit import multifit as multifit
 
+    # Samuel & Jonathan modules
+    from prtpy.partitioning.kk_sy import kk as kk_sy
+    from prtpy.partitioning.ckk_sy import best_ckk_partition
+    from prtpy.partitioning.snp import snp
+
+    # Eli Belkind module
     from prtpy.partitioning.cbldm import cbldm
 
+    # Kfir Goldfarb modules
     from prtpy.partitioning.kk import kk
     from prtpy.partitioning.ckk import ckk
     from prtpy.partitioning.rnp import rnp
     from prtpy.partitioning.irnp import irnp
-
 
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing

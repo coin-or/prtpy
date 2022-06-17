@@ -7,10 +7,12 @@ and a function that maps each item to its value.
 This module lets you call a partitioning algorithm with more convenient input types,
 such as: a list of values, and a dict that maps an item to its value.
 """
+import numpy as np
 
 from prtpy import outputtypes as out, objectives as obj
 from typing import Callable, List, Any
 
+from prtpy.partitioning.greedy import greedy
 
 
 def partition(
@@ -79,3 +81,4 @@ if __name__ == "__main__":
 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+    print(type(partition(algorithm=greedy, numbins=2, items=np.array([1,2,3,3,5,9,9]), outputtype=out.Sums)))
