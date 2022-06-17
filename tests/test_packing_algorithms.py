@@ -4,7 +4,6 @@ Test all supported packing and covering algorithms on small inputs of all suppor
 import prtpy, unittest, itertools
 from utils import functions_in_class
 
-
 class TestPackingAlgorithms(unittest.TestCase):
     def _test_class_with_list_input(self, theclass, items, binsize):
         for algorithm in functions_in_class(theclass):
