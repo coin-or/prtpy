@@ -10,7 +10,7 @@ Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
 import unittest
 
 import prtpy
-from prtpy.partitioning.rnp import rnp
+from prtpy.partitioning.rnp_sy import rnp
 
 
 class TestRNP(unittest.TestCase):
@@ -130,7 +130,7 @@ class TestRNP(unittest.TestCase):
         numbins = 4
         bins = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
         assert (bins == [[0], [], [0], [0]] or bins == [[], [0], [0], [0]]  or bins == [[0], [0], [], [0]]
-                or bins == [[0], [0], [0], []] )
+                or bins ==  [[0], [], [], [0, 0]] )
 
 
 if __name__ == '__main__':

@@ -22,11 +22,11 @@ from copy import deepcopy
 from time import time
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
-from prtpy.partitioning.kk import kk
+from prtpy.partitioning.kk_sy import kk
 import numpy as np
 from prtpy import partition
-from prtpy.partitioning.ckk import best_ckk_partition
-from prtpy.utils import InExclusionBinTree
+from prtpy.partitioning.ckk_sy import best_ckk_partition
+from prtpy.inclusion_exclusion_tree import InExclusionBinTree
 
 
 def find_diff(l1: List, l2: List):
@@ -65,7 +65,7 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     >>> list(snp(BinsKeepingContents(3), items=[1,3,3,4,4,5,5,5]).sums)
     [10.0, 10.0, 10.0]
     >>> snp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9]).bins
-    [[9], [2, 7], [4, 5], [3, 6], [1, 8]]
+    [[2, 7], [4, 5], [9], [3, 6], [1, 8]]
     >>> list(snp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9]).sums)
     [9.0, 9.0, 9.0, 9.0, 9.0]
 
@@ -143,5 +143,3 @@ if __name__ == '__main__':
 
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
-
-    print(snp(BinsKeepingContents(4), items=[1,3,3,4,4,5,5,5]).bins)

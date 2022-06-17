@@ -28,8 +28,8 @@ class partitioning:
     from prtpy.partitioning.multifit import multifit as multifit
 
     # Samuel & Jonathan modules
-    from prtpy.partitioning.kk import kk
-    from prtpy.partitioning.ckk import best_ckk_partition
+    from prtpy.partitioning.kk_sy import kk
+    from prtpy.partitioning.ckk_sy import best_ckk_partition
     from prtpy.partitioning.snp import snp
 
 

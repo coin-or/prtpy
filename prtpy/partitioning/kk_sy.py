@@ -14,9 +14,9 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
     """
     >>> from prtpy import partition
     >>> partition(algorithm=kk, numbins=5, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['c', 'a'], ['e'], ['d', 'b'], ['g'], ['f']]
+    [['c', 'a'], ['d', 'b'], ['e'], ['g'], ['f']]
     >>> partition(algorithm=kk, numbins=4, items=[1,2,3,3,5,9,9])
-    [[5, 2], [3, 3, 1], [9], [9]]
+    [[3, 3, 1], [5, 2], [9], [9]]
     >>> kk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9])
     Bin #0: sum=7.0
     Bin #1: sum=7.0

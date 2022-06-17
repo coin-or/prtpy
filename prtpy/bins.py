@@ -292,8 +292,9 @@ class BinsKeepingContents(BinsKeepingSums):
         return f"{self.bins[bin_index]}, sum={self.sums[bin_index]}"
 
     def sort(self):
-        self.sums.sort()
-        self.bins.sort(key=lambda bin: (sum(map(self.valueof, bin)), len(bin)))
+        sorted_indices = sorted(range(self.num), key=lambda i: self.sums[i])
+        self.sums = [self.sums[sorted_indices[i]] for i in range(self.num)]
+        self.bins = [self.bins[sorted_indices[i]] for i in range(self.num)]
         return self
 
     def clear_bins(self, numbins):

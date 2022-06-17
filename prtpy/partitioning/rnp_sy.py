@@ -25,9 +25,9 @@ from typing import Callable, List, Any
 import numpy as np
 
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
-from prtpy.partitioning.ckk import ckk, best_ckk_partition
-from prtpy.partitioning.kk import kk
-from prtpy.utils import InExclusionBinTree
+from prtpy.partitioning.ckk_sy import ckk, best_ckk_partition
+from prtpy.partitioning.kk_sy import kk
+from prtpy.inclusion_exclusion_tree import InExclusionBinTree
 
 
 def find_diff(l1: List, l2: List):
@@ -69,7 +69,7 @@ def rnp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     >>> list(rnp(BinsKeepingContents(3), items=[1,3,3,4,4,5,5,5]).sums)
     [10.0, 10.0, 10.0]
     >>> rnp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9]).bins
-    [[9], [2, 7], [4, 5], [3, 6], [1, 8]]
+    [[2, 7], [4, 5], [9], [3, 6], [1, 8]]
     >>> list(rnp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9]).sums)
     [9.0, 9.0, 9.0, 9.0, 9.0]
 
