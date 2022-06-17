@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--doctest-modules --ignore=debug --ignore=examples/_pweave.py --ignore=benchmarks"
+addopts = "--doctest-modules --ignore=debug --ignore=examples/_pweave.py --ignore=benchmarks --ignore=examples"
 
 [tool.black]
 exclude="examples/.*"

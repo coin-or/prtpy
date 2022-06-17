@@ -10,10 +10,10 @@ class TestPartitionAlgorithms(unittest.TestCase):
         numbins = 2
         for algorithm in functions_in_class(prtpy.partitioning):
             result = prtpy.partition(algorithm=algorithm, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
-            assert (result[0]==[11] and result[1]==[22] or result[0]==[22] and result[1]==[11])
+            assert ((result[0]==[11] and result[1]==[22]) or (result[0]==[22] and result[1]==[11]))
 
             result = prtpy.partition(algorithm=algorithm, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
-            assert (result[0]==11 and result[1]==22 or result[0]==22 and result[1]==11)
+            assert ((result[0]==11 and result[1]==22) or (result[0]==22 and result[1]==11))
 
             result = prtpy.partition(algorithm=algorithm, numbins=numbins, items=items, outputtype=prtpy.out.LargestSum)
             assert (result==22)
@@ -26,10 +26,10 @@ class TestPartitionAlgorithms(unittest.TestCase):
         numbins = 2
         for algorithm in functions_in_class(prtpy.partitioning):
             result = prtpy.partition(algorithm=algorithm, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
-            assert (result[0]==["a"] and result[1]==["b"] or result[0]==["b"] and result[1]==["a"])
+            assert ((result[0]==["a"] and result[1]==["b"]) or (result[0]==["b"] and result[1]==["a"]))
 
             result = prtpy.partition(algorithm=algorithm, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
-            assert (result[0]==11 and result[1]==22 or result[0]==22 and result[1]==11)
+            assert ((result[0]==11 and result[1]==22) or (result[0]==22 and result[1]==11))
 
             result = prtpy.partition(algorithm=algorithm, numbins=numbins, items=items, outputtype=prtpy.out.LargestSum)
             assert (result==22)

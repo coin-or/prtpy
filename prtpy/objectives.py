@@ -21,48 +21,66 @@ Define various optimization objectives for a partition algorithm.
 from typing import List, Callable
 from dataclasses import dataclass
 
+
 @dataclass
 class Objective:
     get_value_to_minimize: Callable
 
+
 MaximizeSmallestSum = Objective(
-    lambda sums, are_sums_in_ascending_order=False: 
-        -sums[0] if are_sums_in_ascending_order else -min(sums)
+    lambda sums, are_sums_in_ascending_order=False:
+    -sums[0] if are_sums_in_ascending_order else -min(sums)
 )
+
 
 def MaximizeSmallestWeightedSum(weights: List[float]):
     def get_value_to_minimize(sums: List[float], are_sums_in_ascending_order=False) -> float:
         if are_sums_in_ascending_order:
             raise ValueError("are_sums_in_ascending_order parameter not supported")
-        weighted_sums = [s/w for s,w in zip(sums,weights)]
+        weighted_sums = [s / w for s, w in zip(sums, weights)]
         return -min(weighted_sums)
+
     return Objective(get_value_to_minimize)
+
 
 def MaximizeKSmallestSums(num_smallest_parts: int):
     def get_value_to_minimize(sums: List[float], are_sums_in_ascending_order=False) -> float:
         sorted_sums = sums if are_sums_in_ascending_order else sorted(sums)
-        return -sum(sorted_sums[0 : num_smallest_parts])
+        return -sum(sorted_sums[0: num_smallest_parts])
+
     return Objective(get_value_to_minimize)
+
 
 MinimizeLargestSum = Objective(
     lambda sums, are_sums_in_ascending_order=False:
-        sums[-1] if are_sums_in_ascending_order else max(sums)
+    sums[-1] if are_sums_in_ascending_order else max(sums)
 )
+
 
 def MinimizeKLargestSums(num_smallest_parts: int):
     def get_value_to_minimize(sums: List[float], are_sums_in_ascending_order=False) -> float:
         sorted_sums = sums if are_sums_in_ascending_order else sorted(sums)
         return sum(sorted_sums[-num_smallest_parts:])
+
     return Objective(get_value_to_minimize)
 
+
 MinimizeDifference = Objective(
-    lambda sums, are_sums_in_ascending_order=False: 
-        sums[-1] - sums[0] if are_sums_in_ascending_order else max(sums) - min(sums)
+    lambda sums, are_sums_in_ascending_order=False:
+    sums[-1] - sums[0] if are_sums_in_ascending_order else max(sums) - min(sums)
 )
 
+
+def get_complementary(items: list, sub_items: list) -> list:
+    result = []
+    for item in items:
+        if item not in sub_items:
+            result.append(item)
+    return result
 
 
 if __name__ == "__main__":
     import doctest
-    (failures,tests) = doctest.testmod(report=True)
-    print ("{} failures, {} tests".format(failures,tests))
+
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))

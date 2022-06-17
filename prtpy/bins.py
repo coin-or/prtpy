@@ -145,6 +145,10 @@ class BinsKeepingSums(Bins):
     Bin #2: sum=0.0
     >>> bins.num
     3
+    >>> bins.sort()
+    Bin #0: sum=0.0
+    Bin #1: sum=3.0
+    Bin #2: sum=9.0
     """
 
     def __init__(self, numbins: int=0, sums=None):
@@ -256,6 +260,10 @@ class BinsKeepingContents(BinsKeepingSums):
     Bin #2: [], sum=0.0
     >>> bins.num
     3
+    >>> bins.sort()
+    Bin #0: [], sum=0.0
+    Bin #1: ['a'], sum=3.0
+    Bin #2: ['b', 'c'], sum=9.0
     """
 
     def __init__(self, numbins: int=0, sums=None, bins=None):
