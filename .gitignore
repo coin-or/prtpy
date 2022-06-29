@@ -134,3 +134,4 @@ dmypy.json
 *.old
 
 .idea
+*.docx
