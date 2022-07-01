@@ -69,8 +69,8 @@ def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     bins, flag = base_check_bins(bins=bins, items=items, valueof=valueof)
     if flag:
         return bins
-    items.sort(reverse=True, key=valueof)
-    partition = ckk_heuristic(items=items, k=k)
+    sorted_items = sorted(items, key=valueof, reverse=True)
+    partition = ckk_heuristic(sorted_items, k)
     result = [p[0] for p in partition]
 
     for index, p in enumerate(sorted(result[0], key=sum, reverse=True)):
