@@ -17,6 +17,9 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     version=VERSION,
     install_requires=REQUIRES,
+    extras_require = {
+        "experiments": ["experiments_csv[plotting]>=0.4.0"]
+    },
     author="Erel Segal-Halevi",
     author_email="erelsgl@gmail.com",
     description="Number partitioning in Python",

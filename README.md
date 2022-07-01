@@ -9,9 +9,15 @@ Supports several exact and approximate algorithms, with several input formats, o
 
 ## Installation
 
+Basic installation:
+
     pip install prtpy
 
-If you want to speed up the ILP code, you can install the GUROBI solver.
+To run simulation experiments:
+
+    pip install prtpy[experiments]
+
+To speed up the ILP code, you can install the GUROBI solver.
 See the [documentation of Python-MIP](https://www.python-mip.com/) for more information.
 
 ## Usage
