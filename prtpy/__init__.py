@@ -29,8 +29,15 @@ class partitioning:
     from prtpy.partitioning.roundrobin import roundrobin
     from prtpy.partitioning.multifit import multifit as multifit
 
+    # Samuel & Jonathan modules
+    from prtpy.partitioning.kk_sy import kk as kk_sy
+    from prtpy.partitioning.ckk_sy import best_ckk_partition
+    from prtpy.partitioning.snp import snp
+
+    # Eli Belkind module
     from prtpy.partitioning.cbldm import cbldm
 
+    # Kfir Goldfarb modules
     from prtpy.partitioning.kk import kk
     from prtpy.partitioning.ckk import ckk
     from prtpy.partitioning.rnp import rnp
@@ -41,9 +48,11 @@ partitioning.ilp.__name__ = "integer-programming"
 partitioning.dp.__name__ = "dynamic-programming"
 partitioning.kk.__name__ = "karmarkar-karp"
 partitioning.ckk.__name__ = "complete-karmarkar-karp"
+partitioning.kk_sy.__name__ = "karmarkar-karp-sy"
+partitioning.ckk_sy.__name__ = "complete-karmarkar-karp-sy"
 partitioning.rnp.__name__ = "recursive-number-partitioning"
 partitioning.irnp.__name__ = "improved-recursive-number-partitioning"
-
+partitioning.snp.__name__ = "sequential-number-partitioning"
 
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing

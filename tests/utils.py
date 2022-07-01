@@ -1,3 +1,6 @@
+import prtpy
+
+
 def functions_in_class(theclass):
     for funcname in dir(theclass):
         if funcname.startswith('__'):
