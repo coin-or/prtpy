@@ -11,6 +11,7 @@ from prtpy.packing import pack
 from prtpy.partitioning import partition
 
 
+
 class partitioning:
     from prtpy.partitioning.complete_greedy import anytime as cg
     from prtpy.partitioning.complete_greedy import anytime as complete_greedy
@@ -34,6 +35,14 @@ class partitioning:
     from prtpy.partitioning.ckk import ckk
     from prtpy.partitioning.rnp import rnp
     from prtpy.partitioning.irnp import irnp
+
+partitioning.complete_greedy.__name__ = "complete-greedy"
+partitioning.ilp.__name__ = "integer-programming"
+partitioning.dp.__name__ = "dynamic-programming"
+partitioning.kk.__name__ = "karmarkar-karp"
+partitioning.ckk.__name__ = "complete-karmarkar-karp"
+partitioning.rnp.__name__ = "recursive-number-partitioning"
+partitioning.irnp.__name__ = "improved-recursive-number-partitioning"
 
 
 class packing:
