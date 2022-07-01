@@ -31,7 +31,7 @@ class partitioning:
 
     # Samuel & Jonathan modules
     from prtpy.partitioning.kk_sy import kk as kk_sy
-    from prtpy.partitioning.ckk_sy import best_ckk_partition
+    from prtpy.partitioning.ckk_sy import best_ckk_partition as ckk_sy
     from prtpy.partitioning.snp import snp
 
     # Eli Belkind module
