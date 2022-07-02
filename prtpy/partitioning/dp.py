@@ -97,9 +97,9 @@ def _optimal_sums(
     if len(current_states) == 0:
         raise ValueError("No final states!")
     best_final_state = min(
-        current_states, key=objective.get_value_to_minimize
+        current_states, key=objective.value_to_minimize
     )
-    best_final_state_value = objective.get_value_to_minimize(best_final_state)
+    best_final_state_value = objective.value_to_minimize(best_final_state)
     logger.info(
         "Best final state: %s, value: %s",
         best_final_state,
@@ -163,7 +163,7 @@ def _optimal_partition(
     if len(current_state_records) == 0:
         raise ValueError("No final states!")
     best_final_record = min(
-        current_state_records, key=lambda record: objective.get_value_to_minimize(record.state)
+        current_state_records, key=lambda record: objective.value_to_minimize(record.state)
     )
 
     # construct path to solution

@@ -73,7 +73,7 @@ def optimal(
         # If we have reached the leaves of the DFS tree, check if we have an improvement:
         if depth == numitems:
             partitions_checked += 1
-            new_objective_value = objective.get_value_to_minimize(current_bins.sums)
+            new_objective_value = objective.value_to_minimize(current_bins.sums)
             if new_objective_value < best_objective_value:
                 best_bins, best_objective_value = current_bins, new_objective_value
                 logger.info("  Found a better solution: %s, with value %s", best_bins.bins if hasattr(best_bins,'bins') else best_bins.sums, best_objective_value)

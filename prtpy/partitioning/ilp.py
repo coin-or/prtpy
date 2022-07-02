@@ -99,7 +99,7 @@ def optimal(
     ]
 
     model.objective = mip.minimize(
-        objective.get_value_to_minimize(bin_sums, are_sums_in_ascending_order=True)        
+        objective.value_to_minimize(bin_sums, are_sums_in_ascending_order=True)        
     )
 
     # Construct the list of constraints:
