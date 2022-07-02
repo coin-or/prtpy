@@ -86,7 +86,7 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
 
     prior_bins = bins.create_new_bins(0)
 
-    # insert inplace in bins
+    # insert in-place in bins
     rec_generate_sets(prior_bins, bins, items, valueof, k_way, trees=[])
 
     return bins

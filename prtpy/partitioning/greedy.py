@@ -9,6 +9,8 @@
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins
 
+import logging
+logger = logging.getLogger(__name__)
 
 def greedy(bins: Bins, items: List[any], valueof: Callable=lambda x: x):
     """
@@ -36,6 +38,16 @@ def greedy(bins: Bins, items: List[any], valueof: Callable=lambda x: x):
 
 if __name__ == "__main__":
     import doctest
-
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+    
+    from prtpy.bins import BinsKeepingContents
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
+    print(greedy(BinsKeepingContents(2), [4,5,6,7,8]), "\n")
+    
+    walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    print(greedy(BinsKeepingContents(3), walter_numbers), "\n")
+
+
+

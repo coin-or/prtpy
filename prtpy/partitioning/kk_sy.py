@@ -8,6 +8,7 @@ from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
 import heapq
 from itertools import count
+from copy import deepcopy
 
 
 def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
@@ -31,7 +32,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
 
     #  initial a heap
     for item in items:
-        new_bin = bins.add_item_to_bin(item=item, bin_index=(bins.num - 1), inplace=False)
+        new_bin = deepcopy(bins).add_item_to_bin(item=item, bin_index=(bins.num - 1))
         heapq.heappush(
             partitions, (-valueof(item), next(heap_count), new_bin, new_bin.sums)
         )

@@ -31,12 +31,9 @@ class Bins(ABC):
         return self
 
     @abstractmethod
-    def add_item_to_bin(self, item: Any, bin_index: int, inplace=True):
+    def add_item_to_bin(self, item: Any, bin_index: int):
         """
         Add the given item, with the given value, to the bin with the given index.
-
-        If inplace is True, the method modifies the current structure and returns None.
-        If inplace is False, the method does not modify the current structure, but returns a new Bins structure.
         """
         pass
 
@@ -122,11 +119,13 @@ class BinsKeepingSums(Bins):
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=0.0
-    >>> bins.add_item_to_bin(item="d", bin_index=1, inplace=False)
+
+    Adding to a deep copy should not change the original:
+    >>> deepcopy(bins).add_item_to_bin(item="d", bin_index=1)
     Bin #0: sum=3.0
     Bin #1: sum=14.0
     Bin #2: sum=0.0
-    >>> bins.add_item_to_bin(item="e", bin_index=2, inplace=False)
+    >>> deepcopy(bins).add_item_to_bin(item="e", bin_index=2)
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=5.0
@@ -167,15 +166,10 @@ class BinsKeepingSums(Bins):
         self.sums = self.sums[:-numbins]
         return self
 
-    def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
+    def add_item_to_bin(self, item: Any, bin_index: int)->Bins:
         value = self.valueof(item)
-        if inplace:
-            self.sums[bin_index] += value
-            return self
-        else:
-            new_sums = np.copy(self.sums)
-            new_sums[bin_index] += value
-            return BinsKeepingSums(self.num, new_sums).set_valueof(self.valueof)
+        self.sums[bin_index] += value
+        return self
 
     def bin_to_str(self, bin_index: int) -> str:
         return f"sum={self.sums[bin_index]}"
@@ -237,11 +231,13 @@ class BinsKeepingContents(BinsKeepingSums):
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: [], sum=0.0
-    >>> bins.add_item_to_bin(item="d", bin_index=1, inplace=False)
+
+    Adding to a deep copy should not change the original:
+    >>> deepcopy(bins).add_item_to_bin(item="d", bin_index=1)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c', 'd'], sum=14.0
     Bin #2: [], sum=0.0
-    >>> bins.add_item_to_bin(item="d", bin_index=2, inplace=False)
+    >>> deepcopy(bins).add_item_to_bin(item="d", bin_index=2)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: ['d'], sum=5.0
@@ -283,18 +279,11 @@ class BinsKeepingContents(BinsKeepingSums):
         self.bins = self.bins[:-numbins]
         return self
 
-    def add_item_to_bin(self, item: Any, bin_index: int, inplace=True)->Bins:
+    def add_item_to_bin(self, item: Any, bin_index: int)->Bins:
         value = self.valueof(item)
-        if inplace:
-            self.sums[bin_index] += value
-            self.bins[bin_index].append(item)
-            return self
-        else:
-            new_sums = deepcopy(self.sums)
-            new_sums[bin_index] += value
-            new_bins = deepcopy(self.bins)
-            new_bins[bin_index] = new_bins[bin_index] + [item]
-            return BinsKeepingContents(self.num, new_sums, new_bins).set_valueof(self.valueof)
+        self.sums[bin_index] += value
+        self.bins[bin_index].append(item)
+        return self
 
     def bin_to_str(self, bin_index: int) -> str:
         return f"{self.bins[bin_index]}, sum={self.sums[bin_index]}"

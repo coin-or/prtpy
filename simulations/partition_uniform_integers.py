@@ -15,7 +15,7 @@ def partition_random_items(
     numbins: int,
     numitems: int,
     bitsperitem: int,
-    instance_id: int = 0,
+    instance_id: int = 0, # dummy parameter, to allow multiple instances of the same run
 ):
     items = np.random.randint(1, 2**bitsperitem-1, numitems, dtype=np.int64)
     sums = prtpy.partition(
@@ -36,12 +36,13 @@ if __name__ == "__main__":
     experiments_csv.logger.setLevel(logging.INFO)
     experiment = experiments_csv.Experiment("results/", "partition_uniform_integers.csv", backup_folder=None)
 
+    prt = prtpy.partitioning
     input_ranges = {
-        # "algorithm": [prtpy.partitioning.greedy, prtpy.partitioning.roundrobin, prtpy.partitioning.multifit],
-        "algorithm": [prtpy.partitioning.ilp, prtpy.partitioning.complete_greedy],
+        # "algorithm": [prtpy.partitioning.roundrobin, prtpy.partitioning.greedy, prtpy.partitioning.multifit],
+        "algorithm": [prt.integer_programming, prt.complete_greedy, prt.ckk, prt.ckk_sy, prt.dp],
         "numbins": [2],
-        "numitems": [10,20,30,40,50,60,70,80],
+        "numitems": [10,15,20,25,30,35,40,50,60,70,80,90,100],
         "bitsperitem": [16,32,48],
         "instance_id": range(10)
     }
-    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=1)
+    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=30)

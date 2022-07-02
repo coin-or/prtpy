@@ -8,12 +8,12 @@ Credit: based on code by Søren Fuglede Jørgensen in the numberpartitioning pac
 """
 from math import inf
 from time import time
-from typing import Iterator, List, Tuple
-from typing import Callable, List, Any
+from typing import Iterator, List, Tuple, Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
 import heapq
 from itertools import count
 import logging
+from copy import deepcopy
 
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best:float 
 
     heap_count = count()  # To avoid ambiguity in heaps
     for item in items:
-        new_bins = bins.add_item_to_bin(item=item, bin_index=(bins.num - 1), inplace=False)
+        new_bins = deepcopy(bins).add_item_to_bin(item=item, bin_index=(bins.num - 1))
 
         heapq.heappush(
             stack[0], (-valueof(item), next(heap_count), new_bins, new_bins.sums)
@@ -122,7 +122,7 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
 
     heap_count = count()  # To avoid ambiguity in heaps
     for item in items:
-        new_bins = bins.add_item_to_bin(item=item, bin_index=(bins.num - 1), inplace=False)
+        new_bins = deepcopy(bins).add_item_to_bin(item=item, bin_index=(bins.num - 1))
 
         heapq.heappush(
             stack[0], (-valueof(item), next(heap_count), new_bins, new_bins.sums)
