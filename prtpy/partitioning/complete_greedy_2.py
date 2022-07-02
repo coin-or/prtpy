@@ -59,7 +59,7 @@ def optimal(
     logger.info("Complete Greedy Partitioning of %d items into %d bins.", numitems, bins.num)
 
     sorted_items = sorted(items, key=valueof, reverse=True)
-    sum_of_remaining_items = [sum(map(valueof, sorted_items[i:])) for i in range(numitems)]  # For Heuristic 3
+    sums_of_remaining_items = [sum(map(valueof, sorted_items[i:])) for i in range(numitems)] + [0] # For Heuristic 3
     partitions_checked = 0
 
     best_bins, best_objective_value = None, np.inf
@@ -82,10 +82,11 @@ def optimal(
         # Heuristic 3: "If the sum of the remaining unassigned integers plus the smallest current subset sum is <= the largest subset sum, all remaining integers are assigned to the subset with the smallest sum, terminating that branch of the tree."
         # Note that this heuristic is valid only for the objective "minimize largest sum"!
         # if objective==obj.MinimizeLargestSum:
-        #     if sum_of_remaining_items[depth] + current_bins.sums[0] <= current_bins.sums[-1]:
+        #     if sums_of_remaining_items[depth] + current_bins.sums[0] <= current_bins.sums[-1]:
 
         else:
             next_item = sorted_items[depth]
+            sum_of_remaining_items = sums_of_remaining_items[depth+1]
 
             previous_bin_sum = None
             for bin_index in reversed(range(bins.num)):   # by descending order of sum.
@@ -96,11 +97,11 @@ def optimal(
                     continue   
                 previous_bin_sum = current_bin_sum
 
-                # Heuristic 2: "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree."
-                # Note that this heuristic is valid only for the objective "minimize largest sum"!
-                if objective==obj.MinimizeLargestSum:
-                    if current_bin_sum+next_item >= best_objective_value:
-                        continue
+                # Heuristic 2: lower bound (for the objective "minimize largest sum", it is:
+                #    "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree.")                
+                lower_bound = objective.lower_bound(current_bins.sums, valueof(next_item), bin_index, sum_of_remaining_items)
+                if lower_bound >= best_objective_value:
+                    continue
 
                 # Create the next vertex:
                 new_bins = deepcopy(current_bins).add_item_to_bin(next_item, bin_index)
@@ -124,5 +125,6 @@ if __name__ == "__main__":
     optimal(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
     
     walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
     optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
 
