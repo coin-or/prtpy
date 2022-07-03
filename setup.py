@@ -18,7 +18,7 @@ setuptools.setup(
     version=VERSION,
     install_requires=REQUIRES,
     extras_require = {
-        "experiments": ["experiments_csv[plotting]>=0.4.0"]
+        "experiments": ["experiments_csv[plotting]>=0.4.1"]
     },
     author="Erel Segal-Halevi",
     author_email="erelsgl@gmail.com",

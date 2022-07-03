@@ -1,1 +1,1 @@
-experiments_csv[plotting]>=0.4.0
+experiments_csv[plotting]>=0.4.1

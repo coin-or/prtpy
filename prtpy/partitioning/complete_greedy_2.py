@@ -11,8 +11,8 @@ Credit: based on code by Søren Fuglede Jørgensen in the numberpartitioning pac
 
 from typing import List, Tuple, Callable, Iterator, Any
 import numpy as np
-import logging, time,  itertools
-from prtpy import objectives as obj, Bins, partitioning
+import logging
+from prtpy import objectives as obj, Bins
 from copy import deepcopy
 
 logger = logging.getLogger(__name__)
@@ -22,6 +22,7 @@ def optimal(
     items: List[any],
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
+    use_lower_bound: bool = True
 ) -> Iterator:
     """
     Finds a partition in which the largest sum is minimal, using the Complete Greedy algorithm.
@@ -49,6 +50,26 @@ def optimal(
     Bin #1: [27, 16, 13], sum=56.0
     Bin #2: [39, 26], sum=65.0
 
+    Compare results with and without the lower bound:
+    >>> random_numbers = np.random.randint(1, 2**16-1, 10, dtype=np.int64)
+    >>> objective = obj.MinimizeDifference
+    >>> bins1=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
+    >>> bins2=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
+    >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
+    True
+    >>> objective = obj.MinimizeLargestSum
+    >>> bins1=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
+    >>> bins2=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
+    >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
+    True
+    >>> objective = obj.MaximizeSmallestSum
+    >>> bins1=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
+    >>> bins2=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
+    >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
+    True
+
+
+    Partitioning items with names:
     >>> from prtpy import partition, outputtypes as out
     >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['g', 'a'], ['f', 'b'], ['e', 'c', 'd']]
@@ -56,7 +77,7 @@ def optimal(
     array([16., 16.])
     """
     numitems = len(items)
-    logger.info("Complete Greedy Partitioning of %d items into %d bins.", numitems, bins.num)
+    logger.info("Complete Greedy %s Partitioning of %d items into %d bins.", type(objective).__name__, numitems, bins.num)
 
     sorted_items = sorted(items, key=valueof, reverse=True)
     sums_of_remaining_items = [sum(map(valueof, sorted_items[i:])) for i in range(numitems)] + [0] # For Heuristic 3
@@ -98,10 +119,11 @@ def optimal(
                 previous_bin_sum = current_bin_sum
 
                 # Heuristic 2: lower bound (for the objective "minimize largest sum", it is:
-                #    "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree.")                
-                lower_bound = objective.lower_bound(current_bins.sums, valueof(next_item), bin_index, sum_of_remaining_items)
-                if lower_bound >= best_objective_value:
-                    continue
+                #    "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree.")
+                if use_lower_bound:
+                    lower_bound = objective.lower_bound(current_bins.sums, valueof(next_item), bin_index, sum_of_remaining_items)
+                    if lower_bound >= best_objective_value:
+                        continue
 
                 # Create the next vertex:
                 new_bins = deepcopy(current_bins).add_item_to_bin(next_item, bin_index)
