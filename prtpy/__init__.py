@@ -13,8 +13,8 @@ from prtpy.partitioning import partition
 
 
 class partitioning:
-    from prtpy.partitioning.complete_greedy import anytime as cg
-    from prtpy.partitioning.complete_greedy import anytime as complete_greedy
+    from prtpy.partitioning.complete_greedy import optimal as cg
+    from prtpy.partitioning.complete_greedy import optimal as complete_greedy
 
     from prtpy.partitioning.dp import optimal as dp
     from prtpy.partitioning.dp import optimal as dynamic_programming
