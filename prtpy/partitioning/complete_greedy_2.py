@@ -22,7 +22,8 @@ def optimal(
     items: List[any],
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
-    use_lower_bound: bool = True
+    use_lower_bound: bool = True,
+    use_heuristic_3: bool = False
 ) -> Iterator:
     """
     Finds a partition in which the largest sum is minimal, using the Complete Greedy algorithm.
@@ -68,6 +69,13 @@ def optimal(
     >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
     True
 
+    Compare results with and without the heuristic 3:
+    >>> random_numbers = np.random.randint(1, 2**16-1, 10, dtype=np.int64)
+    >>> objective = obj.MinimizeLargestSum
+    >>> bins1=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_heuristic_3=True)
+    >>> bins2=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_heuristic_3=False)
+    >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
+    True
 
     Partitioning items with names:
     >>> from prtpy import partition, outputtypes as out
@@ -99,13 +107,21 @@ def optimal(
                 best_bins, best_objective_value = current_bins, new_objective_value
                 logger.info("  Found a better solution: %s, with value %s", best_bins.bins if hasattr(best_bins,'bins') else best_bins.sums, best_objective_value)
             continue
-    
-        # Heuristic 3: "If the sum of the remaining unassigned integers plus the smallest current subset sum is <= the largest subset sum, all remaining integers are assigned to the subset with the smallest sum, terminating that branch of the tree."
-        # Note that this heuristic is valid only for the objective "minimize largest sum"!
-        # if objective==obj.MinimizeLargestSum:
-        #     if sums_of_remaining_items[depth] + current_bins.sums[0] <= current_bins.sums[-1]:
 
         else:
+    
+            # Heuristic 3: "If the sum of the remaining unassigned integers plus the smallest current subset sum is <= the largest subset sum, all remaining integers are assigned to the subset with the smallest sum, terminating that branch of the tree."
+            # Note that this heuristic is valid only for the objective "minimize largest sum"!
+            if use_heuristic_3 and objective==obj.MinimizeLargestSum:
+                if sums_of_remaining_items[depth] + current_bins.sums[0] <= current_bins.sums[-1]:
+                    new_bins = deepcopy(current_bins)
+                    for i in range(depth,numitems):
+                        new_bins.add_item_to_bin(sorted_items[i], 0)
+                    new_bins.sort()  # by ascending order of sum.
+                    new_depth = numitems
+                    stack.append((new_bins, new_depth))
+                    continue
+
             next_item = sorted_items[depth]
             sum_of_remaining_items = sums_of_remaining_items[depth+1]
 
@@ -120,14 +136,18 @@ def optimal(
 
                 # Heuristic 2: lower bound (for the objective "minimize largest sum", it is:
                 #    "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree.")
-                if use_lower_bound:
-                    lower_bound = objective.lower_bound(current_bins.sums, valueof(next_item), bin_index, sum_of_remaining_items)
-                    if lower_bound >= best_objective_value:
-                        continue
+                # if use_lower_bound:
+                #     lower_bound = objective.lower_bound(current_bins.sums, valueof(next_item), bin_index, sum_of_remaining_items)
+                #     if lower_bound >= best_objective_value:
+                #         continue
 
                 # Create the next vertex:
                 new_bins = deepcopy(current_bins).add_item_to_bin(next_item, bin_index)
                 new_bins.sort()  # by ascending order of sum.
+                if use_lower_bound:
+                    lower_bound = objective.lower_bound(new_bins.sums, sum_of_remaining_items, are_sums_in_ascending_order=True)
+                    if lower_bound >= best_objective_value:
+                        continue
                 new_depth = depth + 1
                 stack.append((new_bins, new_depth))
 

@@ -26,7 +26,8 @@ class Objective(ABC):
     @abstractmethod
     def value_to_minimize(self, sums:list, are_sums_in_ascending_order:bool=False)->float:
         pass
-    def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+    # def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+    def lower_bound(self, sums:list, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
         """ 
         Returns an optimistic (lower) bound on the objective value, givan that:
         * the current bin sums are current_sums;
@@ -42,26 +43,31 @@ class MaximizeTheSmallestSum(Objective):
         return -sums[0] if are_sums_in_ascending_order else -min(sums)
     def __str__(self) -> str:
         return "maximize-smallest-sum"
-    def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+    # def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+    def lower_bound(self, sums:list, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
         """
-        >>> MaximizeSmallestSum.lower_bound(current_sums=[10,20,30,40,50], value_to_add=0, bin_index=1, sum_of_remaining_items=5)
+        >>> MaximizeSmallestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=5)
         -15.0
-        >>> MaximizeSmallestSum.lower_bound(current_sums=[10,20,30,40,50], value_to_add=0, bin_index=1, sum_of_remaining_items=20)
+        >>> MaximizeSmallestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=20)
         -25.0
-        >>> MaximizeSmallestSum.lower_bound(current_sums=[10,20,30,40,50], value_to_add=0, bin_index=1, sum_of_remaining_items=45)
+        >>> MaximizeSmallestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=45)
         -35.0
+        >>> MaximizeSmallestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=200)
+        -70.0
+        >>> MaximizeSmallestSum.lower_bound([0,0,0,0,0], sum_of_remaining_items=54)
+        -10.0
         """
-        new_sums = np.array(current_sums)
-        new_sums[bin_index] += value_to_add
-        sorted_sums = sorted(new_sums)       # sorted by ascending sum
+        # new_sums = np.array(current_sums)
+        # new_sums[bin_index] += value_to_add
+        # sorted_sums = sorted(new_sums)       # sorted by ascending sum
+        sorted_sums = sums if are_sums_in_ascending_order else sorted(sums)
         # algorithm by Paul A. Robin https://or.stackexchange.com/a/8632/2576 
         sum_of_remaining_items += sorted_sums[0]
         for i in range(1, len(sorted_sums)):
             if sum_of_remaining_items <= i*sorted_sums[i]:
                 return -np.floor(sum_of_remaining_items/i)
             sum_of_remaining_items += sorted_sums[i]
-            
-        return  -np.inf
+        return -np.floor(sum_of_remaining_items/len(sorted_sums))
 MaximizeSmallestSum = MaximizeTheSmallestSum()
 
 
@@ -92,8 +98,26 @@ class MinimizeTheLargestSum(Objective):
         return sums[-1] if are_sums_in_ascending_order else max(sums)
     def __str__(self) -> str:
         return "minimize-largest-sum"
-    def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
-        return current_sums[bin_index] + value_to_add
+    # def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+    #     return current_sums[bin_index] + value_to_add
+    # def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+    def lower_bound(self, sums:list, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+        """
+        >>> MinimizeLargestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=5)
+        50
+        >>> MinimizeLargestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=20)
+        50
+        >>> MinimizeLargestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=45)
+        50
+
+        # >>> MinimizeLargestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=200)
+        # 70.0
+        # >>> MinimizeLargestSum.lower_bound([0,0,0,0,0], sum_of_remaining_items=54)
+        #11.0
+        """
+        return sums[-1] if are_sums_in_ascending_order else max(sums)
+    
+
 MinimizeLargestSum = MinimizeTheLargestSum()
 
 class MinimizeKLargestSums(Objective):
@@ -110,7 +134,8 @@ class MinimizeTheDifference(Objective):
         return sums[-1] - sums[0] if are_sums_in_ascending_order else max(sums) - min(sums)
     def __str__(self) -> str:
         return "minimize-largest-difference"
-    def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+    # def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+    def lower_bound(self, sums:list, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
         return  -np.inf
 MinimizeDifference = MinimizeTheDifference()
 
