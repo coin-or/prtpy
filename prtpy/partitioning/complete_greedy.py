@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 
-def optimal(
+def anytime(
     bins: Bins,
     items: List[any],
     valueof: Callable[[Any], float] = lambda x: x,
@@ -31,22 +31,22 @@ def optimal(
     :param objective: represents the function that should be optimized. Default is minimizing the difference between bin sums.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> optimal(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference)
+    >>> anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference)
     Bin #0: [6, 5, 4], sum=15.0
     Bin #1: [8, 7], sum=15.0
     
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference)
+    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference)
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
-    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
+    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
     Bin #0: [27, 26], sum=53.0
     Bin #1: [39, 13, 10], sum=62.0
     Bin #2: [46, 16], sum=62.0
-    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
+    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
     Bin #0: [46, 10], sum=56.0
     Bin #1: [27, 16, 13], sum=56.0
     Bin #2: [39, 26], sum=65.0
@@ -54,38 +54,40 @@ def optimal(
     Compare results with and without the lower bound:
     >>> random_numbers = np.random.randint(1, 2**48-1, 10, dtype=np.int64)
     >>> objective = obj.MinimizeDifference
-    >>> bins1=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
-    >>> bins2=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
+    >>> bins1=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
+    >>> bins2=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
     >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
     True
     >>> objective = obj.MinimizeLargestSum
-    >>> bins1=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
-    >>> bins2=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
+    >>> bins1=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
+    >>> bins2=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
     >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
     True
     >>> objective = obj.MaximizeSmallestSum
-    >>> bins1=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
-    >>> bins2=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
+    >>> bins1=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
+    >>> bins2=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
     >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
     True
 
     Compare results with and without the heuristic 3:
     >>> random_numbers = np.random.randint(1, 2**48-1, 10, dtype=np.int64)
     >>> objective = obj.MinimizeLargestSum
-    >>> bins1=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_heuristic_3=True)
-    >>> bins2=optimal(BinsKeepingSums(3), random_numbers, objective=objective, use_heuristic_3=False)
+    >>> bins1=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_heuristic_3=True)
+    >>> bins2=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_heuristic_3=False)
     >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
     True
 
     Partitioning items with names:
     >>> from prtpy import partition, outputtypes as out
-    >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    >>> partition(algorithm=anytime, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['g', 'a'], ['f', 'b'], ['e', 'c', 'd']]
-    >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
+    >>> partition(algorithm=anytime, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     array([16., 16.])
     """
     numitems = len(items)
     logger.info("\nComplete Greedy %s Partitioning of %d items into %d bins.", type(objective).__name__, numitems, bins.num)
+    start_time = time.perf_counter()
+    end_time = start_time + time_limit
 
     sorted_items = sorted(items, key=valueof, reverse=True)
     sums_of_remaining_items = [sum(map(valueof, sorted_items[i:])) for i in range(numitems)] + [0] # For Heuristic 3
@@ -106,6 +108,9 @@ def optimal(
             if new_objective_value < best_objective_value:
                 best_bins, best_objective_value = current_bins, new_objective_value
                 logger.info("  Found a better solution: %s, with value %s", best_bins.bins if hasattr(best_bins,'bins') else best_bins.sums, best_objective_value)
+            if time.perf_counter() > end_time:
+                logger.info("Time-limit of %s reached - stopping", time_limit)
+                break
             continue
 
         else:
@@ -156,7 +161,8 @@ def optimal(
 
 
 
-
+### OLD VERSION
+'''
 def anytime(
     bins: Bins,
     items: List[any],
@@ -235,24 +241,24 @@ def anytime(
                 new_depth = depth + 1
                 stack.append((new_bins, new_depth))
     return best_bins
-
+'''
 
 if __name__ == "__main__":
     from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    # import doctest
-    # (failures, tests) = doctest.testmod(report=True)
-    # print("{} failures, {} tests".format(failures, tests))
+    import doctest
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))
 
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
-    optimal(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
+    anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
 
-    # walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    # optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
-    # optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
+    walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
+    anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
 
     random_numbers = np.random.randint(1, 2**48-1, 10, dtype=np.int64)
-    optimal(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
-    optimal(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False)
-    optimal(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
-    optimal(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)

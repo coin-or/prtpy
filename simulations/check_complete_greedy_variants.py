@@ -8,7 +8,7 @@ Since:  2022-06
 
 from typing import Callable
 import numpy as np, prtpy
-from prtpy.partitioning.complete_greedy import optimal as CGA
+from prtpy.partitioning.complete_greedy import anytime as CGA
 from prtpy import objectives as obj
 
 def partition_random_items(
