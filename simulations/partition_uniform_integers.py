@@ -37,12 +37,18 @@ if __name__ == "__main__":
     experiment = experiments_csv.Experiment("results/", "partition_uniform_integers.csv", backup_folder=None)
 
     prt = prtpy.partitioning
+    # input_ranges = {
+    #     "algorithm": [prt.integer_programming, prt.complete_greedy, prt.dynamic_programming, prt.ckk, prt.ckk_sy,],
+    #     "numbins": [2],
+    #     "numitems": [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 35, 40, 50, 60, 70, 80, 90, 100],
+    #     "bitsperitem": [16,32,48],
+    #     "instance_id": range(10)
+    # }
     input_ranges = {
-        # "algorithm": [prtpy.partitioning.roundrobin, prtpy.partitioning.greedy, prtpy.partitioning.multifit],
-        "algorithm": [prt.integer_programming, prt.complete_greedy, prt.ckk, prt.ckk_sy, prt.dp],
+        "algorithm": [prt.complete_greedy],
         "numbins": [2],
-        "numitems": [10,15,20,25,30,35,40,50,60,70,80,90,100],
-        "bitsperitem": [16,32,48],
+        "numitems": [40, 50, 60, 70, 80, 90, 100],
+        "bitsperitem": [32,48],
         "instance_id": range(10)
     }
-    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=30)
+    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=300)

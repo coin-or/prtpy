@@ -4,8 +4,20 @@ from matplotlib import pyplot as plt
 
 _, subplots = plt.subplots(1,3, sharey=True)
 for s in subplots:
-     s.set_xlim(0,25)
+     # s.set_xlim(0,25)
      s.set_ylim(0,30)
+
+def plot_partition_algorithms(filename:str):
+     csv_filename = filename+".csv"
+     output_filename = filename+".png"
+     plot_results(subplots[0], csv_filename, filter={"bitsperitem":16}, 
+          xcolumn="numitems", ycolumn="runtime", zcolumn=["algorithm"], mean=True, legend_properties={"size":6})
+     plot_results(subplots[1], csv_filename, filter={"bitsperitem":32}, 
+          xcolumn="numitems", ycolumn="runtime", zcolumn=["algorithm"], mean=True, legend_properties={"size":6})
+     plot_results(subplots[2], csv_filename, filter={"bitsperitem":48}, 
+          xcolumn="numitems", ycolumn="runtime", zcolumn=["algorithm"], mean=True, legend_properties={"size":6})
+     plt.savefig(output_filename)
+
 
 def plot_check_variants_3(filename:str):
      csv_filename = filename+".csv"
@@ -36,4 +48,4 @@ def plot_check_variants_dp(filename:str):
           xcolumn="numitems", ycolumn="runtime", zcolumn=["bitsperitem", "use_boolean_matrix"], mean=True, legend_properties={"size":6})
      plt.savefig(output_filename)
 
-plot_check_variants_dp("results/check_dynamic_programming_variants_1")
+plot_partition_algorithms("results/partition_uniform_integers")
