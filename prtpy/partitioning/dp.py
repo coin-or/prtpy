@@ -1,6 +1,11 @@
 """
 Optimal number partitioning using dynamic programming.
 
+NOTE: The implementation uses sets of states. 
+An alternative implementation would be to use a boolean matrix.
+I compared the implementations, and the boolean matrix implementation is about 100x slower on random inputs of 8 bits or more.
+This is probably because the boolean matrix is very large and it takes a lot of time to go over it.
+
 Author: Erel Segal-Halevi
 Since: 2022-02
 """
