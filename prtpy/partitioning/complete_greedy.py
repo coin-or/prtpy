@@ -22,7 +22,8 @@ def anytime(
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
     use_lower_bound: bool = True,
-    use_heuristic_3: bool = False,
+    use_heuristic_2: bool = True,
+    use_heuristic_3: bool = False,  # Not useful in experiments
     time_limit: float = np.inf,
 ) -> Iterator:
     """
@@ -85,13 +86,16 @@ def anytime(
     array([16., 16.])
     """
     numitems = len(items)
-    logger.info("\nComplete Greedy %s Partitioning of %d items into %d bins.", type(objective).__name__, numitems, bins.num)
     start_time = time.perf_counter()
     end_time = start_time + time_limit
 
     sorted_items = sorted(items, key=valueof, reverse=True)
     sums_of_remaining_items = [sum(map(valueof, sorted_items[i:])) for i in range(numitems)] + [0] # For Heuristic 3
     partitions_checked = 0
+
+    global_lower_bound = objective.lower_bound(bins.sums, sums_of_remaining_items[0], are_sums_in_ascending_order=True)
+
+    logger.info("\nComplete Greedy %s Partitioning of %d items into %d bins. Lower bound: %s", objective, numitems, bins.num, global_lower_bound)
 
     best_bins, best_objective_value = None, np.inf
 
@@ -108,6 +112,9 @@ def anytime(
             if new_objective_value < best_objective_value:
                 best_bins, best_objective_value = current_bins, new_objective_value
                 logger.info("  Found a better solution: %s, with value %s", best_bins.bins if hasattr(best_bins,'bins') else best_bins.sums, best_objective_value)
+                if new_objective_value==global_lower_bound:
+                    logger.info("    Solution matches global lower bound - stopping")
+                    break
             if time.perf_counter() > end_time:
                 logger.info("Time-limit of %s reached - stopping", time_limit)
                 break
@@ -139,12 +146,20 @@ def anytime(
                     continue   
                 previous_bin_sum = current_bin_sum
 
-                # Heuristic 2: lower bound (for the objective "minimize largest sum", it is:
-                #    "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree.")
-                # if use_lower_bound:
-                #     lower_bound = objective.lower_bound(current_bins.sums, valueof(next_item), bin_index, sum_of_remaining_items)
-                #     if lower_bound >= best_objective_value:
-                #         continue
+                # Heuristic 2: "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree.")
+                # Note that this heuristic is valid only for the objective "minimize largest sum"!
+                if use_heuristic_2:
+                    if objective==obj.MinimizeLargestSum:
+                        if current_bin_sum + valueof(next_item) >= best_objective_value or current_bins.sums[-1]>=best_objective_value:
+                            continue  # If we add the next item to the next bin, it will not become better.
+                    elif objective==obj.MaximizeSmallestSum:
+                        # An adaptation of this heuristic to maximizing the smallest sum
+                        if bin_index==0:
+                            current_smallest_sum = min(current_bins.sums[0]+valueof(next_item), current_bins.sums[1])
+                        else:
+                            current_smallest_sum = current_bins.sums[0]
+                        if -(current_smallest_sum+sum_of_remaining_items) >= best_objective_value:
+                            continue # Even if we add all remaining items to the smallest sum, it will not become better.
 
                 # Create the next vertex:
                 new_bins = deepcopy(current_bins).add_item_to_bin(next_item, bin_index)
@@ -245,20 +260,25 @@ def anytime(
 
 if __name__ == "__main__":
     from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+
     import doctest
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
 
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
-    anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
 
+    anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
     walter_numbers = [46, 39, 27, 26, 16, 13, 10]
     anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
     anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
 
-    random_numbers = np.random.randint(1, 2**48-1, 10, dtype=np.int64)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False)
+    random_numbers = np.random.randint(1, 2**16-1, 15, dtype=np.int64)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False, use_heuristic_2=False, use_heuristic_3=False)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_heuristic_2=True, use_heuristic_3=False)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=True, use_heuristic_2=False, use_heuristic_3=False)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=True, use_heuristic_2=True, use_heuristic_3=False)
     anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)

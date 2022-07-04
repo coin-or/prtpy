@@ -11,6 +11,8 @@ import numpy as np, prtpy
 from prtpy.partitioning.complete_greedy import anytime as CGA
 from prtpy import objectives as obj
 
+TIME_LIMIT=30
+
 def partition_random_items(
     numitems: int,
     bitsperitem: int,
@@ -23,6 +25,7 @@ def partition_random_items(
         numbins=2,
         items=items, 
         outputtype=prtpy.out.Sums,
+        time_limit=TIME_LIMIT,
         **kwargs
     )
     return {
@@ -33,14 +36,27 @@ def partition_random_items(
 if __name__ == "__main__":
     import logging, experiments_csv
     experiments_csv.logger.setLevel(logging.INFO)
-    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants.csv", backup_folder=None)
+    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants_4.csv", backup_folder=None)
 
     prt = prtpy.partitioning
     input_ranges = {
-        "numitems": [10,15,20,25,30,35,40,50,60,70,80,90,100],
+        "numitems": [10,12, 14, 16, 18, 20, 22, 24, 26],
         "bitsperitem": [16,32,48],
         "instance_id": range(10),
-        "objective": [obj.MaximizeSmallestSum, obj.MinimizeLargestSum],
+        "objective": [obj.MaximizeSmallestSum],
+        "use_heuristic_2": [False, True],
+        "use_heuristic_3": [False],
         "use_lower_bound": [False, True],
     }
-    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=30)
+    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=TIME_LIMIT)
+
+
+"""
+check_complete_greedy_variants_3: minimize largest sum objective; compare lower bound, heuristic 2, and heuristic 3. 
+  --  Heuristic 2 is the best, then lower bound; Heuristic 3 is not useful.
+
+check_complete_greedy_variants_4: maximize smallest sum objective; compare lower bound and heuristic 2. 
+  -- Heuristic 2 is the best, then lower bound.
+  -- But lower-bound is very useful for 16 bits.
+
+"""

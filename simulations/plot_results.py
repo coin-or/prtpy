@@ -32,5 +32,15 @@ def plot_check_variants(filename:str):
           xcolumn="numitems", ycolumn="runtime", zcolumn=["objective"], mean=True, legend_properties={"size":6})
      plt.savefig(output_filename)
 
-plot_check_variants("results/check_complete_greedy_variants_1")
-plot_check_variants("results/check_complete_greedy_variants_2")
+def plot_check_variants_3(filename:str):
+     csv_filename = filename+".csv"
+     output_filename = filename+".png"
+     plot_results(subplots[0], csv_filename, filter={"bitsperitem":16, "use_heuristic_3":False}, 
+          xcolumn="numitems", ycolumn="runtime", zcolumn=["use_lower_bound", "use_heuristic_2", "use_heuristic_3"], mean=True, legend_properties={"size":6})
+     plot_results(subplots[1], csv_filename, filter={"bitsperitem":32, "use_heuristic_3":False}, 
+          xcolumn="numitems", ycolumn="runtime", zcolumn=["use_lower_bound", "use_heuristic_2", "use_heuristic_3"], mean=True, legend_properties={"size":6})
+     plot_results(subplots[2], csv_filename, filter={"bitsperitem":48, "use_heuristic_3":False}, 
+          xcolumn="numitems", ycolumn="runtime", zcolumn=["use_lower_bound", "use_heuristic_2", "use_heuristic_3"], mean=True, legend_properties={"size":6})
+     plt.savefig(output_filename)
+
+plot_check_variants_3("results/check_complete_greedy_variants_4")

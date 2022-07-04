@@ -110,12 +110,13 @@ class MinimizeTheLargestSum(Objective):
         >>> MinimizeLargestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=45)
         50
 
-        # >>> MinimizeLargestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=200)
-        # 70.0
-        # >>> MinimizeLargestSum.lower_bound([0,0,0,0,0], sum_of_remaining_items=54)
-        #11.0
+        >>> MinimizeLargestSum.lower_bound([10,20,30,40,50], sum_of_remaining_items=200)
+        70.0
+        >>> MinimizeLargestSum.lower_bound([0,0,0,0,0], sum_of_remaining_items=54)
+        11.0
         """
-        return sums[-1] if are_sums_in_ascending_order else max(sums)
+        current_largest_sum = sums[-1] if are_sums_in_ascending_order else max(sums)
+        return max(current_largest_sum, np.ceil((sum(sums)+sum_of_remaining_items)/len(sums)))
     
 
 MinimizeLargestSum = MinimizeTheLargestSum()
@@ -136,7 +137,21 @@ class MinimizeTheDifference(Objective):
         return "minimize-largest-difference"
     # def lower_bound(self, current_sums:list, value_to_add:float, bin_index:int, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
     def lower_bound(self, sums:list, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
-        return  -np.inf
+        """
+        >>> MinimizeDifference.lower_bound([10,20,30,40,50], sum_of_remaining_items=5)
+        35.0
+        >>> MinimizeDifference.lower_bound([10,20,30,40,50], sum_of_remaining_items=20)
+        25.0
+        >>> MinimizeDifference.lower_bound([10,20,30,40,50], sum_of_remaining_items=45)
+        15.0
+
+        >>> MinimizeDifference.lower_bound([10,20,30,40,50], sum_of_remaining_items=200)
+        0.0
+        >>> MinimizeDifference.lower_bound([0,0,0,0,0], sum_of_remaining_items=54)
+        1.0
+        """
+        return MaximizeSmallestSum.lower_bound(sums, sum_of_remaining_items, are_sums_in_ascending_order) \
+             + MinimizeLargestSum.lower_bound(sums, sum_of_remaining_items, are_sums_in_ascending_order)
 MinimizeDifference = MinimizeTheDifference()
 
 
