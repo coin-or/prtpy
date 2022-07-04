@@ -21,15 +21,16 @@ def anytime(
     items: List[any],
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
-    use_lower_bound: bool = True,
-    use_heuristic_2: bool = True,
-    use_heuristic_3: bool = False,  # Not useful in experiments
+    use_lower_bound: bool = True,   # Prune branches whose lower bound (= optimistic value) is at least as large as the current minimum.
+    use_heuristic_2: bool = True,   # A faster lower bound, that does not create the branch at all. Useful for min-max and max-min objectives.
+    use_heuristic_3: bool = False,  # An improved stopping condition, applicable for min-max only. Not very useful in experiments.
     time_limit: float = np.inf,
 ) -> Iterator:
     """
     Finds a partition in which the largest sum is minimal, using the Complete Greedy algorithm.
 
     :param objective: represents the function that should be optimized. Default is minimizing the difference between bin sums.
+    :param time_limit: determines how much time (in seconds) the function should run before it stops. Default is infinity.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference)
@@ -147,7 +148,8 @@ def anytime(
                 previous_bin_sum = current_bin_sum
 
                 # Heuristic 2: "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree.")
-                # Note that this heuristic is valid only for the objective "minimize largest sum"!
+                # This heuristic is helpful since it avoids the creation of new vertices.
+                # It is currently implemented only for two objectives: min-max and max-min.
                 if use_heuristic_2:
                     if objective==obj.MinimizeLargestSum:
                         if current_bin_sum + valueof(next_item) >= best_objective_value or current_bins.sums[-1]>=best_objective_value:
