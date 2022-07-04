@@ -261,14 +261,16 @@ def anytime(
 '''
 
 if __name__ == "__main__":
-    from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-
+    # DOCTEST
     import doctest
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
 
+    # DEMO
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
+
+    from prtpy.bins import BinsKeepingContents, BinsKeepingSums
 
     anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
     walter_numbers = [46, 39, 27, 26, 16, 13, 10]

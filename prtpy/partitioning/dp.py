@@ -8,7 +8,7 @@ Since: 2022-02
 from prtpy import outputtypes as out, objectives as obj, Bins
 from typing import Callable, List, Any, Tuple
 from dataclasses import dataclass
-import logging
+import logging, numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,7 @@ def optimal(
     items: List[Any],
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
+    **kwargs
 ):
 
     """
@@ -48,10 +49,10 @@ def optimal(
     """
     if hasattr(bins, 'bins'):
         # We need the entire partition.
-        _optimal_partition(bins, items, valueof, objective)
+        _optimal_partition(bins, items, valueof, objective, **kwargs)
     else:
         # We need only the sums - not the entire partition.
-        _optimal_sums(bins, items, valueof, objective)
+        _optimal_sums(bins, items, valueof, objective, **kwargs)
     return bins
 
 
@@ -70,11 +71,13 @@ def _optimal_sums(
     The "vi" is the current sum in bin i.
     """
 
-    # Construct initial states:
-    zero_values = bins.num * (0,)
-    current_states = {zero_values}
-    num_of_processed_states = len(current_states)
+    logger.info("\nDynamic Programming %s Partitioning of %d items into %d bins.", objective, len(items), bins.num)
 
+    first_state = bins.num * (0,)
+    num_of_processed_states = 1
+
+    # Construct initial states:
+    current_states = {first_state}
     for item in items:
         value = valueof(item)
 
@@ -84,27 +87,18 @@ def _optimal_sums(
             for ibin in range(bins.num):
                 next_state = list(state)
                 next_state[ibin] += value
-                next_states.add(tuple(next_state))
-        logger.info(
-            "  Processed item %s and added %d states.",
-            input,
-            len(next_states),
-        )
-        num_of_processed_states += len(next_states)
+                next_states.add(tuple(sorted(next_state)))
+        states_added = len(next_states)
+        logger.info("  Processed item %s and added %d states.", item, states_added)
+        num_of_processed_states += states_added
         current_states = next_states
 
-    logger.info("Processed %d states.", num_of_processed_states)
     if len(current_states) == 0:
         raise ValueError("No final states!")
-    best_final_state = min(
-        current_states, key=objective.value_to_minimize
-    )
+    best_final_state = min(current_states, key=objective.value_to_minimize)
     best_final_state_value = objective.value_to_minimize(best_final_state)
-    logger.info(
-        "Best final state: %s, value: %s",
-        best_final_state,
-        best_final_state_value,
-    )
+    logger.info("Processed %d states.", num_of_processed_states)
+    logger.info("Best final state: %s, value: %s", best_final_state, best_final_state_value)
     bins.sums = best_final_state
 
 
@@ -134,7 +128,6 @@ def _optimal_partition(
         def __eq__(self, other):
             return self.state == other.state
 
-
     # Construct initial states:
     zero_values = bins.num * (0,)
     current_state_records = {StateRecord(zero_values, None, None)}
@@ -151,11 +144,7 @@ def _optimal_partition(
                 next_state[ibin] += value
                 next_state_record = StateRecord(tuple(next_state), record, ibin)
                 next_state_records.add(next_state_record)
-        logger.info(
-            "  Processed item %s and added %d state reccords.",
-            input,
-            len(next_state_records),
-        )
+        logger.info("  Processed item %s and added %d state reccords.", item, len(next_state_records))
         num_of_processed_states += len(next_state_records)
         current_state_records = next_state_records
 
@@ -182,6 +171,23 @@ def _optimal_partition(
 
 
 if __name__ == "__main__":
-    import doctest, logging
+    # DOCTEST
+    import doctest
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+
+    # DEMO
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
+
+    from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+
+    optimal(BinsKeepingSums(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
+    walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    optimal(BinsKeepingSums(3), walter_numbers, objective=obj.MaximizeSmallestSum)
+    optimal(BinsKeepingSums(3), walter_numbers, objective=obj.MinimizeLargestSum)
+
+    # random_numbers = np.random.randint(1, 2**8-1, 15, dtype=np.int64)
+    # optimal(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
+    # optimal(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
+    # optimal(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)

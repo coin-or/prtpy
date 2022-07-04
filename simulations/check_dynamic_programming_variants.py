@@ -1,5 +1,5 @@
 """ 
-Check variants of Complete Greedy algorithm on uniformly-random integers.
+Check variants of Dynamic Programming Number Partitioning on uniformly-random integers.
 Aims to reproduce the results of Korf, Moffitt and Schreiber (2018), JACM paper.
 
 Author: Erel Segal-Halevi
@@ -20,11 +20,11 @@ def partition_random_items(
 ):
     items = np.random.randint(1, 2**bitsperitem-1, numitems, dtype=np.int64)
     sums = prtpy.partition(
-        algorithm=prtpy.partitioning.complete_greedy,
+        algorithm=prtpy.partitioning.dynamic_programming,
         numbins=2,
         items=items, 
         outputtype=prtpy.out.Sums,
-        time_limit=TIME_LIMIT,
+        # time_limit=TIME_LIMIT,
         **kwargs
     )
     return {
@@ -35,28 +35,19 @@ def partition_random_items(
 if __name__ == "__main__":
     import logging, experiments_csv
     experiments_csv.logger.setLevel(logging.INFO)
-    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants_5.csv", backup_folder=None)
+    experiment = experiments_csv.Experiment("results/", "check_dynamic_programming_variants_1.csv", backup_folder=None)
 
     prt = prtpy.partitioning
     input_ranges = {
         "numitems": [10, 12, 14, 16, 18, 20, 22, 24, 26, 30, 35, 40, 45, 50],
-        "bitsperitem": [16,32,48],
+        "bitsperitem": [4,8,12,16,20],
         "instance_id": range(10),
         "objective": [obj.MinimizeLargestSum, obj.MaximizeSmallestSum],
-        "use_heuristic_2": [False, True],
-        "use_heuristic_3": [False, True],
-        "use_lower_bound": [False, True],
+        "use_boolean_matrix": [False, True],
     }
     experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=TIME_LIMIT)
 
 
 """
-check_complete_greedy_variants_3: minimize largest sum objective; compare lower bound, heuristic 2, and heuristic 3. 
-  --  Heuristic 2 is the best, then lower bound; Heuristic 3 is not useful.
 
-check_complete_greedy_variants_4: maximize smallest sum objective; compare lower bound and heuristic 2. 
-  -- Heuristic 2 is the best, then lower bound.
-  -- But lower-bound is very useful for 16 bits.
-
-check_complete_greedy_variants_5: maximize smallest sum and minimize largest sum; stopping when an optimal solution is found.
 """
