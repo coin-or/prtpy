@@ -19,7 +19,7 @@ print("Greedy: ", prtpy.partition(algorithm=prtpy.partitioning.greedy, numbins=n
 print(f"\t {perf_counter()-start} seconds")
 start = perf_counter()
 print("Complete greedy: ")
-for time_in_seconds in [0.25,0.5,1,2,4,8,16]:
+for time_limit in [0.25,0.5,1,2,4,8,16]:
     start = perf_counter()
-    print(f"\t{time_in_seconds}: ", prtpy.partition(algorithm=prtpy.partitioning.complete_greedy, numbins=numbins, items=values, outputtype=prtpy.out.ExtremeSums, time_in_seconds=time_in_seconds))
+    print(f"\t{time_limit}: ", prtpy.partition(algorithm=prtpy.partitioning.complete_greedy, numbins=numbins, items=values, outputtype=prtpy.out.ExtremeSums, time_limit=time_limit))
     print(f"\t {perf_counter()-start} seconds")

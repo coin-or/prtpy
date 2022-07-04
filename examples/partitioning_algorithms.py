@@ -39,5 +39,5 @@ print(f"\t {perf_counter()-start} seconds")
 #' The *complete greedy* algorithm (Korf, 1995) allows you to determine how much time you are willing to spend to find an optimal solution.
 start = perf_counter()
 values = np.random.randint(1,1000, 10000)
-print(prtpy.partition(algorithm=prtpy.partitioning.complete_greedy, numbins=9, items=values, outputtype=prtpy.out.Sums, time_in_seconds=1))
+print(prtpy.partition(algorithm=prtpy.partitioning.complete_greedy, numbins=9, items=values, outputtype=prtpy.out.Sums, time_limit=1))
 print(f"\t {perf_counter()-start} seconds")

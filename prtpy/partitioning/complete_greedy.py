@@ -23,6 +23,7 @@ def optimal(
     objective: obj.Objective = obj.MinimizeDifference,
     use_lower_bound: bool = True,
     use_heuristic_3: bool = False,
+    time_limit: float = np.inf,
 ) -> Iterator:
     """
     Finds a partition in which the largest sum is minimal, using the Complete Greedy algorithm.
@@ -161,7 +162,7 @@ def anytime(
     items: List[any],
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
-    time_in_seconds: float = np.inf,
+    time_limit: float = np.inf,
 ) -> Iterator:
     """
     An anytime algorithm for finding a partition using the Complete Greedy algorithm.
@@ -175,25 +176,25 @@ def anytime(
     It stops when the optimal partition is found, OR when the time runs out.
 
     :param objective: represents the function that should be optimized. Default is minimizing the difference between bin sums.
-    :param time_in_seconds: determines how much time the function should run before it stops. Default is infinity.
+    :param time_limit: determines how much time (in seconds) the function should run before it stops. Default is infinity.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference, time_in_seconds=1)
+    >>> anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference, time_limit=1)
     Bin #0: [6, 5, 4], sum=15.0
     Bin #1: [8, 7], sum=15.0
     
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference, time_in_seconds=1)
+    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference, time_limit=1)
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
-    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum, time_in_seconds=1)
+    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum, time_limit=1)
     Bin #0: [27, 26], sum=53.0
     Bin #1: [39, 13, 10], sum=62.0
     Bin #2: [46, 16], sum=62.0
-    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum, time_in_seconds=1)
+    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum, time_limit=1)
     Bin #0: [46, 10], sum=56.0
     Bin #1: [27, 16, 13], sum=56.0
     Bin #2: [39, 26], sum=65.0
@@ -221,7 +222,7 @@ def anytime(
             if new_objective_value < best_objective_value:
                 best_bins, best_objective_value = current_bins, new_objective_value
                 logger.info("Found a better solution: %s, with value $s", best_bins, best_objective_value)
-            if time.perf_counter() - start_time > time_in_seconds:
+            if time.perf_counter() - start_time > time_limit:
                 logger.info("Stopping due to time limit")
                 break
         else:

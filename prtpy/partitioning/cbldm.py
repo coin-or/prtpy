@@ -22,34 +22,34 @@ def cbldm(                  # max items length can be between 900 and 1000 due t
         bins: Bins,         # max length of items can vary from computer to computer
         items: List[float],
         valueof: Callable[[Any], float] = lambda x: x,
-        time_in_seconds: float = np.inf,
+        time_limit: float = np.inf,
         partition_difference: int = sys.maxsize
 ) -> Bins:
     """
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> cbldm(BinsKeepingContents(2), items=[10], time_in_seconds=1).bins
+    >>> cbldm(BinsKeepingContents(2), items=[10], time_limit=1).bins
     [[], [10]]
-    >>> cbldm(BinsKeepingContents(2), items=[1/2,1/3,1/5], time_in_seconds=1, partition_difference=1).bins
+    >>> cbldm(BinsKeepingContents(2), items=[1/2,1/3,1/5], time_limit=1, partition_difference=1).bins
     [[0.5], [0.2, 0.3333333333333333]]
-    >>> cbldm(BinsKeepingContents(2), items=[8,7,6,5,4], time_in_seconds=1, partition_difference=1).bins
+    >>> cbldm(BinsKeepingContents(2), items=[8,7,6,5,4], time_limit=1, partition_difference=1).bins
     [[4, 6, 5], [8, 7]]
-    >>> cbldm(BinsKeepingContents(2), items=[6,6,5,5,5], time_in_seconds=1, partition_difference=1).bins
+    >>> cbldm(BinsKeepingContents(2), items=[6,6,5,5,5], time_limit=1, partition_difference=1).bins
     [[6, 6], [5, 5, 5]]
-    >>> cbldm(BinsKeepingContents(2), items=[4,1,1,1,1], time_in_seconds=1, partition_difference=1).bins
+    >>> cbldm(BinsKeepingContents(2), items=[4,1,1,1,1], time_limit=1, partition_difference=1).bins
     [[1, 1, 1], [4, 1]]
 
     >>> from prtpy import partition, out
-    >>> partition(algorithm=cbldm, numbins=2, items=[10], time_in_seconds=1)
+    >>> partition(algorithm=cbldm, numbins=2, items=[10], time_limit=1)
     [[], [10]]
-    >>> partition(algorithm=cbldm, numbins=2, items=[10,0], time_in_seconds=1, partition_difference=3)
+    >>> partition(algorithm=cbldm, numbins=2, items=[10,0], time_limit=1, partition_difference=3)
     [[0], [10]]
-    >>> partition(algorithm=cbldm, numbins=2, items=[1/2,1/3,1/5], time_in_seconds=1, partition_difference=1)
+    >>> partition(algorithm=cbldm, numbins=2, items=[1/2,1/3,1/5], time_limit=1, partition_difference=1)
     [[0.5], [0.2, 0.3333333333333333]]
-    >>> partition(algorithm=cbldm, numbins=2, items=[6,6,5,5,5], time_in_seconds=1, partition_difference=1)
+    >>> partition(algorithm=cbldm, numbins=2, items=[6,6,5,5,5], time_limit=1, partition_difference=1)
     [[6, 6], [5, 5, 5]]
-    >>> partition(algorithm=cbldm, numbins=2, items=[8,7,6,5,4], time_in_seconds=1, partition_difference=1)
+    >>> partition(algorithm=cbldm, numbins=2, items=[8,7,6,5,4], time_limit=1, partition_difference=1)
     [[4, 6, 5], [8, 7]]
-    >>> partition(algorithm=cbldm, numbins=2, items=[4,1,1,1,1], time_in_seconds=1, partition_difference=1)
+    >>> partition(algorithm=cbldm, numbins=2, items=[4,1,1,1,1], time_limit=1, partition_difference=1)
     [[1, 1, 1], [4, 1]]
 
     >>> partition(algorithm=cbldm, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
@@ -61,14 +61,14 @@ def cbldm(                  # max items length can be between 900 and 1000 due t
     [25390.0, 25390.0]
 
     >>> items = rng.integers(1, 1000, 899)
-    >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums, time_in_seconds=1)
+    >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums, time_limit=1)
     [225368.0, 225369.0]
     """
     start = time.perf_counter()
     if bins.num != 2:
         raise ValueError("number of bins must be 2")
-    if time_in_seconds <= 0:
-        raise ValueError("time_in_seconds must be positive")
+    if time_limit <= 0:
+        raise ValueError("time_limit must be positive")
     if partition_difference < 1 or not isinstance(partition_difference, int):
         raise ValueError("partition_difference must be a complete number and >= 1")
     sorted_items = sorted(items, key=valueof, reverse=True)
@@ -88,17 +88,17 @@ def cbldm(                  # max items length can be between 900 and 1000 due t
         b.set_valueof(valueof)
         b.add_item_to_bin(item=i, bin_index=1)
         normalised_items.append(b)
-    alg = CBLDM_algo(length=length, time_in_seconds=time_in_seconds, len_delta=partition_difference, start=start, val=valueof)
+    alg = CBLDM_algo(length=length, time_limit=time_limit, len_delta=partition_difference, start=start, val=valueof)
     alg.part(normalised_items)
     return alg.best
 
 
 class CBLDM_algo:
 
-    def __init__(self, length, time_in_seconds, len_delta, start, val):
+    def __init__(self, length, time_limit, len_delta, start, val):
         self.sum_delta = np.inf  # partition sum difference
         self.length = length
-        self.time_in_seconds = time_in_seconds
+        self.time_limit = time_limit
         self.len_delta = len_delta  # partition cardinal difference
         self.start = start
         self.best = BinsKeepingContents(2)
@@ -107,7 +107,7 @@ class CBLDM_algo:
         self.val = val
 
     def part(self, items):
-        if time.perf_counter() - self.start >= self.time_in_seconds or self.opt:
+        if time.perf_counter() - self.start >= self.time_limit or self.opt:
             return
         if len(items) == 1:  # possible partition
             if abs(len(items[0].bins[0]) - len(items[0].bins[1])) <= self.len_delta and abs(

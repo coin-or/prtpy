@@ -21,7 +21,7 @@ class TestCBLDMAlgorithms(unittest.TestCase):
 
     def _test_algorithm(self, items, expected, time=np.inf, delta=sys.maxsize, equal=True):
         algorithm = prtpy.partitioning.cbldm
-        result = prtpy.partition(algorithm=algorithm, items=items, numbins=2, outputtype=prtpy.out.Sums, time_in_seconds=time, partition_difference=delta)
+        result = prtpy.partition(algorithm=algorithm, items=items, numbins=2, outputtype=prtpy.out.Sums, time_limit=time, partition_difference=delta)
         if equal:
             self.assertEqual(round(abs(result[0] - result[1]), 4), round(float(expected), 4))
         else:
@@ -59,11 +59,11 @@ class TestCBLDMAlgorithms(unittest.TestCase):
         with self.assertRaises(ValueError):
             prtpy.partition(algorithm=algorithm, items=items, numbins=3)
         with self.assertRaises(ValueError):
-            prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_in_seconds=0)
+            prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_limit=0)
         with self.assertRaises(ValueError):
-            prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_in_seconds=1, partition_difference=-1)
+            prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_limit=1, partition_difference=-1)
         with self.assertRaises(ValueError):
-            prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_in_seconds=1, partition_difference=1.5)
+            prtpy.partition(algorithm=algorithm, items=items, numbins=2, time_limit=1, partition_difference=1.5)
 
 
 if __name__ == "__main__":
