@@ -58,7 +58,7 @@ class Bins(ABC):
         pass
 
     @abstractmethod
-    def sort(self):
+    def sort_by_ascending_sum(self):
         """
         Sort the bins by ascending order of sum. For consistency and testing.
         """
@@ -144,7 +144,7 @@ class BinsKeepingSums(Bins):
     Bin #2: sum=0.0
     >>> bins.num
     3
-    >>> bins.sort()
+    >>> bins.sort_by_ascending_sum()
     Bin #0: sum=0.0
     Bin #1: sum=3.0
     Bin #2: sum=9.0
@@ -174,7 +174,7 @@ class BinsKeepingSums(Bins):
     def bin_to_str(self, bin_index: int) -> str:
         return f"sum={self.sums[bin_index]}"
 
-    def sort(self):
+    def sort_by_ascending_sum(self):
         self.sums.sort()
         return self
 
@@ -256,7 +256,7 @@ class BinsKeepingContents(BinsKeepingSums):
     Bin #2: [], sum=0.0
     >>> bins.num
     3
-    >>> bins.sort()
+    >>> bins.sort_by_ascending_sum()
     Bin #0: [], sum=0.0
     Bin #1: ['a'], sum=3.0
     Bin #2: ['b', 'c'], sum=9.0
@@ -288,7 +288,7 @@ class BinsKeepingContents(BinsKeepingSums):
     def bin_to_str(self, bin_index: int) -> str:
         return f"{self.bins[bin_index]}, sum={self.sums[bin_index]}"
 
-    def sort(self):
+    def sort_by_ascending_sum(self):
         sorted_indices = sorted(range(self.num), key=lambda i: self.sums[i])
         self.sums = [self.sums[sorted_indices[i]] for i in range(self.num)]
         self.bins = [self.bins[sorted_indices[i]] for i in range(self.num)]

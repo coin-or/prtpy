@@ -2,8 +2,12 @@
     Partition the numbers using the Complete Greedy number partitioning algorithm (Korf, 1995):
            https://en.wikipedia.org/wiki/Greedy_number_partitioning
 
-    Credit: based on code by Søren Fuglede Jørgensen in the numberpartitioning package:
+    Credits: based on code by Søren Fuglede Jørgensen in the numberpartitioning package:
            https://github.com/fuglede/numberpartitioning/blob/master/src/numberpartitioning/greedy.py
+
+    This stackoverflow question:
+        https://stackoverflow.com/q/51635177/827927
+    explains how to have a set with a custom key.
 """
 
 from typing import List, Tuple, Callable, Iterator, Any
@@ -135,7 +139,7 @@ def anytime(
                     new_bins = deepcopy(current_bins)
                     for i in range(depth,numitems):
                         new_bins.add_item_to_bin(sorted_items[i], 0)
-                    new_bins.sort()  # by ascending order of sum.
+                    new_bins.sort_by_ascending_sum()
                     new_depth = numitems
                     stack.append((new_bins, new_depth))
                     continue
@@ -171,22 +175,28 @@ def anytime(
                         # logger.debug("  Fast lower bound %f too large", fast_lower_bound)
                         continue
 
-                # Create the next vertex:
-                new_bins = deepcopy(current_bins).add_item_to_bin(next_item, bin_index)
-                new_bins.sort()  # by ascending order of sum.
-
+                new_sums = list(current_bins.sums)
+                new_sums[bin_index] += valueof(next_item)
+                new_sums.sort()
+                
                 # Lower-bound heuristic. 
                 if use_lower_bound:
-                    lower_bound = objective.lower_bound(new_bins.sums, sum_of_remaining_items, are_sums_in_ascending_order=True)
+                    lower_bound = objective.lower_bound(new_sums, sum_of_remaining_items, are_sums_in_ascending_order=True)
                     if lower_bound >= best_objective_value:
                         logger.debug("    Lower bound %f too large", lower_bound)
                         continue
                 if use_set_of_seen_states: 
-                    new_state = tuple(new_bins.sums)
+                    new_state = tuple(new_sums)
                     if new_state in seen_states:
                         logger.debug("    State %s already seen", new_state)
                         continue
                     seen_states.add(new_state)   # should be after if use_lower_bound
+
+                # Create the next vertex:
+                new_bins = deepcopy(current_bins).add_item_to_bin(next_item, bin_index)
+                new_bins.sort_by_ascending_sum() 
+                # new_sums = new_bins.sums
+
                 new_depth = depth + 1
                 stack.append((new_bins, new_depth))
                 intermediate_partitions_checked += 1
@@ -272,7 +282,7 @@ def anytime(
             for bin_index in reversed(range(bins.num)):   # in descending order of sum
                 # Create the next vertex:
                 new_bins = deepcopy(current_bins).add_item_to_bin(next_item, bin_index)
-                new_bins.sort()  # by ascending order of sum
+                new_bins.sort_by_ascending_sum() 
                 new_depth = depth + 1
                 stack.append((new_bins, new_depth))
     return best_bins

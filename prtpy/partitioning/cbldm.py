@@ -150,7 +150,7 @@ class CBLDM_algo:
                 for bin_i in range(2):
                     for i in items[section].bins[bin_i]:
                         combine.add_item_to_bin(i, bin_i)
-            combine.sort()
+            combine.sort_by_ascending_sum()
 
             for i in items[0].bins[0]:  # [small, big] + [small, big] -> [small + big, small + big]
                 split.add_item_to_bin(i, 1)
@@ -159,7 +159,7 @@ class CBLDM_algo:
             for bin_i in range(2):
                 for i in items[1].bins[bin_i]:
                     split.add_item_to_bin(i, bin_i)
-            split.sort()
+            split.sort_by_ascending_sum()
 
             right.append(combine)
             left.append(split)

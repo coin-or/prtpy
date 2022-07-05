@@ -16,16 +16,25 @@ def partition_random_items(
     numitems: int,
     bitsperitem: int,
     instance_id: int, # dummy parameter, to allow multiple instances of the same run
+    use_dynamic_programming: bool,
     **kwargs
 ):
     items = np.random.randint(1, 2**bitsperitem-1, numitems, dtype=np.int64)
-    sums = prtpy.partition(
-        algorithm=prtpy.partitioning.complete_greedy,
-        numbins=2,
-        items=items, 
-        outputtype=prtpy.out.Sums,
-        time_limit=TIME_LIMIT,
-        **kwargs
+    if use_dynamic_programming:
+        sums = prtpy.partition(
+            algorithm=prtpy.partitioning.dynamic_programming,
+            numbins=2,
+            items=items, 
+            outputtype=prtpy.out.Sums,
+        )
+    else:
+        sums = prtpy.partition(
+            algorithm=prtpy.partitioning.complete_greedy,
+            numbins=2,
+            items=items, 
+            outputtype=prtpy.out.Sums,
+            time_limit=TIME_LIMIT,
+            **kwargs
     )
     return {
         "diff": sums[-1]-sums[0]
@@ -35,7 +44,7 @@ def partition_random_items(
 if __name__ == "__main__":
     import logging, experiments_csv
     experiments_csv.logger.setLevel(logging.INFO)
-    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants_6.csv", backup_folder=None)
+    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants_7.csv", backup_folder=None)
 
     prt = prtpy.partitioning
     input_ranges = {
@@ -44,7 +53,21 @@ if __name__ == "__main__":
         "instance_id": range(10),
         "objective": [obj.MinimizeLargestSum, obj.MaximizeSmallestSum],
         "use_lower_bound": [False, True],
+        "use_fast_lower_bound": [False, True],
         "use_set_of_seen_states": [False, True],
+        "use_dynamic_programming": [False],
+    }
+    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=TIME_LIMIT)
+
+    input_ranges = {
+        "numitems": [10, 12, 14, 16, 18, 20, 22, 24, 26, 30, 35, 40, 45, 50],
+        "bitsperitem": [16,32,48],
+        "instance_id": range(10),
+        "objective": [obj.MinimizeLargestSum, obj.MaximizeSmallestSum],
+        "use_lower_bound": [None],
+        "use_fast_lower_bound": [None],
+        "use_set_of_seen_states": [None],
+        "use_dynamic_programming": [True],
     }
     experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=TIME_LIMIT)
 
@@ -65,5 +88,9 @@ check_complete_greedy_variants_6: compare use_lower_bound to use_set_of_seen_sta
   -- with 16 bits, both of them are not needed.
   -- with 32 bits, use_set_of_seen_states is slightly better.
   -- with 48 bits, use_lower_bound is slightly better.
-   
+
+check_complete_greedy_variants_7: compare all lower bounds with dynamic programming.
+
+check_complete_greedy_variants_8: same as 7, but a different implementation, using dict of bins.
+
 """

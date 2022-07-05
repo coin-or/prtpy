@@ -44,7 +44,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
         for i in range(bins.num):
             bin1.combine_bins(ibin=bins.num - i - 1, other_bin=bin2, other_ibin=i)
 
-        bin1.sort()
+        bin1.sort_by_ascending_sum()
 
         # objective
         diff = max(bin1.sums) - min(bin1.sums)

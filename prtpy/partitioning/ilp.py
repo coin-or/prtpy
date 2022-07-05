@@ -48,19 +48,19 @@ def optimal(
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference).sort()
+    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference).sort_by_ascending_sum()
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
-    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum).sort()
+    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum).sort_by_ascending_sum()
     Bin #0: [27, 26], sum=53.0
     Bin #1: [46, 16], sum=62.0
     Bin #2: [39, 13, 10], sum=62.0
-    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum).sort()
+    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum).sort_by_ascending_sum()
     Bin #0: [46, 10], sum=56.0
     Bin #1: [27, 16, 13], sum=56.0
     Bin #2: [39, 26], sum=65.0
-    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum, additional_constraints=lambda sums: [sums[0]==0]).sort()
+    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum, additional_constraints=lambda sums: [sums[0]==0]).sort_by_ascending_sum()
     Bin #0: [], sum=0.0
     Bin #1: [39, 26, 13, 10], sum=88.0
     Bin #2: [46, 27, 16], sum=89.0
