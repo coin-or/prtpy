@@ -165,6 +165,8 @@ def anytime(
                         else:
                             current_smallest_sum = current_bins.sums[0]
                         fast_lower_bound = -(current_smallest_sum+sum_of_remaining_items)
+                    else:
+                        fast_lower_bound = -np.inf
                     if fast_lower_bound >= best_objective_value:
                         # logger.debug("  Fast lower bound %f too large", fast_lower_bound)
                         continue
@@ -282,23 +284,24 @@ if __name__ == "__main__":
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
 
-    # DEMO
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
+    if failures == 0:
+        # DEMO
+        logger.setLevel(logging.DEBUG)
+        logger.addHandler(logging.StreamHandler())
 
-    from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+        from prtpy.bins import BinsKeepingContents, BinsKeepingSums
 
-    anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
-    walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
-    anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
+        anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
+        walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+        anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
+        anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
 
-    random_numbers = np.random.randint(1, 2**16-1, 15, dtype=np.int64)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_set_of_seen_states=False)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_set_of_seen_states=True)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=True, use_set_of_seen_states=False)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=True, use_set_of_seen_states=True)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)
+        random_numbers = np.random.randint(1, 2**16-1, 15, dtype=np.int64)
+        anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_set_of_seen_states=False)
+        anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_set_of_seen_states=True)
+        anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=True, use_set_of_seen_states=False)
+        anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=True, use_set_of_seen_states=True)
+        # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
+        # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
+        # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
+        # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)
