@@ -22,8 +22,9 @@ def anytime(
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
     use_lower_bound: bool = True,   # Prune branches whose lower bound (= optimistic value) is at least as large as the current minimum.
-    use_heuristic_2: bool = True,   # A faster lower bound, that does not create the branch at all. Useful for min-max and max-min objectives.
+    use_fast_lower_bound: bool = True,   # A faster lower bound, that does not create the branch at all. Useful for min-max and max-min objectives.
     use_heuristic_3: bool = False,  # An improved stopping condition, applicable for min-max only. Not very useful in experiments.
+    use_set_of_seen_states: bool = True, 
     time_limit: float = np.inf,
 ) -> Iterator:
     """
@@ -92,7 +93,6 @@ def anytime(
 
     sorted_items = sorted(items, key=valueof, reverse=True)
     sums_of_remaining_items = [sum(map(valueof, sorted_items[i:])) for i in range(numitems)] + [0] # For Heuristic 3
-    partitions_checked = 0
 
     global_lower_bound = objective.lower_bound(bins.sums, sums_of_remaining_items[0], are_sums_in_ascending_order=True)
 
@@ -102,13 +102,18 @@ def anytime(
 
     # Create a stack whose elements are bins and the current depth.
     # Initially, it contains a single tuple: an empty partition with depth 0.
-    stack: List[Tuple[Bins, int]] = [(bins, 0)]
+    first_state = (bins, 0)
+    stack: List[Tuple[Bins, int]] = [first_state]
+    if use_set_of_seen_states:
+        seen_states = set(tuple(first_state[0].sums))
+    complete_partitions_checked = 0      # for logging
+    intermediate_partitions_checked = 1  # for logging
     while len(stack) > 0:
         current_bins, depth = stack.pop()
 
         # If we have reached the leaves of the DFS tree, check if we have an improvement:
         if depth == numitems:
-            partitions_checked += 1
+            complete_partitions_checked += 1
             new_objective_value = objective.value_to_minimize(current_bins.sums)
             if new_objective_value < best_objective_value:
                 best_bins, best_objective_value = current_bins, new_objective_value
@@ -147,33 +152,44 @@ def anytime(
                     continue   
                 previous_bin_sum = current_bin_sum
 
-                # Heuristic 2: "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree.")
-                # This heuristic is helpful since it avoids the creation of new vertices.
-                # It is currently implemented only for two objectives: min-max and max-min.
-                if use_heuristic_2:
+                # Fast-lower-bound heuristic - before creating the new vertex.
+                # Currently implemented only for two objectives: min-max and max-min.
+                if use_fast_lower_bound:
                     if objective==obj.MinimizeLargestSum:
-                        if current_bin_sum + valueof(next_item) >= best_objective_value or current_bins.sums[-1]>=best_objective_value:
-                            continue  # If we add the next item to the next bin, it will not become better.
+                        # "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree."
+                        fast_lower_bound = max(current_bin_sum + valueof(next_item), current_bins.sums[-1])
                     elif objective==obj.MaximizeSmallestSum:
-                        # An adaptation of this heuristic to maximizing the smallest sum
+                        # An adaptation of the above heuristic to maximizing the smallest sum.
                         if bin_index==0:
                             current_smallest_sum = min(current_bins.sums[0]+valueof(next_item), current_bins.sums[1])
                         else:
                             current_smallest_sum = current_bins.sums[0]
-                        if -(current_smallest_sum+sum_of_remaining_items) >= best_objective_value:
-                            continue # Even if we add all remaining items to the smallest sum, it will not become better.
+                        fast_lower_bound = -(current_smallest_sum+sum_of_remaining_items)
+                    if fast_lower_bound >= best_objective_value:
+                        # logger.debug("  Fast lower bound %f too large", fast_lower_bound)
+                        continue
 
                 # Create the next vertex:
                 new_bins = deepcopy(current_bins).add_item_to_bin(next_item, bin_index)
                 new_bins.sort()  # by ascending order of sum.
+
+                # Lower-bound heuristic. 
                 if use_lower_bound:
                     lower_bound = objective.lower_bound(new_bins.sums, sum_of_remaining_items, are_sums_in_ascending_order=True)
                     if lower_bound >= best_objective_value:
+                        logger.debug("    Lower bound %f too large", lower_bound)
                         continue
+                if use_set_of_seen_states: 
+                    new_state = tuple(new_bins.sums)
+                    if new_state in seen_states:
+                        logger.debug("    State %s already seen", new_state)
+                        continue
+                    seen_states.add(new_state)   # should be after if use_lower_bound
                 new_depth = depth + 1
                 stack.append((new_bins, new_depth))
+                intermediate_partitions_checked += 1
 
-    logger.info("Checked %d out of %d partitions.", partitions_checked, bins.num**numitems)
+    logger.info("Checked %d out of %d complete partitions, and %d intermediate partitions.", complete_partitions_checked, bins.num**numitems, intermediate_partitions_checked)
     return best_bins
 
 
@@ -267,7 +283,7 @@ if __name__ == "__main__":
     print("{} failures, {} tests".format(failures, tests))
 
     # DEMO
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
 
     from prtpy.bins import BinsKeepingContents, BinsKeepingSums
@@ -278,11 +294,11 @@ if __name__ == "__main__":
     anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
 
     random_numbers = np.random.randint(1, 2**16-1, 15, dtype=np.int64)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False, use_heuristic_2=False, use_heuristic_3=False)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_heuristic_2=True, use_heuristic_3=False)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=True, use_heuristic_2=False, use_heuristic_3=False)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=True, use_heuristic_2=True, use_heuristic_3=False)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
-    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_set_of_seen_states=False)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_set_of_seen_states=True)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=True, use_set_of_seen_states=False)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=True, use_set_of_seen_states=True)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
     # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)

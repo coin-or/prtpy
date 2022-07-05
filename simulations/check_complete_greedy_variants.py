@@ -35,7 +35,7 @@ def partition_random_items(
 if __name__ == "__main__":
     import logging, experiments_csv
     experiments_csv.logger.setLevel(logging.INFO)
-    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants_5.csv", backup_folder=None)
+    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants_6.csv", backup_folder=None)
 
     prt = prtpy.partitioning
     input_ranges = {
@@ -43,20 +43,27 @@ if __name__ == "__main__":
         "bitsperitem": [16,32,48],
         "instance_id": range(10),
         "objective": [obj.MinimizeLargestSum, obj.MaximizeSmallestSum],
-        "use_heuristic_2": [False, True],
-        "use_heuristic_3": [False, True],
         "use_lower_bound": [False, True],
+        "use_set_of_seen_states": [False, True],
     }
     experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=TIME_LIMIT)
 
 
 """
 check_complete_greedy_variants_3: minimize largest sum objective; compare lower bound, heuristic 2, and heuristic 3. 
-  --  Heuristic 2 is the best, then lower bound; Heuristic 3 is not useful.
+  --  Heuristic 2 (use_fast_lower_bound) is the best, then lower bound; Heuristic 3 is not useful.
 
 check_complete_greedy_variants_4: maximize smallest sum objective; compare lower bound and heuristic 2. 
-  -- Heuristic 2 is the best, then lower bound.
+  -- Heuristic 2 (use_fast_lower_bound) is the best, then lower bound.
   -- But lower-bound is very useful for 16 bits.
 
 check_complete_greedy_variants_5: maximize smallest sum and minimize largest sum; stopping when an optimal solution is found.
+  -- Both objectives have similar performance.
+  -- Heuristic 3 harms performance.
+
+check_complete_greedy_variants_6: compare use_lower_bound to use_set_of_seen_states, when fast_lower_bound is used.
+  -- with 16 bits, both of them are not needed.
+  -- with 32 bits, use_set_of_seen_states is slightly better.
+  -- with 48 bits, use_lower_bound is slightly better.
+   
 """

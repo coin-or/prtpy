@@ -47,8 +47,8 @@ if __name__ == "__main__":
     input_ranges = {
         "algorithm": [prt.complete_greedy],
         "numbins": [2],
-        "numitems": [40, 50, 60, 70, 80, 90, 100],
+        "numitems": [60, 70, 80, 90, 100],
         "bitsperitem": [32,48],
         "instance_id": range(10)
     }
-    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=300)
+    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=3000)
