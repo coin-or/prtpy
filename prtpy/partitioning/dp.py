@@ -10,7 +10,7 @@ Author: Erel Segal-Halevi
 Since: 2022-02
 """
 
-from prtpy import outputtypes as out, objectives as obj, Bins
+from prtpy import outputtypes as out, objectives as obj, Bins, Binner, BinnerKeepingContents, BinnerKeepingSums, printbins
 from typing import Callable, List, Any, Tuple
 from dataclasses import dataclass
 import logging, numpy as np
@@ -31,40 +31,41 @@ def optimal(
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> optimal(BinsKeepingContents(2), [1,1,1,1,2], objective=obj.MaximizeSmallestSum).sums
-    array([3., 3.])
+    >>> printbins(optimal(BinsKeepingContents(2), [1,1,1,1,2], objective=obj.MaximizeSmallestSum))
+    Bin #0: [1, 1, 1], sum=3.0
+    Bin #1: [1, 2], sum=3.0
 
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference)
+    >>> printbins(optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference))
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
-    >>> optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
+    >>> printbins(optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum))
     Bin #0: [46, 16], sum=62.0
     Bin #1: [39, 13, 10], sum=62.0
     Bin #2: [27, 26], sum=53.0
-    >>> optimal(BinsKeepingSums(3), walter_numbers, objective=obj.MaximizeSmallestSum)
-    Bin #0: sum=56
-    Bin #1: sum=56
-    Bin #2: sum=65
+    >>> printbins(optimal(BinsKeepingSums(3), walter_numbers, objective=obj.MaximizeSmallestSum))
+    Bin #0: sum=56.0
+    Bin #1: sum=56.0
+    Bin #2: sum=65.0
 
     >>> from prtpy import partition
     >>> partition(algorithm=optimal, numbins=3, items={"a":46, "b":39, "c":27, "d":26, "e":16, "f":13, "g":10}, objective=obj.MinimizeDifference, outputtype=out.Partition)
     [['b', 'e'], ['a', 'f'], ['c', 'd', 'g']]
     """
-    if hasattr(bins, 'bins'):
+    binner = bins.get_binner()
+    if isinstance(binner, BinnerKeepingSums):
         # We need the entire partition.
-        _optimal_partition(bins, items, valueof, objective, **kwargs)
+        return _optimal_partition(binner, items, valueof, objective, **kwargs)
     else:
         # We need only the sums - not the entire partition.
-        _optimal_sums(bins, items, valueof, objective, **kwargs)
-    return bins
+        return _optimal_sums(binner, items, valueof, objective, **kwargs)
 
 
 
 
 def _optimal_sums(
-    bins: Bins,
+    binner: Binner,
     items: List[Any],
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
@@ -76,23 +77,23 @@ def _optimal_sums(
     The "vi" is the current sum in bin i.
     """
 
-    logger.info("\nDynamic Programming %s Partitioning of %d items into %d bins.", objective, len(items), bins.num)
+    logger.info("\nDynamic Programming %s Partitioning of %d items into %d bins.", objective, len(items), binner.numbins)
 
-    first_state = bins.num * (0,)
+    first_state = binner.new_bins()
     num_of_processed_states = 1
 
     # Construct initial states:
-    current_states = {first_state}
+    current_states = {binner.sums_as_tuple(first_state)}
     for item in items:
         value = valueof(item)
 
         # Construct next states:
         next_states = set()
         for state in current_states:
-            for ibin in range(bins.num):
-                next_state = list(state)
-                next_state[ibin] += value
-                next_states.add(tuple(sorted(next_state)))
+            for ibin in range(binner.numbins):
+                next_state = binner.add_item_to_bin(binner.clone(state), item, ibin)
+                binner.sort_by_ascending_sum(next_state)
+                next_states.add(binner.sums_as_tuple(next_state))
         states_added = len(next_states)
         logger.info("  Processed item %s and added %d states.", item, states_added)
         num_of_processed_states += states_added
@@ -104,11 +105,11 @@ def _optimal_sums(
     best_final_state_value = objective.value_to_minimize(best_final_state)
     logger.info("Processed %d states.", num_of_processed_states)
     logger.info("Best final state: %s, value: %s", best_final_state, best_final_state_value)
-    bins.sums = best_final_state
+    return best_final_state
 
 
 def _optimal_partition(
-    bins: Bins,
+    binner: Binner,
     items: List[Any],
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
@@ -134,7 +135,7 @@ def _optimal_partition(
             return self.state == other.state
 
     # Construct initial states:
-    zero_values = bins.num * (0,)
+    zero_values = binner.numbins * (0,)
     current_state_records = {StateRecord(zero_values, None, None)}
     num_of_processed_states = len(current_state_records)
 
@@ -144,7 +145,7 @@ def _optimal_partition(
         # Construct next state records:
         next_state_records = set()
         for record in current_state_records:
-            for ibin in range(bins.num):
+            for ibin in range(binner.numbins):
                 next_state = list(record.state)
                 next_state[ibin] += value
                 next_state_record = StateRecord(tuple(next_state), record, ibin)
@@ -169,17 +170,21 @@ def _optimal_partition(
     logger.info("Path to best solution: %s", path)
 
     # construct solution
+    result_bins = binner.new_bins()
     for item_index, item in enumerate(items):
         ibin = path[item_index]
         logger.info("  Item %d (%s): bin %d", item_index, item, ibin,)
-        bins.add_item_to_bin(item, ibin)
+        binner.add_item_to_bin(result_bins, item, ibin)
+    return result_bins
 
 
 if __name__ == "__main__":
     # DOCTEST
-    import doctest
+    import doctest, sys
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+    if failures>0:
+        sys.exit(1)
 
     # DEMO
     logger.setLevel(logging.INFO)

@@ -44,7 +44,7 @@ def partition_random_items(
 if __name__ == "__main__":
     import logging, experiments_csv
     experiments_csv.logger.setLevel(logging.INFO)
-    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants_7.csv", backup_folder=None)
+    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants_8.csv", backup_folder=None)
 
     prt = prtpy.partitioning
     input_ranges = {
@@ -93,6 +93,6 @@ check_complete_greedy_variants_7: compare all lower bounds with dynamic programm
   -- set_of_seen_states is useful only with 16 bits.
   -- fast_lower_bound is best.
 
-check_complete_greedy_variants_8: same as 7, but a different implementation, using dict of bins.
+check_complete_greedy_variants_8: same as 7, but a different implementation, using a binner.
 
 """

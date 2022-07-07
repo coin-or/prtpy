@@ -5,6 +5,8 @@ Some algorithms (e.g. branch-and-bound algorithms) keep many arrays of bins simu
 A Binner is a class that manages a collection of bin-arrays.
 It can create a new bins-array, fill an existing array, etc.
 
+It uses the FlyWeight design pattern. See: https://refactoring.guru/design-patterns/flyweight
+
 Author: Erel Segal-Halevi
 Since:  2022-07
 """
