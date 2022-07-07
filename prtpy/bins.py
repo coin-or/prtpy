@@ -75,7 +75,7 @@ class Bins(ABC):
         pass
 
     @abstractmethod
-    def combinations(self, other_bins):
+    def all_combinations(self, other_bins):
         '''
         generate all the possible combinations of bins between two object bins
         NOTE: there is no duplicates combinations
@@ -193,11 +193,11 @@ class BinsKeepingSums(Bins):
         self.sums[ibin] += other_bin.sums[other_ibin]
         return self
 
-    def combinations(self, other_bins:Bins) -> Iterator[Bins]:
+    def all_combinations(self, other_bins:Bins) -> Iterator[Bins]:
         """
         >>> b1 = BinsKeepingSums(3, sums=[1,2,3])
         >>> b2 = BinsKeepingSums(3, sums=[4,5,6])
-        >>> for perm in b1.combinations(b2): perm.sums
+        >>> for perm in b1.all_combinations(b2): perm.sums
         [5, 7, 9]
         [5, 8, 8]
         [6, 6, 9]
@@ -317,11 +317,11 @@ class BinsKeepingContents(BinsKeepingSums):
         self.bins[ibin] += other_bin.bins[other_ibin]
         return self
 
-    def combinations(self, other_bins:Bins) -> Iterator[Bins]:
+    def all_combinations(self, other_bins:Bins) -> Iterator[Bins]:
         """
         >>> b1 = BinsKeepingContents(3, sums=[1, 2, 3], bins=[[1], [2], [3]])
         >>> b2 = BinsKeepingContents(3, sums=[4, 5, 6], bins=[[1, 3], [4, 1], [6]])
-        >>> for perm in b1.combinations(b2): perm.bins
+        >>> for perm in b1.all_combinations(b2): perm.bins
         [[1, 1, 3], [1, 2, 4], [3, 6]]
         [[1, 1, 3], [1, 3, 4], [2, 6]]
         [[1, 1, 4], [1, 2, 3], [3, 6]]
