@@ -12,10 +12,9 @@ Since:  2022-07
 """
 
 from abc import ABC, abstractmethod
-from itertools import permutations
 
-import numpy as np
-from typing import Any, Callable, List, Tuple
+import numpy as np, itertools
+from typing import Any, Callable, List, Tuple, Iterator
 
 BinsArray = Any
 
@@ -57,9 +56,9 @@ class Binner(ABC):
         self.valueof = valueof
 
     @abstractmethod
-    def new_bins(self)->BinsArray:
+    def new_bins(self, numbins=None)->BinsArray:
         '''
-        Create a new bins-array with self.numbins bins.
+        Create a new bins-array with numbins or self.numbins bins.
         '''
         return None
 
@@ -83,7 +82,6 @@ class Binner(ABC):
     def sort_by_ascending_sum(self, bins:BinsArray):
         """
         Sort the bins by ascending order of sum. For consistency and testing.
-        # Return the bins after the sorting.
         """
         pass
         # return bins
@@ -102,10 +100,19 @@ class Binner(ABC):
         return tuple(self.sums(bins))
 
     @abstractmethod
-    def combine_bins(bins1:BinsArray, ibin1:int, bins2:BinsArray, ibin2:int):
+    def combine_bins(self, bins1:BinsArray, ibin1:int, bins2:BinsArray, ibin2:int):
         """
         Combine between bin ibin1 at array bins1 to bin ibin2 at array bins2.
+        NOTE: bins1 is modified; bins2 is not.
         """
+        pass
+
+    @abstractmethod
+    def all_combinations(self, bins1: BinsArray, bins2: BinsArray)->Iterator[BinsArray]:
+        '''
+        generate all the possible combinations of bins between two object bins
+        NOTE: duplicate combinations are not returned.
+        '''
         pass
 
     # @abstractmethod
@@ -114,14 +121,6 @@ class Binner(ABC):
     #     @param: numbins - the number of the bins
     #      clear the content of the bins.
     #     """
-    #     pass
-
-    # @abstractmethod
-    # def combinations(self, other_bins):
-    #     '''
-    #     generate all the possible combinations of bins between two object bins
-    #     NOTE: there is no duplicates combinations
-    #     '''
     #     pass
 
 
@@ -173,8 +172,9 @@ class BinnerKeepingSums(Binner):
 
     BinsArray = np.ndarray    # Here, the bins-array is simply an array of the sums.
 
-    def new_bins(self)->BinsArray:
-        bins = np.zeros(self.numbins)
+    def new_bins(self, numbins=None)->BinsArray:
+        if numbins is None: numbins = self.numbins
+        bins = np.zeros(numbins)
         return bins
 
     def clone(self, bins: BinsArray)->BinsArray:
@@ -194,27 +194,36 @@ class BinnerKeepingSums(Binner):
     def combine_bins(self, bins1:BinsArray, ibin1:int, bins2:BinsArray, ibin2:int):
         bins1[ibin1] += bins2[ibin2]
 
-    # def combinations(self, other_bins:Bins) -> Iterator[Bins]:
-    #     """
-    #     >>> b1 = BinsKeepingSums(3, sums=[1,2,3])
-    #     >>> b2 = BinsKeepingSums(3, sums=[4,5,6])
-    #     >>> for perm in b1.combinations(b2): perm.sums
-    #     [5, 7, 9]
-    #     [5, 8, 8]
-    #     [6, 6, 9]
-    #     [6, 7, 8]
-    #     [7, 7, 7]
-    #     """
-    #     if self.numbins != other_bins.numbins:
-    #         raise ValueError
-
-    #     yielded = set()
-    #     for permutation in permutations(self.sums, self.numbins):
-    #         new_sums = sorted(p + l for p, l in zip(permutation, other_bins.sums))
-    #         out_ = tuple(el for el in new_sums)
-    #         if out_ not in yielded:
-    #             yielded.add(out_)
-    #             yield BinsKeepingSums(self.numbins, self.valueof, new_sums)
+    def all_combinations(self, bins1: BinsArray, bins2: BinsArray)->Iterator[BinsArray]:
+        """
+        >>> binner = BinnerKeepingSums(3)
+        >>> b1 = [1,2,3]
+        >>> b2 = [4,5,6]
+        >>> for perm in binner.all_combinations(b1, b2): perm
+        [5, 7, 9]
+        [5, 8, 8]
+        [6, 6, 9]
+        [6, 7, 8]
+        [7, 7, 7]
+        >>> b1 = [1,20,300]
+        >>> b2 = [4,50,600]
+        >>> for perm in binner.all_combinations(b1, b2): perm
+        [5, 70, 900]
+        [5, 350, 620]
+        [24, 51, 900]
+        [24, 350, 601]
+        [51, 304, 620]
+        [70, 304, 601]
+        """
+        yielded = set()   # prevent duplicates
+        for perm in itertools.permutations(range(self.numbins)):
+            # print("perm=",perm)
+            new_sums = [bins1[perm[i]] + bins2[i] for i in range(self.numbins)]
+            new_sums.sort()   # to avoid duplicates
+            new_sums_tuple = tuple(new_sums)
+            if new_sums_tuple not in yielded:
+                yielded.add(new_sums_tuple)
+                yield new_sums
 
 
 class BinnerKeepingContents(BinnerKeepingSums):
@@ -265,9 +274,10 @@ class BinnerKeepingContents(BinnerKeepingSums):
 
     BinsArray = Tuple[np.ndarray, List[List]]  # Here, each bins-array is a tuple: sums,lists. sums is an array of sums; lists is a list of lists of items.
 
-    def new_bins(self)->BinsArray:
-        sums  = np.zeros(self.numbins)
-        lists = [[] for _ in range(self.numbins)]
+    def new_bins(self, numbins:int=None)->BinsArray:
+        if numbins is None: numbins = self.numbins
+        sums  = np.zeros(numbins)
+        lists = [[] for _ in range(numbins)]
         return (sums, lists)
 
     def clone(self, bins: BinsArray)->BinsArray:
@@ -297,35 +307,40 @@ class BinnerKeepingContents(BinnerKeepingSums):
         sums1[ibin1] += sums2[ibin2]
         lists1[ibin1] += lists2[ibin2]
 
-    # def combinations(self, other_bins:Bins) -> Iterator[Bins]:
-    #     """
-    #     >>> b1 = BinsKeepingContents(3, sums=[1, 2, 3], bins=[[1], [2], [3]])
-    #     >>> b2 = BinsKeepingContents(3, sums=[4, 5, 6], bins=[[1, 3], [4, 1], [6]])
-    #     >>> for perm in b1.combinations(b2): perm.bins
-    #     [[1, 1, 3], [1, 2, 4], [3, 6]]
-    #     [[1, 1, 3], [1, 3, 4], [2, 6]]
-    #     [[1, 1, 4], [1, 2, 3], [3, 6]]
-    #     [[1, 2, 3], [1, 3, 4], [1, 6]]
-    #     [[1, 1, 4], [1, 3, 3], [2, 6]]
-    #     [[1, 2, 4], [1, 3, 3], [1, 6]]
-    #     """
-    #     if self.numbins != other_bins.numbins:
-    #         raise ValueError
-
-    #     yielded = set()
-    #     for permutation in permutations(self.bins, self.numbins):
-    #         new_bins = sorted(sorted(p + l) for p, l in zip(permutation, other_bins.bins))
-    #         out_ = tuple(tuple(el) for el in new_bins)
-    #         if out_ not in yielded:
-    #             new_sums = [sum(map(self.valueof,bin) )for bin in new_bins]
-    #             yielded.add(out_)
-    #             yield BinsKeepingContents(self.numbins, self.valueof, new_sums, new_bins)
+    def all_combinations(self, bins1: BinsArray, bins2: BinsArray)->Iterator[BinsArray]:
+        """
+        >>> binner = BinnerKeepingContents(3)
+        >>> b1 = ([1, 20, 300],  [[1], [20], [300]])
+        >>> b2 = ([4, 50, 600],  [[1, 3], [4, 46], [600]])
+        >>> for perm in binner.all_combinations(b1,b2): perm[1]
+        [[1, 1, 3], [4, 20, 46], [300, 600]]
+        [[1, 1, 3], [4, 46, 300], [20, 600]]
+        [[1, 3, 20], [1, 4, 46], [300, 600]]
+        [[1, 3, 20], [4, 46, 300], [1, 600]]
+        [[1, 4, 46], [1, 3, 300], [20, 600]]
+        [[4, 20, 46], [1, 3, 300], [1, 600]]
+        """
+        yielded = set() # to avoid duplicates
+        sums1, lists1 = bins1
+        sums2, lists2 = bins2
+        for perm in itertools.permutations(range(self.numbins)):
+            new_sums =  [sums1[perm[i]] + sums2[i] for i in range(self.numbins)]
+            new_lists = [sorted(lists1[perm[i]] + lists2[i]) for i in range(self.numbins)]  # sorting to avoid duplicates
+            new_bins = (new_sums, new_lists)
+            self.sort_by_ascending_sum(new_bins)
+            new_lists_tuple = tuple(map(tuple,new_bins[1]))
+            if new_lists_tuple not in yielded:
+                yielded.add(new_lists_tuple)
+                yield new_bins
 
 
 if __name__ == "__main__":
-    import doctest
+    import doctest, sys
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+    if failures>0:
+        sys.exit(1)
+
 
     import time
     from prtpy import BinsKeepingSums, BinnerKeepingSums
@@ -356,4 +371,4 @@ if __name__ == "__main__":
         for _ in range(times):
             binner.sort_by_ascending_sum(binner.add_item_to_bin(binner.clone(binsarray), 5, 0))
         print("binner: ",time.perf_counter()-start)  # 0.14; almost the same as list.
-    compare_ways_to_add_items()
+    # compare_ways_to_add_items()
