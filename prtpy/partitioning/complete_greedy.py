@@ -36,23 +36,23 @@ def anytime(
     :param objective: represents the function that should be optimized. Default is minimizing the difference between bin sums.
     :param time_limit: determines how much time (in seconds) the function should run before it stops. Default is infinity.
 
-    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference)
+    >>> from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
+    >>> printbins(anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference))
     Bin #0: [6, 5, 4], sum=15.0
     Bin #1: [8, 7], sum=15.0
 
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference)
+    >>> printbins(anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference))
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
-    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
+    >>> printbins(anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum))
     Bin #0: [27, 26], sum=53.0
     Bin #1: [39, 13, 10], sum=62.0
     Bin #2: [46, 16], sum=62.0
-    >>> anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
+    >>> printbins(anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum))
     Bin #0: [46, 10], sum=56.0
     Bin #1: [27, 16, 13], sum=56.0
     Bin #2: [39, 26], sum=65.0
@@ -62,17 +62,17 @@ def anytime(
     >>> objective = obj.MinimizeDifference
     >>> bins1=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
     >>> bins2=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
-    >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
+    >>> objective.value_to_minimize(bins1)==objective.value_to_minimize(bins2)
     True
     >>> objective = obj.MinimizeLargestSum
     >>> bins1=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
     >>> bins2=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
-    >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
+    >>> objective.value_to_minimize(bins1)==objective.value_to_minimize(bins2)
     True
     >>> objective = obj.MaximizeSmallestSum
     >>> bins1=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=True)
     >>> bins2=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_lower_bound=False)
-    >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
+    >>> objective.value_to_minimize(bins1)==objective.value_to_minimize(bins2)
     True
 
     Compare results with and without the heuristic 3:
@@ -80,7 +80,7 @@ def anytime(
     >>> objective = obj.MinimizeLargestSum
     >>> bins1=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_heuristic_3=True)
     >>> bins2=anytime(BinsKeepingSums(3), random_numbers, objective=objective, use_heuristic_3=False)
-    >>> objective.value_to_minimize(bins1.sums)==objective.value_to_minimize(bins2.sums)
+    >>> objective.value_to_minimize(bins1)==objective.value_to_minimize(bins2)
     True
 
     Partitioning items with names:
@@ -162,7 +162,7 @@ def anytime(
         # We want to insert the next item to the bin with the *smallest* sum first.
         # But, since we use a stack, we have to insert it to the bin with the *largest* sum first,
         # so that it is pushed deeper into the stack.
-        # Therefore, we process the bins in reverse, by *descending* order of sum.
+        # Therefore, we proceed in reverse, by *descending* order of sum.
         for bin_index in reversed(range(binner.numbins)):   
 
             # Heuristic 1: "If there are two subsets with the same sum, the current number is assigned to only one."
@@ -190,8 +190,7 @@ def anytime(
                     times_fast_lower_bound_activated += 1
                     continue
 
-            new_bins = binner.clone(current_bins)
-            binner.add_item_to_bin(new_bins, next_item, bin_index)
+            new_bins = binner.add_item_to_bin(binner.clone(current_bins), next_item, bin_index)
             binner.sort_by_ascending_sum(new_bins)
             new_sums = binner.sums_as_tuple(new_bins)
 
@@ -213,7 +212,7 @@ def anytime(
             stack.append(new_vertex)
             intermediate_partitions_checked += 1
 
-    logger.info("Checked %d out of %d complete partitions, and %d intermediate partitions.", complete_partitions_checked, bins.num**numitems, intermediate_partitions_checked)
+    logger.info("Checked %d out of %d complete partitions, and %d intermediate partitions.", complete_partitions_checked, binner.numbins**numitems, intermediate_partitions_checked)
     logger.info("  Heuristics: fast lower bound = %d, lower bound = %d, seen state = %d, heuristic 3 = %d.", times_fast_lower_bound_activated, times_lower_bound_activated, times_seen_state_skipped, times_heuristic_3_activated)
 
     return best_bins
@@ -222,11 +221,10 @@ def anytime(
 if __name__ == "__main__":
     import doctest, sys
 
-    from prtpy.binners import BinnerKeepingContents, BinnerKeepingSums
-    from prtpy.bins    import BinsKeepingContents, BinsKeepingSums
+    from prtpy import BinsKeepingContents, BinsKeepingSums, printbins, BinnerKeepingContents, BinnerKeepingSums
 
-    print(anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference))
-    sys.exit()
+    printbins(anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeDifference))
+    # sys.exit()
 
     # DOCTEST
     (failures, tests) = doctest.testmod(report=True)
@@ -238,13 +236,13 @@ if __name__ == "__main__":
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
 
-    from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    from prtpy import BinsKeepingContents, BinsKeepingSums
 
-    # anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
+    anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
 
-    # walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    # anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
-    # anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
+    walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
+    anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
 
     random_numbers = np.random.randint(1, 2**16-1, 15, dtype=np.int64)
     # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_fast_lower_bound=False, use_lower_bound=False, use_set_of_seen_states=False, use_heuristic_3=True)
@@ -252,27 +250,6 @@ if __name__ == "__main__":
     # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_fast_lower_bound=False, use_lower_bound=True, use_set_of_seen_states=False, use_heuristic_3=False)
     # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_fast_lower_bound=True, use_lower_bound=False, use_set_of_seen_states=False, use_heuristic_3=False)
     # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_fast_lower_bound=True, use_lower_bound=False, use_set_of_seen_states=False, use_heuristic_3=True)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
-    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)
-
-
-    def compare_ways_to_add_items():
-        current_bins = BinsKeepingSums(3)
-        current_bins.add_item_to_bin(10, 1).add_item_to_bin(20,2).add_item_to_bin(30,0).sort_by_ascending_sum()
-        print(current_bins)
-        times = 100000
-
-        start = time.perf_counter()
-        for _ in range(times):
-            new_sums = list(current_bins.sums)
-            new_sums[0] += current_bins.valueof(5)
-            new_sums.sort()
-        print("list: ",time.perf_counter()-start)
-        
-        start = time.perf_counter()
-        for _ in range(times):
-            current_bins.clone().add_item_to_bin(5, 0).sort_by_ascending_sum() 
-        print("bins: ",time.perf_counter()-start)  # 1.5-2 times slower. (deepcopy is 10 times slower; __deepcopy__ is 3-4 times slower).
-    compare_ways_to_add_items()
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
+    anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
