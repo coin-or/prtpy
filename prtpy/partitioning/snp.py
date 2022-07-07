@@ -84,7 +84,7 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     if best_diff == 0:
         return bins
 
-    prior_bins = bins.create_new_bins(0)
+    prior_bins = bins.empty_clone(0)
 
     # insert in-place in bins
     rec_generate_sets(prior_bins, bins, items, valueof, k_way, trees=[])
@@ -98,7 +98,7 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
 
     if k_way == 2:
         # ckk 2 way on remaining numbers
-        two_bins = prior_bins.create_new_bins(2)
+        two_bins = prior_bins.empty_clone(2)
         two_bins = best_ckk_partition(bins=two_bins, items=items, valueof=valueof)
 
         sums = np.append(two_bins.sums, prior_bins.sums)

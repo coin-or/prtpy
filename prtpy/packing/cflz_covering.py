@@ -25,17 +25,17 @@ def twothirds(
     From Csirik et al (1999).
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> twothirds(BinsKeepingContents(), 10, [11,12,13]).bins   # large items
+    >>> twothirds(BinsKeepingContents(0), 10, [11,12,13]).bins   # large items
     [[13], [12], [11]]
-    >>> twothirds(BinsKeepingContents(), 10, [3,3,3,3, 3,3,3,3, 3,3,3]).bins   # identical items
+    >>> twothirds(BinsKeepingContents(0), 10, [3,3,3,3, 3,3,3,3, 3,3,3]).bins   # identical items
     [[3, 3, 3, 3], [3, 3, 3, 3]]
-    >>> twothirds(BinsKeepingContents(), 10, [1,2,3,4,5,6,7,8,9,10]).bins   # different items
+    >>> twothirds(BinsKeepingContents(0), 10, [1,2,3,4,5,6,7,8,9,10]).bins   # different items
     [[10], [9, 1], [8, 2], [7, 3], [6, 4]]
-    >>> twothirds(BinsKeepingContents(), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]).bins   # worst-case example (k=1)
+    >>> twothirds(BinsKeepingContents(0), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]).bins   # worst-case example (k=1)
     [[994, 1, 1, 1, 1, 1, 1], [499, 499, 499], [499, 499, 499]]
-    >>> twothirds(BinsKeepingContents(), 1000, [988] + 12*[499] + 12*[1]).bins   # worst-case example (k=2)
+    >>> twothirds(BinsKeepingContents(0), 1000, [988] + 12*[499] + 12*[1]).bins   # worst-case example (k=2)
     [[988, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [499, 499, 499], [499, 499, 499], [499, 499, 499], [499, 499, 499]]
-    >>> twothirds(BinsKeepingContents(), 1200, [594,594] + 12*[399] + 12*[1]).bins  # worst-case example for 3/4 (k=1)
+    >>> twothirds(BinsKeepingContents(0), 1200, [594,594] + 12*[399] + 12*[1]).bins  # worst-case example for 3/4 (k=1)
     [[594, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 399, 399], [594, 399, 399], [399, 399, 399, 399], [399, 399, 399, 399]]
     """
     bins.add_empty_bins(1)
@@ -70,19 +70,19 @@ def threequarters(
     From Csirik et al (1999).
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> threequarters(BinsKeepingContents(), 10, [11,12,13]).bins   # large items
+    >>> threequarters(BinsKeepingContents(0), 10, [11,12,13]).bins   # large items
     [[13], [12], [11]]
-    >>> threequarters(BinsKeepingContents(), 10, [3,3,3,3, 3,3,3,3, 3,3,3]).bins   # identical items
+    >>> threequarters(BinsKeepingContents(0), 10, [3,3,3,3, 3,3,3,3, 3,3,3]).bins   # identical items
     [[3, 3, 3, 3], [3, 3, 3, 3]]
-    >>> threequarters(BinsKeepingContents(), 10, [1,2,3,4,5,6,7,8,9,10]).bins   # different items
+    >>> threequarters(BinsKeepingContents(0), 10, [1,2,3,4,5,6,7,8,9,10]).bins   # different items
     [[10], [9, 1], [8, 2], [7, 3], [6, 5]]
-    >>> threequarters(BinsKeepingContents(), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]).bins   # worst-case example for 2/3 (k=1)
+    >>> threequarters(BinsKeepingContents(0), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]).bins   # worst-case example for 2/3 (k=1)
     [[499, 499, 1, 1], [499, 499, 1, 1], [499, 499, 1, 1]]
-    >>> threequarters(BinsKeepingContents(), 1000, [988] + 12*[499] + 12*[1]).bins   # worst-case example for 2/3 (k=2)
+    >>> threequarters(BinsKeepingContents(0), 1000, [988] + 12*[499] + 12*[1]).bins   # worst-case example for 2/3 (k=2)
     [[499, 499, 1, 1], [499, 499, 1, 1], [499, 499, 1, 1], [499, 499, 1, 1], [499, 499, 1, 1], [499, 499, 1, 1]]
-    >>> threequarters(BinsKeepingContents(), 1200, [594,594] + 12*[399] + 12*[1]).bins   # worst-case example for 3/4 (k=1)
+    >>> threequarters(BinsKeepingContents(0), 1200, [594,594] + 12*[399] + 12*[1]).bins   # worst-case example for 3/4 (k=1)
     [[594, 594, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [399, 399, 399, 399], [399, 399, 399, 399], [399, 399, 399, 399]]
-    >>> threequarters(BinsKeepingContents(), 1000, [994, 501,501, 499,499,499,499]+12*[1]).bins
+    >>> threequarters(BinsKeepingContents(0), 1000, [994, 501,501, 499,499,499,499]+12*[1]).bins
     [[499, 499, 1, 1], [499, 499, 1, 1], [994, 1, 1, 1, 1, 1, 1], [501, 1, 1, 501]]
     """
     bins.add_empty_bins(1)

@@ -25,15 +25,15 @@ def decreasing(
     it orders the items in descending order, and puts them into a bin until it is filled.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> decreasing(BinsKeepingContents(), 10, [11,12,13]).bins  # large items
+    >>> decreasing(BinsKeepingContents(0), 10, [11,12,13]).bins  # large items
     [[13], [12], [11]]
-    >>> decreasing(BinsKeepingContents(), 10, [3,3,3,3, 3,3,3,3, 3,3,3]).bins   # identical items
+    >>> decreasing(BinsKeepingContents(0), 10, [3,3,3,3, 3,3,3,3, 3,3,3]).bins   # identical items
     [[3, 3, 3, 3], [3, 3, 3, 3]]
-    >>> decreasing(BinsKeepingContents(), 10, [1,2,3,4,5,6,7,8,9,10]).bins   # different items
+    >>> decreasing(BinsKeepingContents(0), 10, [1,2,3,4,5,6,7,8,9,10]).bins   # different items
     [[10], [9, 8], [7, 6], [5, 4, 3]]
-    >>> decreasing(BinsKeepingContents(), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]).bins   # worst-case example (k=1)
+    >>> decreasing(BinsKeepingContents(0), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]).bins   # worst-case example (k=1)
     [[994, 499], [499, 499, 499], [499, 499, 1, 1]]
-    >>> decreasing(BinsKeepingContents(), 1000, [988] + 12*[499] + 12*[1]).bins   # worst-case example (k=2)
+    >>> decreasing(BinsKeepingContents(0), 1000, [988] + 12*[499] + 12*[1]).bins   # worst-case example (k=2)
     [[988, 499], [499, 499, 499], [499, 499, 499], [499, 499, 499], [499, 499, 1, 1]]
 
     >>> from prtpy import pack

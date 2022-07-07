@@ -28,27 +28,27 @@ def bin_completion(
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
 
     Example 1: max capacity
-    >>> bin_completion(BinsKeepingContents(), binsize=100, items=[100,100,100,100,100,100]).bins
+    >>> bin_completion(BinsKeepingContents(0), binsize=100, items=[100,100,100,100,100,100]).bins
     [[100], [100], [100], [100], [100], [100]]
 
     Example 2: min capacity
-    >>> bin_completion(BinsKeepingContents(), binsize=100, items=[1,2,3,4,5,85]).bins
+    >>> bin_completion(BinsKeepingContents(0), binsize=100, items=[1,2,3,4,5,85]).bins
     [[85, 5, 4, 3, 2, 1]]
 
     Example 3: Complex input
-    >>> bin_completion(BinsKeepingContents(), binsize=100, items=[99,94,79,64,50,44,43,37,32,19,18,7,3]).bins
+    >>> bin_completion(BinsKeepingContents(0), binsize=100, items=[99,94,79,64,50,44,43,37,32,19,18,7,3]).bins
     [[99], [94, 3], [79, 19], [64, 32], [50, 43, 7], [44, 37, 18]]
 
     Example 4: Article Example #1
-    >>> bin_completion(BinsKeepingContents(), binsize=100, items=[100, 98, 96, 93, 91, 87, 81, 59, 58, 55, 50, 43, 22, 21, 20, 15, 14, 10, 8, 6, 5, 4, 3, 1, 0]).bins
+    >>> bin_completion(BinsKeepingContents(0), binsize=100, items=[100, 98, 96, 93, 91, 87, 81, 59, 58, 55, 50, 43, 22, 21, 20, 15, 14, 10, 8, 6, 5, 4, 3, 1, 0]).bins
     [[100], [98], [96, 4], [93, 6, 1], [91, 8], [87, 10, 3], [81, 15], [59, 22, 14, 5], [58, 21, 20], [55, 43], [50]]
 
     Example 5: Article Example #2
-    >>> bin_completion(BinsKeepingContents(), binsize=100, items=[6, 12, 15, 40, 43, 82]).bins
+    >>> bin_completion(BinsKeepingContents(0), binsize=100, items=[6, 12, 15, 40, 43, 82]).bins
     [[82, 12, 6], [43, 40, 15]]
 
     Example 6: Article Example #3
-    >>> bin_completion(BinsKeepingContents(), binsize=100, items=[99, 97, 94, 93, 8, 5, 4, 2]).bins
+    >>> bin_completion(BinsKeepingContents(0), binsize=100, items=[99, 97, 94, 93, 8, 5, 4, 2]).bins
     [[99], [97, 2], [94, 5], [93, 4], [8]]
     """
     # Test if there is an item which is not a number OR larger than binsize.
@@ -60,7 +60,7 @@ def bin_completion(
     items = list(filter((0).__ne__, items))
 
     # Find the BFD solution and check if it's optimal using the lower bound calculation.
-    bfd_solution = best_fit.decreasing(BinsKeepingContents(), binsize, items.copy())
+    bfd_solution = best_fit.decreasing(BinsKeepingContents(0), binsize, items.copy())
     lb = lower_bound(binsize, items)
 
     # If the BFD solution is optimal - return it.

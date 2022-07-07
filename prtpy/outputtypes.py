@@ -3,13 +3,13 @@ Define the various available output formats for a partition algorithm.
 """
 
 from abc import ABC
-from typing import Any, List
+from typing import Any, List, Callable
 from prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
 
 
 class OutputType(ABC):
     @classmethod
-    def create_empty_bins(cls, numbins: int) -> Bins:
+    def create_empty_bins(cls, numbins: int, valueof: Callable) -> Bins:
         """
         Construct and return a Bins structure. Used at the initialization phase of an algorithm.
         """
@@ -25,8 +25,8 @@ class OutputType(ABC):
 
 class Sums(OutputType):
     @classmethod
-    def create_empty_bins(cls, numbins: int) -> List:
-        return BinsKeepingSums(numbins)
+    def create_empty_bins(cls, numbins: int, valueof: Callable) -> List:
+        return BinsKeepingSums(numbins, valueof)
 
     # Output the sums of all the bins (but not the bins contents).
     @classmethod
@@ -72,8 +72,8 @@ class BinCount(Sums):
 
 class Partition(OutputType):
     @classmethod
-    def create_empty_bins(cls, numbins: int) -> List:
-        return BinsKeepingContents(numbins)
+    def create_empty_bins(cls, numbins: int, valueof: Callable) -> List:
+        return BinsKeepingContents(numbins, valueof)
 
     # Output the set of all bins.
     @classmethod

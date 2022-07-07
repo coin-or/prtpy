@@ -90,7 +90,7 @@ def rnp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     if best_diff == 0:
         return bins
 
-    prior_bins = bins.create_new_bins(0)
+    prior_bins = bins.empty_clone(0)
 
     rec_generate_sets(prior_bins, bins, items, valueof, k_way, trees=[])
 
@@ -102,7 +102,7 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
     best_diff = max(bins.sums) - min(bins.sums)
 
     if k_way == 2:
-        return best_ckk_partition(bins=BinsKeepingContents(2).set_valueof(valueof), items=items, valueof=valueof)
+        return best_ckk_partition(bins=BinsKeepingContents(2, valueof), items=items, valueof=valueof)
 
     if k_way % 2: # %2 == 1
         # take one with in_ex_tree end then split in 2
@@ -142,7 +142,7 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
 
             prior_bins.remove_bins()
     else:
-        for top_level_part in ckk(bins=BinsKeepingContents(2).set_valueof(valueof), items=items,valueof=valueof,best= -best_diff):
+        for top_level_part in ckk(bins=BinsKeepingContents(2, valueof), items=items,valueof=valueof,best= -best_diff):
             bin1 = top_level_part.bins[0]
             new_bin1 = rec_generate_sets(prior_bins, bins, bin1, valueof, k_way/2, trees)
 

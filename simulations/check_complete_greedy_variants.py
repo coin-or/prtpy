@@ -90,6 +90,8 @@ check_complete_greedy_variants_6: compare use_lower_bound to use_set_of_seen_sta
   -- with 48 bits, use_lower_bound is slightly better.
 
 check_complete_greedy_variants_7: compare all lower bounds with dynamic programming.
+  -- set_of_seen_states is useful only with 16 bits.
+  -- fast_lower_bound is best.
 
 check_complete_greedy_variants_8: same as 7, but a different implementation, using dict of bins.
 

@@ -63,8 +63,7 @@ def pack(
         item_names = items
         if valueof is None:
             valueof = lambda item: item
-    bins = outputtype.create_empty_bins(0)
-    bins.set_valueof(valueof)
+    bins = outputtype.create_empty_bins(0, valueof)
     bins = algorithm(bins, binsize, item_names, valueof, **kwargs)
     return outputtype.extract_output_from_bins(bins)
 

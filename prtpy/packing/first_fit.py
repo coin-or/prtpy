@@ -14,11 +14,11 @@ def online(bins: Bins, binsize: float, items: List[any], valueof: Callable[[Any]
     The online algorithm handles the items in the order they are given.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> online(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).bins
+    >>> online(BinsKeepingContents(0), binsize=9, items=[1,2,3,3,5,9,9]).bins
     [[1, 2, 3, 3], [5], [9], [9]]
-    >>> online(BinsKeepingContents(), binsize=18, items=[1,2,3,3,5,9,9]).bins
+    >>> online(BinsKeepingContents(0), binsize=18, items=[1,2,3,3,5,9,9]).bins
     [[1, 2, 3, 3, 5], [9, 9]]
-    >>> list(online(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).sums)
+    >>> list(online(BinsKeepingContents(0), binsize=9, items=[1,2,3,3,5,9,9]).sums)
     [9.0, 5.0, 9.0, 9.0]
     """
     bins.add_empty_bins(1) 
@@ -44,23 +44,23 @@ def decreasing(bins: Bins, binsize: float, items: List[any], valueof: Callable[[
     It sorts the items by descending value, and then runs first-fit.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> decreasing(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).bins
+    >>> decreasing(BinsKeepingContents(0), binsize=9, items=[1,2,3,3,5,9,9]).bins
     [[9], [9], [5, 3, 1], [3, 2]]
-    >>> decreasing(BinsKeepingContents(), binsize=18, items=[1,2,3,3,5,9,9]).bins
+    >>> decreasing(BinsKeepingContents(0), binsize=18, items=[1,2,3,3,5,9,9]).bins
     [[9, 9], [5, 3, 3, 2, 1]]
-    >>> list(decreasing(BinsKeepingContents(), binsize=9, items=[1,2,3,3,5,9,9]).sums)
+    >>> list(decreasing(BinsKeepingContents(0), binsize=9, items=[1,2,3,3,5,9,9]).sums)
     [9.0, 9.0, 9.0, 5.0]
 
     Non-monotonicity examples from Wikipedia:
     >>> example1 = [44, 24, 24, 22, 21, 17, 8, 8, 6, 6]
-    >>> decreasing(BinsKeepingContents(), binsize=60, items=example1).bins # 3 bins
+    >>> decreasing(BinsKeepingContents(0), binsize=60, items=example1).bins # 3 bins
     [[44, 8, 8], [24, 24, 6, 6], [22, 21, 17]]
-    >>> decreasing(BinsKeepingContents(), binsize=61, items=example1).bins # 4 bins
+    >>> decreasing(BinsKeepingContents(0), binsize=61, items=example1).bins # 4 bins
     [[44, 17], [24, 24, 8], [22, 21, 8, 6], [6]]
     >>> example2 = [51, 27.5, 27.5, 27.5, 27.5, 25, 12, 12, 10, 10, 10, 10, 10, 10, 10, 10, 10]
-    >>> decreasing(BinsKeepingContents(), binsize=75, items=example2).bins # 4 bins
+    >>> decreasing(BinsKeepingContents(0), binsize=75, items=example2).bins # 4 bins
     [[51, 12, 12], [27.5, 27.5, 10, 10], [27.5, 27.5, 10, 10], [25, 10, 10, 10, 10, 10]]
-    >>> decreasing(BinsKeepingContents(), binsize=76, items=example2).bins # 5 bins
+    >>> decreasing(BinsKeepingContents(0), binsize=76, items=example2).bins # 5 bins
     [[51, 25], [27.5, 27.5, 12], [27.5, 27.5, 12], [10, 10, 10, 10, 10, 10, 10], [10, 10]]
 
     >>> from prtpy import pack

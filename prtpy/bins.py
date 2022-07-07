@@ -21,14 +21,10 @@ class Bins(ABC):
     """
 
     @abstractmethod
-    def __init__(self, numbins: int=0):
+    def __init__(self, numbins: int, valueof: Callable):
         self.num = numbins
-        self.valueof = lambda x:x
-        pass
-
-    def set_valueof(self, valueof:Callable):
         self.valueof = valueof
-        return self
+        pass
 
     @abstractmethod
     def add_item_to_bin(self, item: Any, bin_index: int):
@@ -88,10 +84,18 @@ class Bins(ABC):
         pass
 
     @abstractmethod
-    def create_new_bins(self, numbins):
+    def clone(self):
+        '''
+        create a clone of the current object.
+        NOTE: This works much faster than deepcopy.
+        '''
+        pass
+
+    @abstractmethod
+    def empty_clone(self, numbins):
         '''
         @param: numbins - the number of the bins
-        create new bins object
+        create new bins object.
         '''
         pass
 
@@ -120,12 +124,12 @@ class BinsKeepingSums(Bins):
     Bin #1: sum=9.0
     Bin #2: sum=0.0
 
-    Adding to a deep copy should not change the original:
-    >>> deepcopy(bins).add_item_to_bin(item="d", bin_index=1)
+    Adding to a clone should not change the original:
+    >>> bins.clone().add_item_to_bin(item="d", bin_index=1)
     Bin #0: sum=3.0
     Bin #1: sum=14.0
     Bin #2: sum=0.0
-    >>> deepcopy(bins).add_item_to_bin(item="e", bin_index=2)
+    >>> bins.clone().add_item_to_bin(item="e", bin_index=2)
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=5.0
@@ -150,8 +154,8 @@ class BinsKeepingSums(Bins):
     Bin #2: sum=9.0
     """
 
-    def __init__(self, numbins: int=0, sums=None):
-        super().__init__(numbins)
+    def __init__(self, numbins: int, valueof: Callable = lambda x:x, sums=None):
+        super().__init__(numbins, valueof)
         if sums is None:
             sums = np.zeros(numbins)
         self.sums = sums
@@ -188,8 +192,8 @@ class BinsKeepingSums(Bins):
 
     def combinations(self, other_bins:Bins) -> Iterator[Bins]:
         """
-        >>> b1 = BinsKeepingSums(3,[1,2,3])
-        >>> b2 = BinsKeepingSums(3,[4,5,6])
+        >>> b1 = BinsKeepingSums(3, sums=[1,2,3])
+        >>> b2 = BinsKeepingSums(3, sums=[4,5,6])
         >>> for perm in b1.combinations(b2): perm.sums
         [5, 7, 9]
         [5, 8, 8]
@@ -206,10 +210,13 @@ class BinsKeepingSums(Bins):
             out_ = tuple(el for el in new_sums)
             if out_ not in yielded:
                 yielded.add(out_)
-                yield BinsKeepingSums(self.num, new_sums).set_valueof(self.valueof)
+                yield BinsKeepingSums(self.num, self.valueof, new_sums)
 
-    def create_new_bins(self, numbins):
-        return BinsKeepingSums(numbins).set_valueof(self.valueof)
+    def clone(self):
+        return BinsKeepingSums(self.num, self.valueof, np.array(self.sums))
+
+    def empty_clone(self, numbins):
+        return BinsKeepingSums(numbins, self.valueof)
 
 
 class BinsKeepingContents(BinsKeepingSums):
@@ -233,11 +240,11 @@ class BinsKeepingContents(BinsKeepingSums):
     Bin #2: [], sum=0.0
 
     Adding to a deep copy should not change the original:
-    >>> deepcopy(bins).add_item_to_bin(item="d", bin_index=1)
+    >>> bins.clone().add_item_to_bin(item="d", bin_index=1)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c', 'd'], sum=14.0
     Bin #2: [], sum=0.0
-    >>> deepcopy(bins).add_item_to_bin(item="d", bin_index=2)
+    >>> bins.clone().add_item_to_bin(item="d", bin_index=2)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: ['d'], sum=5.0
@@ -262,8 +269,8 @@ class BinsKeepingContents(BinsKeepingSums):
     Bin #2: ['b', 'c'], sum=9.0
     """
 
-    def __init__(self, numbins: int=0, sums=None, bins=None):
-        super().__init__(numbins, sums)
+    def __init__(self, numbins: int, valueof: Callable = lambda x:x, sums=None, bins=None):
+        super().__init__(numbins, valueof, sums)
         if bins is None:
             bins = [[] for _ in range(numbins)]
         self.bins = bins
@@ -306,8 +313,8 @@ class BinsKeepingContents(BinsKeepingSums):
 
     def combinations(self, other_bins:Bins) -> Iterator[Bins]:
         """
-        >>> b1 = BinsKeepingContents(3, [1, 2, 3], [[1], [2], [3]])
-        >>> b2 = BinsKeepingContents(3, [4, 5, 6], [[1, 3], [4, 1], [6]])
+        >>> b1 = BinsKeepingContents(3, sums=[1, 2, 3], bins=[[1], [2], [3]])
+        >>> b2 = BinsKeepingContents(3, sums=[4, 5, 6], bins=[[1, 3], [4, 1], [6]])
         >>> for perm in b1.combinations(b2): perm.bins
         [[1, 1, 3], [1, 2, 4], [3, 6]]
         [[1, 1, 3], [1, 3, 4], [2, 6]]
@@ -326,15 +333,25 @@ class BinsKeepingContents(BinsKeepingSums):
             if out_ not in yielded:
                 new_sums = [sum(map(self.valueof,bin) )for bin in new_bins]
                 yielded.add(out_)
-                yield BinsKeepingContents(self.num, new_sums,new_bins).set_valueof(self.valueof)
+                yield BinsKeepingContents(self.num, self.valueof, new_sums, new_bins)
 
-    def create_new_bins(self, numbins):
-        return BinsKeepingContents(numbins).set_valueof(self.valueof)
+    def clone(self):
+        return BinsKeepingContents(self.num, self.valueof, np.array(self.sums), list(map(list, self.bins)))
+
+    def empty_clone(self, numbins):
+        return BinsKeepingContents(numbins, self.valueof)
 
 
 if __name__ == "__main__":
     import doctest
-
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+
+    # bins = BinsKeepingContents(3)
+    # values = {"a":3, "b":4, "c":5, "d":5, "e":5}
+    # bins.valueof = lambda x: values[x]
+    # bins.add_item_to_bin(item="a", bin_index=0)
+    # print(bins)
+    # newbins = deepcopy(bins)
+    # print(newbins)
 

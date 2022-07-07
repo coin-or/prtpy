@@ -70,8 +70,7 @@ def partition(
         item_names = items
         if valueof is None:
             valueof = lambda item: item
-    bins = outputtype.create_empty_bins(numbins)
-    bins.set_valueof(valueof)
+    bins = outputtype.create_empty_bins(numbins, valueof)
     bins = algorithm(bins, item_names, valueof, **kwargs)
     return outputtype.extract_output_from_bins(bins)
 

@@ -48,8 +48,7 @@ def multifit(bins: Bins, items: List[any], valueof: Callable[[Any], float] = lam
     sorted_items = sorted(items, key=valueof, reverse=True)
     for _ in range(iterations):
         binsize = (lower_bound+upper_bound)/2
-        ffd_bins = BinsKeepingSums()
-        ffd_bins.set_valueof(valueof)
+        ffd_bins = BinsKeepingSums(0, valueof)
         ffd_bins = first_fit.online(ffd_bins, binsize, sorted_items, valueof)
         ffd_num_of_bins = ffd_bins.num
         logger.info("FFD with bin size %f needs %d bins", binsize, ffd_num_of_bins)

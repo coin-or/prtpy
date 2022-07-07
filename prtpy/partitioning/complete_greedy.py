@@ -14,7 +14,6 @@ from typing import List, Tuple, Callable, Iterator, Any
 import numpy as np
 import logging, time
 from prtpy import objectives as obj, Bins, partitioning
-from copy import deepcopy
 
 logger = logging.getLogger(__name__)
 
@@ -110,8 +109,16 @@ def anytime(
     stack: List[Tuple[Bins, int]] = [first_state]
     if use_set_of_seen_states:
         seen_states = set(tuple(first_state[0].sums))
-    complete_partitions_checked = 0      # for logging
-    intermediate_partitions_checked = 1  # for logging
+
+    # For logging and profiling:
+    complete_partitions_checked = 0      
+    intermediate_partitions_checked = 1  
+
+    times_fast_lower_bound_activated = 0
+    times_lower_bound_activated = 0
+    times_heuristic_3_activated = 0
+    times_seen_state_skipped = 0
+
     while len(stack) > 0:
         current_bins, depth = stack.pop()
 
@@ -122,7 +129,7 @@ def anytime(
             if new_objective_value < best_objective_value:
                 best_bins, best_objective_value = current_bins, new_objective_value
                 logger.info("  Found a better solution: %s, with value %s", best_bins.bins if hasattr(best_bins,'bins') else best_bins.sums, best_objective_value)
-                if new_objective_value==global_lower_bound:
+                if new_objective_value<=global_lower_bound:
                     logger.info("    Solution matches global lower bound - stopping")
                     break
             if time.perf_counter() > end_time:
@@ -130,105 +137,135 @@ def anytime(
                 break
             continue
 
-        else:
-    
-            # Heuristic 3: "If the sum of the remaining unassigned integers plus the smallest current subset sum is <= the largest subset sum, all remaining integers are assigned to the subset with the smallest sum, terminating that branch of the tree."
-            # Note that this heuristic is valid only for the objective "minimize largest sum"!
-            if use_heuristic_3 and objective==obj.MinimizeLargestSum:
-                if sums_of_remaining_items[depth] + current_bins.sums[0] <= current_bins.sums[-1]:
-                    new_bins = deepcopy(current_bins)
-                    for i in range(depth,numitems):
-                        new_bins.add_item_to_bin(sorted_items[i], 0)
-                    new_bins.sort_by_ascending_sum()
-                    new_depth = numitems
-                    stack.append((new_bins, new_depth))
+        # Heuristic 3: "If the sum of the remaining unassigned integers plus the smallest current subset sum is <= the largest subset sum, all remaining integers are assigned to the subset with the smallest sum, terminating that branch of the tree."
+        # Note that this heuristic is valid only for the objective "minimize largest sum"!
+        if use_heuristic_3 and objective==obj.MinimizeLargestSum:
+            if sums_of_remaining_items[depth] + current_bins.sums[0] <= current_bins.sums[-1]:
+                new_bins = current_bins.clone()
+                for i in range(depth,numitems):
+                    new_bins.add_item_to_bin(sorted_items[i], 0)
+                new_bins.sort_by_ascending_sum()
+                new_depth = numitems
+                stack.append((new_bins, new_depth))
+                logger.debug("    Heuristic 3 activated")
+                times_heuristic_3_activated+=1
+                continue
+
+        next_item = sorted_items[depth]
+        sum_of_remaining_items = sums_of_remaining_items[depth+1]
+
+        previous_bin_sum = None
+
+        # We want to insert the next item to the bin with the *smallest* sum first.
+        # But, since we use a stack, we have to insert it to the bin with the *largest* sum first,
+        # so that it is pushed deeper into the stack.
+        # Therefore, we process the bins in reverse, by *descending* order of sum.
+        for bin_index in reversed(range(bins.num)):   
+
+            # Heuristic 1: "If there are two subsets with the same sum, the current number is assigned to only one."
+            current_bin_sum = current_bins.sums[bin_index]
+            if current_bin_sum == previous_bin_sum:
+                continue   
+            previous_bin_sum = current_bin_sum
+
+            # Fast-lower-bound heuristic - before creating the new vertex.
+            # Currently implemented only for two objectives: min-max and max-min.
+            if use_fast_lower_bound:
+                if objective==obj.MinimizeLargestSum:
+                    # "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree."
+                    fast_lower_bound = max(current_bin_sum + valueof(next_item), current_bins.sums[-1])
+                elif objective==obj.MaximizeSmallestSum:
+                    # An adaptation of the above heuristic to maximizing the smallest sum.
+                    if bin_index==0:
+                        current_smallest_sum = min(current_bins.sums[0]+valueof(next_item), current_bins.sums[1])
+                    else:
+                        current_smallest_sum = current_bins.sums[0]
+                    fast_lower_bound = -(current_smallest_sum+sum_of_remaining_items)
+                else:
+                    fast_lower_bound = -np.inf
+                if fast_lower_bound >= best_objective_value:
+                    times_fast_lower_bound_activated += 1
                     continue
 
-            next_item = sorted_items[depth]
-            sum_of_remaining_items = sums_of_remaining_items[depth+1]
+            new_sums = list(current_bins.sums)
+            new_sums[bin_index] += valueof(next_item)
+            new_sums.sort()
 
-            previous_bin_sum = None
-            for bin_index in reversed(range(bins.num)):   # by descending order of sum.
+            # Lower-bound heuristic. 
+            if use_lower_bound:
+                lower_bound = objective.lower_bound(new_sums, sum_of_remaining_items, are_sums_in_ascending_order=True)
+                if lower_bound >= best_objective_value:
+                    logger.debug("    Lower bound %f too large", lower_bound)
+                    times_lower_bound_activated += 1
+                    continue
+            if use_set_of_seen_states: 
+                new_state = tuple(new_sums)
+                if new_state in seen_states:
+                    logger.debug("    State %s already seen", new_state)
+                    times_seen_state_skipped += 1
+                    continue
+                seen_states.add(new_state)   # should be after if use_lower_bound
 
-                # Heuristic 1: "If there are two subsets with the same sum, the current number is assigned to only one."
-                current_bin_sum = current_bins.sums[bin_index]
-                if current_bin_sum == previous_bin_sum:
-                    continue   
-                previous_bin_sum = current_bin_sum
+            # Create the next vertex:
+            new_bins = current_bins.clone().add_item_to_bin(next_item, bin_index).sort_by_ascending_sum()
+            # new_sums = new_bins.sums
 
-                # Fast-lower-bound heuristic - before creating the new vertex.
-                # Currently implemented only for two objectives: min-max and max-min.
-                if use_fast_lower_bound:
-                    if objective==obj.MinimizeLargestSum:
-                        # "If an assignment to a subset creates a subset sum that equals or exceeds the largest subset sum in the best complete solution found so far, that branch is pruned from the tree."
-                        fast_lower_bound = max(current_bin_sum + valueof(next_item), current_bins.sums[-1])
-                    elif objective==obj.MaximizeSmallestSum:
-                        # An adaptation of the above heuristic to maximizing the smallest sum.
-                        if bin_index==0:
-                            current_smallest_sum = min(current_bins.sums[0]+valueof(next_item), current_bins.sums[1])
-                        else:
-                            current_smallest_sum = current_bins.sums[0]
-                        fast_lower_bound = -(current_smallest_sum+sum_of_remaining_items)
-                    else:
-                        fast_lower_bound = -np.inf
-                    if fast_lower_bound >= best_objective_value:
-                        # logger.debug("  Fast lower bound %f too large", fast_lower_bound)
-                        continue
-
-                new_sums = list(current_bins.sums)
-                new_sums[bin_index] += valueof(next_item)
-                new_sums.sort()
-                
-                # Lower-bound heuristic. 
-                if use_lower_bound:
-                    lower_bound = objective.lower_bound(new_sums, sum_of_remaining_items, are_sums_in_ascending_order=True)
-                    if lower_bound >= best_objective_value:
-                        logger.debug("    Lower bound %f too large", lower_bound)
-                        continue
-                if use_set_of_seen_states: 
-                    new_state = tuple(new_sums)
-                    if new_state in seen_states:
-                        logger.debug("    State %s already seen", new_state)
-                        continue
-                    seen_states.add(new_state)   # should be after if use_lower_bound
-
-                # Create the next vertex:
-                new_bins = deepcopy(current_bins).add_item_to_bin(next_item, bin_index)
-                new_bins.sort_by_ascending_sum() 
-                # new_sums = new_bins.sums
-
-                new_depth = depth + 1
-                stack.append((new_bins, new_depth))
-                intermediate_partitions_checked += 1
+            new_depth = depth + 1
+            stack.append((new_bins, new_depth))
+            intermediate_partitions_checked += 1
 
     logger.info("Checked %d out of %d complete partitions, and %d intermediate partitions.", complete_partitions_checked, bins.num**numitems, intermediate_partitions_checked)
+    logger.info("  Heuristics: fast lower bound = %d, lower bound = %d, seen state = %d, heuristic 3 = %d.", times_fast_lower_bound_activated, times_lower_bound_activated, times_seen_state_skipped, times_heuristic_3_activated)
     return best_bins
 
 
 if __name__ == "__main__":
     # DOCTEST
-    import doctest
-    (failures, tests) = doctest.testmod(report=True)
-    print("{} failures, {} tests".format(failures, tests))
+    # import doctest, sys
+    # (failures, tests) = doctest.testmod(report=True)
+    # print("{} failures, {} tests".format(failures, tests))
+    # if failures>0: 
+    #   sys.exit()
 
-    if failures == 0:
-        # DEMO
-        logger.setLevel(logging.DEBUG)
-        logger.addHandler(logging.StreamHandler())
+    # DEMO
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
 
-        from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    from prtpy.bins import BinsKeepingContents, BinsKeepingSums
 
-        anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
-        walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-        anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
-        anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
+    # anytime(BinsKeepingContents(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
 
-        random_numbers = np.random.randint(1, 2**16-1, 15, dtype=np.int64)
-        anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_set_of_seen_states=False)
-        anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=False, use_set_of_seen_states=True)
-        anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=True, use_set_of_seen_states=False)
-        anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_lower_bound=True, use_set_of_seen_states=True)
-        # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
-        # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
-        # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
-        # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)
+    # walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    # anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MaximizeSmallestSum)
+    # anytime(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum)
+
+    random_numbers = np.random.randint(1, 2**16-1, 15, dtype=np.int64)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_fast_lower_bound=False, use_lower_bound=False, use_set_of_seen_states=False, use_heuristic_3=True)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_fast_lower_bound=False, use_lower_bound=False, use_set_of_seen_states=True, use_heuristic_3=False)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_fast_lower_bound=False, use_lower_bound=True, use_set_of_seen_states=False, use_heuristic_3=False)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_fast_lower_bound=True, use_lower_bound=False, use_set_of_seen_states=False, use_heuristic_3=False)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum, use_fast_lower_bound=True, use_lower_bound=False, use_set_of_seen_states=False, use_heuristic_3=True)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
+    # anytime(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum, use_lower_bound=False)
+
+
+    def compare_ways_to_add_items():
+        current_bins = BinsKeepingSums(3)
+        current_bins.add_item_to_bin(10, 1).add_item_to_bin(20,2).add_item_to_bin(30,0).sort_by_ascending_sum()
+        print(current_bins)
+        times = 100000
+
+        start = time.perf_counter()
+        for _ in range(times):
+            new_sums = list(current_bins.sums)
+            new_sums[0] += current_bins.valueof(5)
+            new_sums.sort()
+        print("list: ",time.perf_counter()-start)
+        
+        start = time.perf_counter()
+        for _ in range(times):
+            current_bins.clone().add_item_to_bin(5, 0).sort_by_ascending_sum() 
+        print("bins: ",time.perf_counter()-start)  # 1.5-2 times slower. (deepcopy is 10 times slower; __deepcopy__ is 3-4 times slower).
+    compare_ways_to_add_items()

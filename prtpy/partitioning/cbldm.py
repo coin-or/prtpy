@@ -84,8 +84,7 @@ def cbldm(                  # max items length can be between 900 and 1000 due t
 
     normalised_items = []  # list of bins, each bin contain a sub partition
     for i in sorted_items:
-        b = BinsKeepingContents(2)
-        b.set_valueof(valueof)
+        b = BinsKeepingContents(2, valueof)
         b.add_item_to_bin(item=i, bin_index=1)
         normalised_items.append(b)
     alg = CBLDM_algo(length=length, time_limit=time_limit, len_delta=partition_difference, start=start, val=valueof)
@@ -141,10 +140,8 @@ class CBLDM_algo:
             # split items to left branch and right branch according to partition type
             left = items[2:]
             right = items[2:]
-            split = BinsKeepingContents(2)  # split partition according to sum of bins
-            combine = BinsKeepingContents(2)  # merge partition according to sum of bins
-            split.set_valueof(self.val)
-            combine.set_valueof(self.val)
+            split = BinsKeepingContents(2, self.val)  # split partition according to sum of bins
+            combine = BinsKeepingContents(2, self.val)  # merge partition according to sum of bins
 
             for section in range(2):  # [small, big] + [small, big] -> [small + small, big + big]
                 for bin_i in range(2):
