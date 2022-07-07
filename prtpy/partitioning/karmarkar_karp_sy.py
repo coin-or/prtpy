@@ -112,8 +112,10 @@ if __name__ == '__main__':
         sys.exit()
 
     # DEMO
-    # logger.setLevel(logging.DEBUG)
-    # logger.addHandler(logging.StreamHandler())
-    # from prtpy import BinsKeepingContents, BinsKeepingSums
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
+    from prtpy import BinsKeepingContents, BinsKeepingSums
     # kk(BinsKeepingSums(2), [4,5,6,7,8])
     # kk(BinsKeepingContents(2), [4,5,6,7,8])
+    kk(BinsKeepingSums(4), [1,2,3,3,5,9,9])
+    kk(BinsKeepingContents(4), [1,2,3,3,5,9,9])
