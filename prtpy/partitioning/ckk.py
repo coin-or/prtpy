@@ -3,7 +3,7 @@
 
     Taken help from:
         "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
-        By Richard E. Korf,
+        By Richard E. Korf
 
     Algorithm number in Paper:
         2.3
@@ -19,13 +19,14 @@ import heapq
 import numpy as np
 from typing import Callable, List
 from itertools import count, permutations
-from prtpy import Bins, BinsKeepingContents
-from prtpy.utils import base_check_bins
+from prtpy import Bins, printbins
+from prtpy.partitioning.trivial import trivial_partition
 
 
 def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     """
-    Partition the items using the complete Karmarkar-Karp Heuristic partitioning algorithm
+    Partition the items using the complete Karmarkar-Karp Heuristic partitioning algorithm.
+    Finds a partition that minimizes the difference between the largest and smallest sum.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
     >>> ckk(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
@@ -64,13 +65,17 @@ def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> ckk(BinsKeepingContents(0), items=[number for number in range(10)]).bins
     []
 
+    >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    >>> ckk(BinsKeepingContents(3), walter_numbers).sort_by_ascending_sum()  # objective=obj.MinimizeDifference
+    Bin #0: [39, 16], sum=55.0
+    Bin #1: [46, 13], sum=59.0
+    Bin #2: [27, 26, 10], sum=63.0
     """
-    k = bins.num
-    bins, flag = base_check_bins(bins=bins, items=items, valueof=valueof)
-    if flag:
+    if trivial_partition(bins, items):
         return bins
+
     sorted_items = sorted(items, key=valueof, reverse=True)
-    partition = ckk_heuristic(sorted_items, k)
+    partition = ckk_heuristic(sorted_items, bins.num)
     result = [p[0] for p in partition]
 
     for index, p in enumerate(sorted(result[0], key=sum, reverse=True)):
@@ -81,7 +86,7 @@ def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
 
 def ckk_heuristic(items: List[any], k: int = 2):
     """
-    This function return an heuristic of items list for k >= 2
+    This function returns a heuristic of items list for k >= 2
 
     For any k ≥ 2, the algorithm can be generalized in the following way:
         1. Initially, for each number i in S, construct a k-tuple of subsets, in which one subset is {i} and the other k-1 subsets are empty.

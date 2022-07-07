@@ -1,72 +1,6 @@
 import itertools
 from copy import deepcopy
-from typing import List, Callable
-import random
 import numpy as np
-
-from prtpy import Bins, BinsKeepingContents
-
-
-def base_check_bins(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> (Bins, bool):
-    """
-    This function is a base function for partition algorithms,
-    It's get a list of items and number of bins (from the initialize given bins)
-    and return True flag and the new bins if needed for base cases when k = 0, k = 1 or k = number of items
-    The flag will equal to True if and only if this function has return a new bins (one of the base cases conditions was found)
-
-    Author: Kfir Goldfarb
-    Date: 08/06/2022
-    Email: kfir.goldfarb@msmail.ariel.ac.il
-
-    >>> base_check_bins(bins=BinsKeepingContents(0), items=[1, 2, 3, 4, 5, 6])[0].bins
-    []
-
-    >>> base_check_bins(bins=BinsKeepingContents(0), items=[1, 2, 3, 4, 5, 6])[1]
-    True
-
-    >>> base_check_bins(bins=BinsKeepingContents(0), items=[random.randint(0, 100) for i in range(random.randint(100, 1000))])[0].bins
-    []
-
-    >>> base_check_bins(bins=BinsKeepingContents(0), items=[random.randint(0, 100) for i in range(random.randint(100, 1000))])[1]
-    True
-
-    >>> base_check_bins(bins=BinsKeepingContents(1), items=[1, 2, 3, 4, 5, 6])[0].bins
-    [[1, 2, 3, 4, 5, 6]]
-
-    >>> base_check_bins(bins=BinsKeepingContents(1), items=[3, 6, 13, 20, 30, 40, 73])[0].bins
-    [[3, 6, 13, 20, 30, 40, 73]]
-
-    >>> base_check_bins(bins=BinsKeepingContents(1), items=[1, 2, 3, 4, 5, 6])[1]
-    True
-
-    >>> base_check_bins(bins=BinsKeepingContents(1), items=[random.randint(0, 100) for i in range(random.randint(100, 1000))])[1]
-    True
-
-    >>> base_check_bins(bins=BinsKeepingContents(1), items=[1])[0].bins
-    [[1]]
-
-    >>> base_check_bins(bins=BinsKeepingContents(5), items=[1, 2, 3, 4, 5])[0].bins
-    [[1], [2], [3], [4], [5]]
-
-    >>> base_check_bins(bins=BinsKeepingContents(6), items=[1, 2, 3, 4, 5, 6])[0].bins
-    [[1], [2], [3], [4], [5], [6]]
-
-    """
-    flag = False
-    k = bins.num
-    if k == 0:
-        flag = True
-    elif k == 1:
-        for item in items:
-            bins.add_item_to_bin(item=item, bin_index=0)
-        flag = True
-
-    if not flag and len(items) == k:
-        for index, item in enumerate(items):
-            bins.add_item_to_bin(item=item, bin_index=index)
-        flag = True
-
-    return bins, flag
 
 
 def get_best_best_k_combination(k_combinations):
@@ -250,6 +184,6 @@ def is_all_lists_are_different(list_of_lists) -> bool:
 
 if __name__ == "__main__":
     import doctest
-
+    import random
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))

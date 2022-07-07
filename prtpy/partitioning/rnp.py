@@ -20,7 +20,8 @@ from typing import Callable, List
 
 from prtpy import Bins, BinsKeepingContents
 from prtpy.partitioning.ckk import ckk
-from prtpy.utils import base_check_bins, all_in, is_all_lists_are_different, get_best_best_k_combination
+from prtpy.utils import all_in, is_all_lists_are_different, get_best_best_k_combination
+from prtpy.partitioning.trivial import trivial_partition
 
 
 def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -56,20 +57,18 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     []
 
     """
-    k = bins.num
-    bins, flag = base_check_bins(bins=bins, items=items, valueof=valueof)
-    if flag:
+    if trivial_partition(bins, items):
         return bins
 
-    if k == 2:
+    if bins.num == 2:
         return ckk(bins=bins, items=items, valueof=valueof)
 
     items.sort(reverse=True, key=valueof)
 
     all_combinations = []
-    for i in range(1, len(items) - k + 2):
+    for i in range(1, len(items) - bins.num + 2):
         all_combinations.extend([list(combination) for combination in itertools.combinations(items, i)])
-    all_k_combinations = [list(combination) for combination in itertools.combinations(all_combinations, k) if
+    all_k_combinations = [list(combination) for combination in itertools.combinations(all_combinations, bins.num) if
                           is_all_lists_are_different(combination) and all_in(combination, items)]
     best_k_combination = get_best_best_k_combination(k_combinations=all_k_combinations)
 

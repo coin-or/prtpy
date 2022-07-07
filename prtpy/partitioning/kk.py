@@ -22,7 +22,7 @@
 import copy
 from typing import Callable, List
 from prtpy import Bins, BinsKeepingContents
-from prtpy.utils import base_check_bins
+from prtpy.partitioning.trivial import trivial_partition
 
 
 def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -55,14 +55,13 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     []
 
     """
-    k = bins.num
-    bins, flag = base_check_bins(bins=bins, items=items, valueof=valueof)
-    if flag:
+    if trivial_partition(bins, items):
         return bins
+
     items.sort(reverse=True, key=valueof)
 
-    if k > 2:
-        raise ValueError(f"KK algorithm is capable with k <= 2, got {k}")
+    if bins.num > 2:
+        raise ValueError(f"KK algorithm is capable with k <= 2, got {bins.num}")
 
     difference_sets, original_items = kk_heuristic(items=items, valueof=valueof)
 

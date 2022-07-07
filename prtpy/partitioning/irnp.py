@@ -16,8 +16,9 @@ from typing import Callable, List
 from prtpy import Bins
 from prtpy.bins import BinsKeepingContents
 from prtpy.partitioning.rnp import rnp
-from prtpy.utils import base_check_bins, is_all_lists_are_different, all_in, get_best_best_k_combination, \
+from prtpy.utils import is_all_lists_are_different, all_in, get_best_best_k_combination, \
     get_sum_of_max_subset, get_largest_number
+from prtpy.partitioning.trivial import trivial_partition
 
 
 def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
@@ -68,20 +69,19 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     []
 
     """
-    k = bins.num
-    bins, flag = base_check_bins(bins=bins, items=items, valueof=valueof)
-    if flag:
+    if trivial_partition(bins, items):
         return bins
+
     items.sort(reverse=True, key=valueof)
 
     all_combinations = []
-    for i in range(1, len(items) - k + 2):
+    for i in range(1, len(items) - bins.num + 2):
         all_combinations.extend([list(combination) for combination in itertools.combinations(items, i)])
 
     flag = False
     best_k_combination = []
     all_k_combinations = []
-    for combination in itertools.combinations(all_combinations, k):
+    for combination in itertools.combinations(all_combinations, bins.num):
         if is_all_lists_are_different(combination) and all_in(combination, items):
             all_k_combinations.append(list(combination))
 
