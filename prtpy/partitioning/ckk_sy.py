@@ -13,7 +13,6 @@ from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingConten
 import heapq
 from itertools import count
 import logging
-from copy import deepcopy
 
 
 logger = logging.getLogger(__name__)
@@ -24,7 +23,7 @@ def _possible_partition_difference_lower_bound(node: List[Tuple[int, int, Bins, 
     This function check if from the current node we can yield to a better partition or not by checking the
     best difference we can reach from this node.
     """
-    logger.info("the current node: ", node)
+    logger.info("the current node: %s", node)
 
     sums_flattened = [size for partition in node for size in partition[3]]
     max_sums_flattened = max(sums_flattened)
@@ -53,7 +52,7 @@ def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best:float 
 
     heap_count = count()  # To avoid ambiguity in heaps
     for item in items:
-        new_bins = deepcopy(bins).add_item_to_bin(item=item, bin_index=(bins.num - 1))
+        new_bins = bins.clone().add_item_to_bin(item=item, bin_index=(bins.num - 1))
 
         heapq.heappush(
             stack[0], (-valueof(item), next(heap_count), new_bins, new_bins.sums)
@@ -104,7 +103,7 @@ def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best:float 
 
         tmp_stack_extension = []
 
-        for new_bins in bin1.combinations(bin2):
+        for new_bins in bin1.all_combinations(bin2):
             tmp_partitions = partitions[:]
 
             diff = max(new_bins.sums) - min(new_bins.sums)
@@ -118,11 +117,37 @@ def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best:float 
 
 
 def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x: x) -> Bins:
+    """
+    Finds a partition in which the largest sum is minimal, using the Complete Greedy algorithm.
+
+    :param objective: represents the function that should be optimized. Default is minimizing the difference between bin sums.
+    :param time_limit: determines how much time (in seconds) the function should run before it stops. Default is infinity.
+
+    >>> from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
+    >>> print(best_ckk_partition(BinsKeepingContents(2), [4,5,6,7,8]))
+    Bin #0: [4, 5, 6], sum=15
+    Bin #1: [7, 8], sum=15
+
+    The following examples are based on:
+        Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
+    >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    >>> print(best_ckk_partition(BinsKeepingContents(3), walter_numbers))
+    Bin #0: [16, 39], sum=55
+    Bin #1: [13, 46], sum=59
+    Bin #2: [10, 26, 27], sum=63
+
+    Partitioning items with names:
+    >>> from prtpy import partition, outputtypes as out
+    >>> partition(algorithm=best_ckk_partition, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    [['a', 'g'], ['b', 'f'], ['c', 'd', 'e']]
+    >>> partition(algorithm=best_ckk_partition, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
+    [16.0, 16.0]
+    """
     stack = [[]]  #: List[List[Tuple[int, int, Bins, List[int]]]]
 
     heap_count = count()  # To avoid ambiguity in heaps
     for item in items:
-        new_bins = deepcopy(bins).add_item_to_bin(item=item, bin_index=(bins.num - 1))
+        new_bins = bins.clone().add_item_to_bin(item=item, bin_index=(bins.num - 1))
 
         heapq.heappush(
             stack[0], (-valueof(item), next(heap_count), new_bins, new_bins.sums)
@@ -156,7 +181,7 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
 
         tmp_stack_extension = []
 
-        for new_bins in bin1.combinations(bin2):
+        for new_bins in bin1.all_combinations(bin2):
             tmp_partitions = partitions[:]
 
             diff = max(new_bins.sums) - min(new_bins.sums)
@@ -168,15 +193,16 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
 
         stack.extend(sorted(tmp_stack_extension))
 
+    best_partition.sort_by_ascending_sum()
     return best_partition
 
 
 if __name__ == '__main__':
-
-    # logger.setLevel(logging.INFO)
-    # logger.addHandler(logging.StreamHandler())
-
     import doctest
-
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+
+    # logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
+    from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
+    print(best_ckk_partition(BinsKeepingContents(2), [4,5,6,7,8]))
