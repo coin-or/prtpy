@@ -1,6 +1,7 @@
 import itertools
 from copy import deepcopy
 import numpy as np
+import random  # for the doctests
 
 
 def get_best_best_k_combination(k_combinations):
@@ -184,6 +185,5 @@ def is_all_lists_are_different(list_of_lists) -> bool:
 
 if __name__ == "__main__":
     import doctest
-    import random
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
