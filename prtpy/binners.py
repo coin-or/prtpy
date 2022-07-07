@@ -89,25 +89,30 @@ class Binner(ABC):
         # return bins
 
     @abstractmethod
+    def sums(self, bins: BinsArray) -> Tuple[float]:
+        """
+        Return only the current sums. 
+        """
+        return None
+
     def sums_as_tuple(self, bins: BinsArray) -> Tuple[float]:
         """
         Return a tuple with only the current sums. Can be used as a key in a set or dict.
         """
-        return None
+        return tuple(self.sums(bins))
 
+    @abstractmethod
+    def combine_bins(bins1:BinsArray, ibin1:int, bins2:BinsArray, ibin2:int):
+        """
+        Combine between bin ibin1 at array bins1 to bin ibin2 at array bins2.
+        """
+        pass
 
     # @abstractmethod
     # def clear_bins(self, numbins):
     #     """
     #     @param: numbins - the number of the bins
     #      clear the content of the bins.
-    #     """
-    #     pass
-
-    # @abstractmethod
-    # def combine_bins(self, ibin, other_bin, other_ibin):
-    #     """
-    #     combine between bin at index ibin and bin of other bin at index other ibin
     #     """
     #     pass
 
@@ -179,19 +184,15 @@ class BinnerKeepingSums(Binner):
         bins[bin_index] += self.valueof(item)
         return bins
 
-    def sums_as_tuple(self, bins: BinsArray) -> Tuple[float]:
-        """
-        Return a tuple with only the current sums. Can be used as a key in a set or dict.
-        """
-        return tuple(bins)
+    def sums(self, bins: BinsArray) -> Tuple[float]:
+        return bins
 
     def sort_by_ascending_sum(self, bins:BinsArray)->BinsArray:
         bins.sort()
         # return bins
 
-    # def combine_bins(self, ibin, other_bin, other_ibin):
-    #     self.sums[ibin] += other_bin.sums[other_ibin]
-    #     return self
+    def combine_bins(self, bins1:BinsArray, ibin1:int, bins2:BinsArray, ibin2:int):
+        bins1[ibin1] += bins2[ibin2]
 
     # def combinations(self, other_bins:Bins) -> Iterator[Bins]:
     #     """
@@ -280,11 +281,8 @@ class BinnerKeepingContents(BinnerKeepingSums):
         lists[bin_index].append(item)
         return bins
 
-    def sums_as_tuple(self, bins: BinsArray) -> Tuple[float]:
-        """
-        Return a tuple with only the current sums. Can be used as a key in a set or dict.
-        """
-        return tuple(bins[0])
+    def sums(self, bins: BinsArray) -> Tuple[float]:
+        return bins[0]
 
     def sort_by_ascending_sum(self, bins: BinsArray) -> BinsArray:
         sums, lists = bins
@@ -293,10 +291,11 @@ class BinnerKeepingContents(BinnerKeepingSums):
         lists[:] = list(map(lists.__getitem__, sorted_indices))
         # return bins
 
-    # def combine_bins(self, ibin, other_bin, other_ibin):
-    #     super().combine_bins(ibin, other_bin, other_ibin)
-    #     self.bins[ibin] += other_bin.bins[other_ibin]
-    #     return self
+    def combine_bins(self, bins1:BinsArray, ibin1:int, bins2:BinsArray, ibin2:int):
+        sums1, lists1 = bins1
+        sums2, lists2 = bins2
+        sums1[ibin1] += sums2[ibin2]
+        lists1[ibin1] += lists2[ibin2]
 
     # def combinations(self, other_bins:Bins) -> Iterator[Bins]:
     #     """

@@ -32,6 +32,8 @@ class partitioning:
 
     # Samuel & Jonathan modules
     from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp_sy
+    from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp
+    from prtpy.partitioning.karmarkar_karp_sy import kk as kk
     from prtpy.partitioning.ckk_sy import best_ckk_partition as ckk_sy
     from prtpy.partitioning.snp import snp
 
@@ -48,8 +50,9 @@ partitioning.complete_greedy.__name__ = "complete-greedy"
 partitioning.ilp.__name__ = "integer-programming"
 partitioning.dp.__name__ = "dynamic-programming"
 partitioning.karmarkar_karp_kg.__name__ = "karmarkar-karp-kg"
-partitioning.ckk.__name__ = "complete-karmarkar-karp"
 partitioning.karmarkar_karp_sy.__name__ = "karmarkar-karp-sy"
+partitioning.karmarkar_karp.__name__ = "karmarkar-karp"
+partitioning.ckk.__name__ = "complete-karmarkar-karp"
 partitioning.ckk_sy.__name__ = "complete-karmarkar-karp-sy"
 partitioning.rnp.__name__ = "recursive-number-partitioning"
 partitioning.irnp.__name__ = "improved-recursive-number-partitioning"

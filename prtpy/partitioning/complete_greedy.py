@@ -230,7 +230,7 @@ if __name__ == "__main__":
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
     if failures>0: 
-      sys.exit()
+        sys.exit()
 
     # DEMO
     logger.setLevel(logging.INFO)
