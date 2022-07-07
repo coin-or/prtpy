@@ -7,13 +7,12 @@ Since:  2022-02
 """
 
 from abc import ABC, abstractmethod
-from typing import Iterator
 from copy import deepcopy
 from itertools import permutations
-
 import numpy as np
-from typing import Any, Callable
+from typing import Any, Callable, Iterator
 
+from prtpy.binners import Binner, BinnerKeepingContents, BinnerKeepingSums
 
 class Bins(ABC):
     """
@@ -50,7 +49,7 @@ class Bins(ABC):
         pass
 
     @abstractmethod
-    def bin_to_str(self, bin_index: int) -> str:
+    def bin2str(self, bin_index: int) -> str:
         pass
 
     @abstractmethod
@@ -100,8 +99,13 @@ class Bins(ABC):
         pass
 
     def __repr__(self) -> str:
-        bins_str = [f"Bin #{i}: {self.bin_to_str(i)}" for i in range(self.num)]
+        bins_str = [f"Bin #{i}: {self.bin2str(i)}" for i in range(self.num)]
         return "\n".join(bins_str)
+
+    @abstractmethod
+    def get_binner(self)->Binner:
+        pass
+
 
 
 class BinsKeepingSums(Bins):
@@ -174,7 +178,7 @@ class BinsKeepingSums(Bins):
         self.sums[bin_index] += value
         return self
 
-    def bin_to_str(self, bin_index: int) -> str:
+    def bin2str(self, bin_index: int) -> str:
         return f"sum={self.sums[bin_index]}"
 
     def sort_by_ascending_sum(self):
@@ -216,6 +220,9 @@ class BinsKeepingSums(Bins):
 
     def empty_clone(self, numbins):
         return BinsKeepingSums(numbins, self.valueof)
+
+    def get_binner(self)->Binner:
+        return BinnerKeepingSums(self.num, self.valueof)
 
 
 class BinsKeepingContents(BinsKeepingSums):
@@ -291,7 +298,7 @@ class BinsKeepingContents(BinsKeepingSums):
         self.bins[bin_index].append(item)
         return self
 
-    def bin_to_str(self, bin_index: int) -> str:
+    def bin2str(self, bin_index: int) -> str:
         return f"{self.bins[bin_index]}, sum={self.sums[bin_index]}"
 
     def sort_by_ascending_sum(self):
@@ -339,6 +346,9 @@ class BinsKeepingContents(BinsKeepingSums):
 
     def empty_clone(self, numbins):
         return BinsKeepingContents(numbins, self.valueof)
+
+    def get_binner(self)->Binner:
+        return BinnerKeepingContents(self.num, self.valueof)
 
 
 if __name__ == "__main__":

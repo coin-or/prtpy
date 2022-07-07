@@ -13,9 +13,33 @@ from abc import ABC, abstractmethod
 from itertools import permutations
 
 import numpy as np
-from typing import Any, Callable, Iterator, List, Tuple
+from typing import Any, Callable, List, Tuple
 
 BinsArray = Any
+
+def bin2str(bins: BinsArray, bin_index:int):
+    try:
+        # bins is a tuple (sums,lists):
+        sums, lists = bins
+        return f"{lists[bin_index]}, sum={sums[bin_index]}"
+    except:
+        # bins is an array of sums:
+        return f"sum={bins[bin_index]}"
+
+def bins2str(bins: BinsArray)->str:
+    try:
+        # bins is a tuple (sums,lists):
+        sums, lists = bins
+        numbins = len(sums)
+        bins_str = [f"Bin #{i}: {lists[i]}, sum={sums[i]}" for i in range(numbins)]
+    except:
+        # bins is an array of sums:
+        numbins = len(bins)
+        bins_str = [f"Bin #{i}: sum={bins[i]}" for i in range(numbins)]
+    return "\n".join(bins_str)
+
+def printbins(bins:BinsArray):
+    print(bins2str(bins))
 
 class Binner(ABC):
     """
@@ -50,8 +74,7 @@ class Binner(ABC):
         Add the given item to the given bin in the given array.
         Return the bins after the addition.
         """
-        pass
-        # return bins
+        return bins
 
 
     @abstractmethod
@@ -62,6 +85,13 @@ class Binner(ABC):
         """
         pass
         # return bins
+
+    @abstractmethod
+    def sums_as_tuple(self, bins: BinsArray) -> Tuple[float]:
+        """
+        Return a tuple with only the current sums. Can be used as a key in a set or dict.
+        """
+        return None
 
     @abstractmethod
     def bin_to_str(self, bins: BinsArray, bin_index: int) -> str:
@@ -106,44 +136,43 @@ class BinnerKeepingSums(Binner):
     >>> values = {"a":3, "b":4, "c":5, "d":5, "e":5}
     >>> binner = BinnerKeepingSums(3, lambda x: values[x])
     >>> bins = binner.new_bins()
-    >>> binner.add_item_to_bin(bins, item="a", bin_index=0)
-    >>> print(binner.str(bins))
+    >>> printbins(binner.add_item_to_bin(bins, item="a", bin_index=0))
     Bin #0: sum=3.0
     Bin #1: sum=0.0
     Bin #2: sum=0.0
-    >>> binner.add_item_to_bin(bins, item="b", bin_index=1)
-    >>> print(binner.str(bins))
+    >>> _=binner.add_item_to_bin(bins, item="b", bin_index=1)
+    >>> printbins(bins)
     Bin #0: sum=3.0
     Bin #1: sum=4.0
     Bin #2: sum=0.0
-    >>> binner.add_item_to_bin(bins, item="c", bin_index=1)
-    >>> print(binner.str(bins))
+    >>> _=binner.add_item_to_bin(bins, item="c", bin_index=1)
+    >>> printbins(bins)
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=0.0
 
     Adding to a clone should not change the original:
-    >>> bins1 = binner.clone(bins)
-    >>> binner.add_item_to_bin(bins1, item="d", bin_index=1)
-    >>> print(binner.str(bins1))
+    >>> printbins(binner.add_item_to_bin(binner.clone(bins), item="d", bin_index=1))
     Bin #0: sum=3.0
     Bin #1: sum=14.0
     Bin #2: sum=0.0
-    >>> print(binner.str(bins))
+    >>> printbins(bins)
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=0.0
     >>> bins2 = binner.clone(bins)
-    >>> binner.add_item_to_bin(bins2, item="e", bin_index=2)
-    >>> print(binner.str(bins2))
+    >>> _=binner.add_item_to_bin(bins2, item="e", bin_index=2)
+    >>> printbins(bins2)
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=5.0
     >>> binner.sort_by_ascending_sum(bins)
-    >>> print(binner.str(bins))
+    >>> printbins(bins)
     Bin #0: sum=0.0
     Bin #1: sum=3.0
     Bin #2: sum=9.0
+    >>> binner.sums_as_tuple(bins)
+    (0.0, 3.0, 9.0)
     """
 
     BinsArray = np.ndarray    # Here, the bins-array is simply an array of the sums.
@@ -156,9 +185,14 @@ class BinnerKeepingSums(Binner):
         return np.array(bins)
 
     def add_item_to_bin(self, bins: BinsArray, item: Any, bin_index: int)->BinsArray:
-        value = self.valueof(item)
-        bins[bin_index] += value
-        # return bins
+        bins[bin_index] += self.valueof(item)
+        return bins
+
+    def sums_as_tuple(self, bins: BinsArray) -> Tuple[float]:
+        """
+        Return a tuple with only the current sums. Can be used as a key in a set or dict.
+        """
+        return tuple(bins)
 
     def bin_to_str(self, bins: BinsArray, bin_index: int) -> str:
         return f"sum={bins[bin_index]}"
@@ -201,44 +235,43 @@ class BinnerKeepingContents(BinnerKeepingSums):
     >>> values = {"a":3, "b":4, "c":5, "d":5, "e":5}
     >>> binner = BinnerKeepingContents(3, lambda x: values[x])
     >>> bins = binner.new_bins()
-    >>> binner.add_item_to_bin(bins, item="a", bin_index=0)
-    >>> print(binner.str(bins))
+    >>> printbins(binner.add_item_to_bin(bins, item="a", bin_index=0))
     Bin #0: ['a'], sum=3.0
     Bin #1: [], sum=0.0
     Bin #2: [], sum=0.0
-    >>> binner.add_item_to_bin(bins, item="b", bin_index=1)
-    >>> print(binner.str(bins))
+    >>> _=binner.add_item_to_bin(bins, item="b", bin_index=1)
+    >>> printbins(bins)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b'], sum=4.0
     Bin #2: [], sum=0.0
-    >>> binner.add_item_to_bin(bins, item="c", bin_index=1)
-    >>> print(binner.str(bins))
+    >>> _=binner.add_item_to_bin(bins, item="c", bin_index=1);
+    >>> printbins(bins)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: [], sum=0.0
 
     Adding to a clone should not change the original:
-    >>> bins1 = binner.clone(bins)
-    >>> binner.add_item_to_bin(bins1, item="d", bin_index=1)
-    >>> print(binner.str(bins1))
+    >>> printbins(binner.add_item_to_bin(binner.clone(bins), item="d", bin_index=1))
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c', 'd'], sum=14.0
     Bin #2: [], sum=0.0
-    >>> print(binner.str(bins))
+    >>> printbins(bins)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: [], sum=0.0
     >>> bins2 = binner.clone(bins)
-    >>> binner.add_item_to_bin(bins2, item="e", bin_index=2)
-    >>> print(binner.str(bins2))
+    >>> _=binner.add_item_to_bin(bins2, item="e", bin_index=2)
+    >>> printbins(bins2)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: ['e'], sum=5.0
     >>> binner.sort_by_ascending_sum(bins)
-    >>> print(binner.str(bins))
+    >>> printbins(bins)
     Bin #0: [], sum=0.0
     Bin #1: ['a'], sum=3.0
     Bin #2: ['b', 'c'], sum=9.0
+    >>> binner.sums_as_tuple(bins)
+    (0.0, 3.0, 9.0)
     """
 
     BinsArray = Tuple[np.ndarray, List[List]]  # Here, each bins-array is a tuple: sums,lists. sums is an array of sums; lists is a list of lists of items.
@@ -257,7 +290,13 @@ class BinnerKeepingContents(BinnerKeepingSums):
         value = self.valueof(item)
         sums[bin_index] += value
         lists[bin_index].append(item)
-        # return bins
+        return bins
+
+    def sums_as_tuple(self, bins: BinsArray) -> Tuple[float]:
+        """
+        Return a tuple with only the current sums. Can be used as a key in a set or dict.
+        """
+        return tuple(bins[0])
 
     def bin_to_str(self, bins: BinsArray, bin_index: int) -> str:
         sums, lists = bins

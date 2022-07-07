@@ -29,6 +29,13 @@ class OutputType(ABC):
         """
         raise NotImplementedError("Choose a specific output type")
 
+    @classmethod
+    def extract_output_from_binsarray(cls, bins: BinsArray) -> List:
+        """
+        Return the required output from the given bins-array.
+        """
+        raise NotImplementedError("Choose a specific output type")
+
 
 
 #

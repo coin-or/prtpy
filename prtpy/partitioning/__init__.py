@@ -9,7 +9,7 @@ such as: a list of values, and a dict that maps an item to its value.
 """
 import numpy as np
 
-from prtpy import outputtypes as out, objectives as obj
+from prtpy import outputtypes as out, objectives as obj, Bins
 from typing import Callable, List, Any
 
 from prtpy.partitioning.greedy import greedy
@@ -72,7 +72,11 @@ def partition(
             valueof = lambda item: item
     bins = outputtype.create_empty_bins(numbins, valueof)
     bins = algorithm(bins, item_names, valueof, **kwargs)
-    return outputtype.extract_output_from_bins(bins)
+
+    if isinstance(bins, Bins):
+        return outputtype.extract_output_from_bins(bins)
+    else:
+        return outputtype.extract_output_from_binsarray(bins)
 
 
 if __name__ == "__main__":
