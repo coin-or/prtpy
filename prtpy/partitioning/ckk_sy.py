@@ -202,7 +202,7 @@ if __name__ == '__main__':
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
 
-    # logger.setLevel(logging.INFO)
+    logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
     from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
     print(best_ckk_partition(BinsKeepingContents(2), [4,5,6,7,8]))
