@@ -34,7 +34,7 @@ class partitioning:
     from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp_sy
     from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp
     from prtpy.partitioning.karmarkar_karp_sy import kk as kk
-    from prtpy.partitioning.ckk_sy import best_ckk_partition as ckk_sy
+    from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition as ckk_sy
     from prtpy.partitioning.snp import snp
 
     # Eli Belkind module
@@ -42,7 +42,7 @@ class partitioning:
 
     # Kfir Goldfarb modules
     from prtpy.partitioning.karmarkar_karp_kg import kk as karmarkar_karp_kg
-    from prtpy.partitioning.ckk import ckk
+    from prtpy.partitioning.complete_karmarkar_karp_kg import ckk
     from prtpy.partitioning.rnp import rnp
     from prtpy.partitioning.irnp import irnp
 

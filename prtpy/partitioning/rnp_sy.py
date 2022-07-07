@@ -25,7 +25,7 @@ from typing import Callable, List, Any
 import numpy as np
 
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
-from prtpy.partitioning.ckk_sy import ckk, best_ckk_partition
+from prtpy.partitioning.complete_karmarkar_karp_sy import ckk, best_ckk_partition
 from prtpy.partitioning.karmarkar_karp_sy import kk
 from prtpy.inclusion_exclusion_tree import InExclusionBinTree
 
@@ -142,7 +142,7 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
 
             prior_bins.remove_bins()
     else:
-        for top_level_part in ckk(bins=BinsKeepingContents(2, valueof), items=items,valueof=valueof,best= -best_diff):
+        for top_level_part in ckk(bins=BinsKeepingContents(2, valueof), items=items,valueof=valueof,best_difference_so_far= -best_diff):
             bin1 = top_level_part.bins[0]
             new_bin1 = rec_generate_sets(prior_bins, bins, bin1, valueof, k_way/2, trees)
 

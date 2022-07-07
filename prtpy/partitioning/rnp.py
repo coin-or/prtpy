@@ -19,7 +19,7 @@ import itertools
 from typing import Callable, List
 
 from prtpy import Bins, BinsKeepingContents
-from prtpy.partitioning.ckk import ckk
+from prtpy.partitioning.complete_karmarkar_karp_kg import ckk
 from prtpy.utils import all_in, is_all_lists_are_different, get_best_best_k_combination
 from prtpy.partitioning.trivial import trivial_partition
 
