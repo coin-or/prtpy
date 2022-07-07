@@ -15,8 +15,9 @@ logger = logging.getLogger(__name__)
 
 class BinsSortedByMaxDiff:
     """
-    A data-structure that stores a collection of bin-arrays, sorted by the difference between the largest and smallest sum.
+    A data-structure that stores a collection of bin-arrays, that should be popped in descending order of the difference between the largest and smallest sum.
     Used by the multiway Karmarkar-Karp algorithm.
+    Uses Python's heap library, where the sorting key is minus the difference (since it is a min-heap).
     """
     def __init__(self, binner:Binner):
         self.bins_heap = []
@@ -34,6 +35,29 @@ class BinsSortedByMaxDiff:
     def pop(self)->BinsArray:
         _, _, bins = heapq.heappop(self.bins_heap) 
         return bins
+
+    def top(self)->BinsArray:
+        _, _, bins = self.bins_heap[0]
+        return bins
+
+    def iterator(self):
+        """ Iterate over all bins-arrays in the heap. """
+        for _, _, bins in self.bins_heap:
+            yield bins
+
+    def topdiff(self)->float:
+        diff, _, _ = self.bins_heap[0]
+        return diff
+
+    def clone(self):
+        the_clone = BinsSortedByMaxDiff(self.binner)
+        the_clone.bins_heap = self.bins_heap
+        the_clone.heap_count = self.heap_count
+        return the_clone
+
+    def __len__(self):
+        return len(self.bins_heap)
+
 
 
 def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
@@ -101,7 +125,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
             binner.combine_bins(bins1, binner.numbins-i-1, bins2, i)
         bins_heap.push(bins1)
 
-    return bins_heap.pop()
+    return bins_heap.top()
 
 
 if __name__ == '__main__':
