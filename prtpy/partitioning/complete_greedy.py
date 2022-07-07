@@ -88,7 +88,7 @@ def anytime(
     >>> partition(algorithm=anytime, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['g', 'a'], ['f', 'b'], ['e', 'c', 'd']]
     >>> partition(algorithm=anytime, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
-    array([16., 16.])
+    [16.0, 16.0]
     """
     numitems = len(items)
     start_time = time.perf_counter()
@@ -221,11 +221,11 @@ def anytime(
 
 if __name__ == "__main__":
     # DOCTEST
-    # import doctest, sys
-    # (failures, tests) = doctest.testmod(report=True)
-    # print("{} failures, {} tests".format(failures, tests))
-    # if failures>0: 
-    #   sys.exit()
+    import doctest, sys
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))
+    if failures>0: 
+      sys.exit()
 
     # DEMO
     logger.setLevel(logging.INFO)

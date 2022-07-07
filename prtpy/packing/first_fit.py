@@ -67,7 +67,7 @@ def decreasing(bins: Bins, binsize: float, items: List[any], valueof: Callable[[
     >>> pack(algorithm=decreasing, binsize=60, items={"a":44, "b":24, "c":24, "d":22, "e":21, "f":17, "g":8, "h":8, "i":6, "j":6})
     [['a', 'g', 'h'], ['b', 'c', 'i', 'j'], ['d', 'e', 'f']]
     >>> pack(algorithm=decreasing, binsize=60, items={"a":44, "b":24, "c":24, "d":22, "e":21, "f":17, "g":8, "h":8, "i":6, "j":6}, outputtype=out.Sums)
-    array([60., 60., 60.])
+    [60.0, 60.0, 60.0]
     """
     items = sorted(items, key=valueof, reverse=True)
     return online(bins, binsize, items, valueof)

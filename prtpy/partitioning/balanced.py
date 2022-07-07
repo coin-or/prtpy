@@ -27,7 +27,7 @@ def bidirectional_balanced(
     >>> partition(algorithm=bidirectional_balanced, numbins=3, items={"a":1, "b":2, "c":3, "d":4, "e":5, "f":9})
     [['f', 'a'], ['e', 'b'], ['d', 'c']]
     >>> partition(algorithm=bidirectional_balanced, numbins=2, items={"a":1, "b":2, "c":3, "d":4, "e":5, "f":9}, outputtype=out.Sums)
-    array([14., 10.])
+    [14.0, 10.0]
     """
     current_bin = 0
     current_direction = +1

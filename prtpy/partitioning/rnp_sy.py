@@ -77,7 +77,7 @@ def rnp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     >>> partition(algorithm=rnp, numbins=4, items={"a":1, "b":1, "c":1, "d":1})
     [['c'], ['d'], ['b'], ['a']]
     >>> partition(algorithm=rnp, numbins=4, items={"a":1, "b":1, "c":1, "d":1}, outputtype=out.Sums)
-    array([1., 1., 1., 1.])
+    [1.0, 1.0, 1.0, 1.0]
     """
 
     k_way = bins.num

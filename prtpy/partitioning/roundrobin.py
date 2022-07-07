@@ -29,7 +29,7 @@ def roundrobin(
     >>> partition(algorithm=roundrobin, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['f', 'c', 'a'], ['g', 'd'], ['e', 'b']]
     >>> partition(algorithm=roundrobin, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
-    array([18., 14.])
+    [18.0, 14.0]
     """
     ibin = 0
     for item in sorted(items, key=valueof, reverse=True):

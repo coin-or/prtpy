@@ -73,7 +73,7 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     >>> partition(algorithm=snp, numbins=3, items={"a":1, "b":1, "c":1})
     [['a'], ['b'], ['c']]
     >>> partition(algorithm=snp, numbins=3, items={"a":1, "b":1, "c":1}, outputtype=out.Sums)
-    array([1., 1., 1.])
+    [1.0, 1.0, 1.0]
     """
     k_way = bins.num
 

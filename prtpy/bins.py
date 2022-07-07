@@ -29,7 +29,7 @@ class Bins(ABC):
     @abstractmethod
     def add_item_to_bin(self, item: Any, bin_index: int):
         """
-        Add the given item, with the given value, to the bin with the given index.
+        Add the given item to the bin with the given index.
         """
         pass
 
@@ -108,9 +108,8 @@ class BinsKeepingSums(Bins):
     """
     A bins structure that keeps track only of the total sum in each bin.
 
-    >>> bins = BinsKeepingSums(3)
     >>> values = {"a":3, "b":4, "c":5, "d":5, "e":5}
-    >>> bins.valueof = lambda x: values[x]
+    >>> bins = BinsKeepingSums(3, lambda x: values[x])
     >>> bins.add_item_to_bin(item="a", bin_index=0)
     Bin #0: sum=3.0
     Bin #1: sum=0.0
@@ -297,8 +296,8 @@ class BinsKeepingContents(BinsKeepingSums):
 
     def sort_by_ascending_sum(self):
         sorted_indices = sorted(range(self.num), key=lambda i: self.sums[i])
-        self.sums = [self.sums[sorted_indices[i]] for i in range(self.num)]
-        self.bins = [self.bins[sorted_indices[i]] for i in range(self.num)]
+        self.sums[:] = list(map(self.sums.__getitem__, sorted_indices))
+        self.bins[:] = list(map(self.bins.__getitem__, sorted_indices))
         return self
 
     def clear_bins(self, numbins):

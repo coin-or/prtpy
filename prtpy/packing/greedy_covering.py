@@ -40,7 +40,7 @@ def decreasing(
     >>> pack(algorithm=decreasing, binsize=60, items={"a":44, "b":24, "c":24, "d":22, "e":21, "f":17, "g":8, "h":8, "i":6, "j":6})
     [['a', 'b'], ['c', 'd', 'e']]
     >>> pack(algorithm=decreasing, binsize=60, items={"a":44, "b":24, "c":24, "d":22, "e":21, "f":17, "g":8, "h":8, "i":6, "j":6}, outputtype=out.Sums)
-    array([68., 67.])
+    [68.0, 67.0]
     """
     bins.add_empty_bins(1)
     items = sorted(items, key=valueof, reverse=True)

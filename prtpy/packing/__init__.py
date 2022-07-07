@@ -49,7 +49,7 @@ def pack(
     >>> pack(algorithm=ffd, binsize=60, items={"a":44, "b":24, "c":24, "d":22, "e":21, "f":17, "g":8, "h":8, "i":6, "j":6})
     [['a', 'g', 'h'], ['b', 'c', 'i', 'j'], ['d', 'e', 'f']]
     >>> pack(algorithm=ffd, binsize=60, items=np.array([44, 24, 24, 22, 21, 17, 8, 8, 6, 6]), outputtype=out.Sums)
-    array([60., 60., 60.])
+    [60.0, 60.0, 60.0]
     >>> pack(algorithm=ffd, binsize=60, items=[44, 24, 24, 22, 21, 17, 8, 8, 6, 6], outputtype=out.BinCount)
     3
     >>> pack(algorithm=ffd, binsize=61, items=[44, 24, 24, 22, 21, 17, 8, 8, 6, 6], outputtype=out.BinCount)

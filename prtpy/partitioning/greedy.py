@@ -28,7 +28,7 @@ def greedy(bins: Bins, items: List[any], valueof: Callable=lambda x: x):
     >>> partition(algorithm=greedy, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['f', 'b'], ['g', 'a'], ['e', 'c', 'd']]
     >>> partition(algorithm=greedy, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
-    array([16., 16.])
+    [16.0, 16.0]
     """
     for item in sorted(items, key=valueof, reverse=True):
         index_of_least_full_bin = min(range(bins.num), key=bins.sums.__getitem__)
