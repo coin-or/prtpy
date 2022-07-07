@@ -160,34 +160,33 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
     # maybe insert here upper bound constraint : best = upper
     best_difference_so_far = -np.inf
     while stack:
-        partitions = stack.pop()
+        current_heap = stack.pop()
 
         # if could lead to better partition - maybe insert here upper bound constraint
-        if _possible_partition_difference_lower_bound(partitions, bins.num) <= best_difference_so_far:
+        lower_bound = _possible_partition_difference_lower_bound(current_heap, binner.numbins) 
+        if lower_bound <= best_difference_so_far:
             continue
 
-        # if could lead to legal partition
-        if len(partitions) == 1:
+        # if could lead to complete partition
+        if len(current_heap) == 1:
             # diff and best are non-positives numbers
-            diff = partitions[0][0]
+            diff = current_heap[0][0]
 
             if diff > best_difference_so_far:
                 best_difference_so_far = diff
-                _, _, final_partition = partitions[0]
-                best_partition =  final_partition
-
+                _, _, best_partition_so_far = current_heap[0]
                 if diff == 0:
-                    return best_partition
+                    return best_partition_so_far
             continue
 
         # continue create legal part
-        _, _, bin1 = heapq.heappop(partitions)
-        _, _, bin2 = heapq.heappop(partitions)
+        _, _, bin1 = heapq.heappop(current_heap)
+        _, _, bin2 = heapq.heappop(current_heap)
 
         tmp_stack_extension = []
 
         for new_bins in bin1.all_combinations(bin2):
-            tmp_partitions = partitions[:]
+            tmp_partitions = current_heap[:]
 
             diff = max(new_bins.sums) - min(new_bins.sums)
             heapq.heappush(
@@ -195,11 +194,11 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
             )
 
             tmp_stack_extension.append(tmp_partitions)
+        tmp_stack_extension.sort(key=lambda heap: heap[0])
+        stack.extend(tmp_stack_extension)
 
-        stack.extend(sorted(tmp_stack_extension))
-
-    best_partition.sort_by_ascending_sum()
-    return best_partition
+    best_partition_so_far.sort_by_ascending_sum()
+    return best_partition_so_far
 
 
 if __name__ == '__main__':
