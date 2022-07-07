@@ -1,5 +1,5 @@
 """ 
-Check variants of Complete Greedy algorithm on uniformly-random integers.
+Compare the performance of variants of Complete Greedy algorithm on uniformly-random integers.
 Aims to reproduce the results of Korf, Moffitt and Schreiber (2018), JACM paper.
 
 Author: Erel Segal-Halevi
@@ -44,7 +44,7 @@ def partition_random_items(
 if __name__ == "__main__":
     import logging, experiments_csv
     experiments_csv.logger.setLevel(logging.INFO)
-    experiment = experiments_csv.Experiment("results/", "check_complete_greedy_variants_8.csv", backup_folder=None)
+    experiment = experiments_csv.Experiment("results/", "complete_greedy_variants_8.csv", backup_folder=None)
 
     prt = prtpy.partitioning
     input_ranges = {

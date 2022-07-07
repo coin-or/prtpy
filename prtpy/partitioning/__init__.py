@@ -78,9 +78,21 @@ def partition(
     else:
         return outputtype.extract_output_from_binsarray(bins)
 
+def partition_random_items(numitems: int, bitsperitem: int, **kwargs):
+    """
+    Generates a uniformly-random list of items and partitions them using the given algorithm.
+
+    :param numitems: how many items to generate.
+    :param bitsperitem: how many bits in each item.
+    :param kwargs: keyword arguments delegated to `partition`.
+    """
+    items = np.random.randint(1, 2**bitsperitem-1, numitems, dtype=np.int64)
+    return partition(items=items, **kwargs)
+
 
 if __name__ == "__main__":
     import doctest
-
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+
+    print(partition_random_items(10, 16, algorithm=greedy, numbins=2, outputtype=out.PartitionAndSums))

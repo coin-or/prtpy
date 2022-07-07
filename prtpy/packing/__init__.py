@@ -7,9 +7,11 @@ and a function that maps each item to its value.
 This module lets you call a packing algorithm with more convenient input types,
 such as: a list of values, and a dict that maps an item to its value.
 """
+import numpy as np
 
 from prtpy import outputtypes as out
 from typing import Callable, List, Any
+from prtpy.packing.first_fit import decreasing as ffd
 
 
 
@@ -67,9 +69,21 @@ def pack(
     bins = algorithm(bins, binsize, item_names, valueof, **kwargs)
     return outputtype.extract_output_from_bins(bins)
 
+def pack_random_items(numitems: int, bitsperitem: int, **kwargs):
+    """
+    Generates a uniformly-random list of items and packs them using the given algorithm.
+
+    :param numitems: how many items to generate.
+    :param bitsperitem: how many bits in each item.
+    :param kwargs: keyword arguments delegated to `pack`.
+    """
+    items = np.random.randint(1, 2**bitsperitem-1, numitems, dtype=np.int64)
+    return pack(items=items, **kwargs)
+
 
 if __name__ == "__main__":
     import doctest
-
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+
+    print(pack_random_items(10, 16, algorithm=ffd, binsize=2**17, outputtype=out.PartitionAndSums))

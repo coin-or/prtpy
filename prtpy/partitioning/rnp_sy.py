@@ -26,7 +26,7 @@ import numpy as np
 
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
 from prtpy.partitioning.ckk_sy import ckk, best_ckk_partition
-from prtpy.partitioning.kk_sy import kk
+from prtpy.partitioning.karmarkar_karp_sy import kk
 from prtpy.inclusion_exclusion_tree import InExclusionBinTree
 
 

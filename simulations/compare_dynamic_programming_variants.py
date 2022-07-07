@@ -18,24 +18,21 @@ def partition_random_items(
     instance_id: int, # dummy parameter, to allow multiple instances of the same run
     **kwargs
 ):
-    items = np.random.randint(1, 2**bitsperitem-1, numitems, dtype=np.int64)
-    sums = prtpy.partition(
+    diff = prtpy.partition_random_items(
+        numitems, bitsperitem,
         algorithm=prtpy.partitioning.dynamic_programming,
         numbins=2,
-        items=items, 
-        outputtype=prtpy.out.Sums,
+        outputtype=prtpy.out.Difference
         # time_limit=TIME_LIMIT,
         **kwargs
     )
-    return {
-        "diff": sums[-1]-sums[0]
-    }
+    return {"diff": diff}
 
 
 if __name__ == "__main__":
     import logging, experiments_csv
     experiments_csv.logger.setLevel(logging.INFO)
-    experiment = experiments_csv.Experiment("results/", "check_dynamic_programming_variants_1.csv", backup_folder=None)
+    experiment = experiments_csv.Experiment("results/", "dynamic_programming_variants_2.csv", backup_folder=None)
 
     prt = prtpy.partitioning
     input_ranges = {

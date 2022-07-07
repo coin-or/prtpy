@@ -8,8 +8,8 @@ import prtpy.objectives as obj
 from prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
 from prtpy.binners import BinsArray, Binner, BinnerKeepingContents, BinnerKeepingSums, printbins
 
-from prtpy.packing import pack
-from prtpy.partitioning import partition
+from prtpy.packing import pack, pack_random_items
+from prtpy.partitioning import partition, partition_random_items
 
 
 
@@ -31,7 +31,7 @@ class partitioning:
     from prtpy.partitioning.multifit import multifit as multifit
 
     # Samuel & Jonathan modules
-    from prtpy.partitioning.kk_sy import kk as kk_sy
+    from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp_sy
     from prtpy.partitioning.ckk_sy import best_ckk_partition as ckk_sy
     from prtpy.partitioning.snp import snp
 
@@ -39,7 +39,7 @@ class partitioning:
     from prtpy.partitioning.cbldm import cbldm
 
     # Kfir Goldfarb modules
-    from prtpy.partitioning.kk import kk
+    from prtpy.partitioning.karmarkar_karp_kg import kk as karmarkar_karp_kg
     from prtpy.partitioning.ckk import ckk
     from prtpy.partitioning.rnp import rnp
     from prtpy.partitioning.irnp import irnp
@@ -47,9 +47,9 @@ class partitioning:
 partitioning.complete_greedy.__name__ = "complete-greedy"
 partitioning.ilp.__name__ = "integer-programming"
 partitioning.dp.__name__ = "dynamic-programming"
-partitioning.kk.__name__ = "karmarkar-karp"
+partitioning.karmarkar_karp_kg.__name__ = "karmarkar-karp-kg"
 partitioning.ckk.__name__ = "complete-karmarkar-karp"
-partitioning.kk_sy.__name__ = "karmarkar-karp-sy"
+partitioning.karmarkar_karp_sy.__name__ = "karmarkar-karp-sy"
 partitioning.ckk_sy.__name__ = "complete-karmarkar-karp-sy"
 partitioning.rnp.__name__ = "recursive-number-partitioning"
 partitioning.irnp.__name__ = "improved-recursive-number-partitioning"

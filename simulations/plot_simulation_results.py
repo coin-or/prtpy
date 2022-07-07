@@ -29,9 +29,16 @@ from matplotlib import pyplot as plt
 #      subplot_field = "bitsperitem", subplot_rows=1, subplot_cols=3, sharey=True, 
 #      legend_properties={"size":6}, xlim=(0,30), ylim=(0,30))
 
+# multi_plot_results(
+#      "results/check_complete_greedy_variants_7.csv", save_to_file=True,
+#      filter={}, 
+#      x_field="numitems", y_field="runtime", z_field=["use_lower_bound", "use_fast_lower_bound", "use_set_of_seen_states", "use_dynamic_programming"], mean=True, 
+#      subplot_field = "bitsperitem", subplot_rows=1, subplot_cols=3, sharey=True, sharex=True,
+#      legend_properties={"size":6}, ylim=(0,30))
+
 multi_plot_results(
-     "results/check_complete_greedy_variants_7.csv", save_to_file=True,
+     "results/karmarkar_karp_variants_1.csv", save_to_file=True,
      filter={}, 
-     x_field="numitems", y_field="runtime", z_field=["use_lower_bound", "use_fast_lower_bound", "use_set_of_seen_states", "use_dynamic_programming"], mean=True, 
-     subplot_field = "bitsperitem", subplot_rows=1, subplot_cols=3, sharey=True, sharex=True,
-     legend_properties={"size":6}, ylim=(0,30))
+     x_field="numitems", y_field="runtime", z_field="algorithm", mean=True, 
+     subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=3, sharey=True, sharex=True,
+     legend_properties={"size":6})

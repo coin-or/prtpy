@@ -1,5 +1,5 @@
 """ 
-Check partitioning algorithms on uniformly-random integers.
+Compare the performance of number-partitioning algorithms on uniformly-random integers.
 Aims to reproduce the results of Korf, Moffitt and Schreiber (2018), JACM paper.
 
 Author: Erel Segal-Halevi

@@ -22,7 +22,7 @@ from copy import deepcopy
 from time import time
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
-from prtpy.partitioning.kk_sy import kk
+from prtpy.partitioning.karmarkar_karp_sy import kk
 import numpy as np
 from prtpy import partition
 from prtpy.partitioning.ckk_sy import best_ckk_partition
