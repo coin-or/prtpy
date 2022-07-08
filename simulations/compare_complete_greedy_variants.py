@@ -94,5 +94,7 @@ check_complete_greedy_variants_7: compare all lower bounds with dynamic programm
   -- fast_lower_bound is best.
 
 check_complete_greedy_variants_8: same as 7, but a different implementation, using a binner.
+  -- fast_lower_bound alone is best.
+  -- dynamic programming is worst.
 
 """
