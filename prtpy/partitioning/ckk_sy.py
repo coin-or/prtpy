@@ -21,14 +21,13 @@ def _possible_partition_difference_lower_bound(current_heap: List[Tuple[int, int
     This function check if from the current node we can yield to a better partition or not by checking the
     best difference we can reach from this node.
     """
-    logger.info("  The current heap: %s", current_heap)
-
-    sums_flattened = [size for partition in current_heap for size in partition[2].sums]
+    logger.info("  A heap with %d partitions", len(current_heap))
+    sums_flattened = [size for bins in current_heap for size in bins[2].sums]
     max_sums_flattened = max(sums_flattened)
     sum_sums_flattened = sum(sums_flattened)
-    logger.info(f"  Max sums sizes = {max_sums_flattened}, sum of all sums = {sum_sums_flattened}")
-
-    return -(max_sums_flattened - (sum_sums_flattened - max_sums_flattened) // (numBins - 1))
+    lower_bound = -(max_sums_flattened - (sum_sums_flattened - max_sums_flattened) // (numBins - 1))
+    logger.info(f"  Max sums = {max_sums_flattened}, sum of all sums = {sum_sums_flattened}, lower_bound = {lower_bound}")
+    return lower_bound
 
 
 # def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best:float = -np.inf) -> Iterator[Bins]:
@@ -147,18 +146,15 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
     logger.info("\nComplete-Karmarkar-Karp Partitioning of %d items into %d parts.", numitems, binner.numbins)
     items = sorted(items, reverse=True, key=binner.valueof)
 
-    stack = [[]]  #: List[List[Tuple[int, int, Bins, List[int]]]]
-
+    stack = []  #: List[List[Tuple[int, int, Bins, List[int]]]]
+    first_heap = []
     heap_count = count()  # To avoid ambiguity in heaps
     for item in items:
         new_bins = bins.clone().add_item_to_bin(item=item, bin_index=(bins.num - 1))
+        heapq.heappush(            first_heap, (-valueof(item), next(heap_count), new_bins))
+    stack.append(first_heap)
 
-        heapq.heappush(
-            stack[0], (-valueof(item), next(heap_count), new_bins)
-        )
-
-    # maybe insert here upper bound constraint : best = upper
-    best_difference_so_far = -np.inf
+    best_difference_so_far = -np.inf  # maybe insert here upper bound constraint : best = upper
     while stack:
         current_heap = stack.pop()
 
@@ -180,20 +176,20 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
             continue
 
         # continue create legal part
-        _, _, bin1 = heapq.heappop(current_heap)
-        _, _, bin2 = heapq.heappop(current_heap)
+        _, _, bins1 = heapq.heappop(current_heap)
+        _, _, bins2 = heapq.heappop(current_heap)
 
         tmp_stack_extension = []
 
-        for new_bins in bin1.all_combinations(bin2):
-            tmp_partitions = current_heap[:]
+        for new_bins in bins1.all_combinations(bins2):
+            tmp_heap = current_heap[:]
 
             diff = max(new_bins.sums) - min(new_bins.sums)
             heapq.heappush(
-                tmp_partitions, (-diff, next(heap_count), new_bins)
+                tmp_heap, (-diff, next(heap_count), new_bins)
             )
 
-            tmp_stack_extension.append(tmp_partitions)
+            tmp_stack_extension.append(tmp_heap)
         tmp_stack_extension.sort(key=lambda heap: heap[0])
         stack.extend(tmp_stack_extension)
 

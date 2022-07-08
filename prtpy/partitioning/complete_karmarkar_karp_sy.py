@@ -122,8 +122,7 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
         first_heap.push(new_bins)
     stack.append(first_heap)
 
-    # maybe insert here upper bound constraint : best = upper
-    best_difference_so_far = -np.inf
+    best_difference_so_far = -np.inf # maybe insert here upper bound constraint : best = upper
     while stack:
         current_heap = stack.pop()
 
