@@ -36,8 +36,8 @@ class partitioning:
     from prtpy.partitioning.karmarkar_karp_sy import kk as kk
     from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition as complete_karmarkar_karp_sy
     from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition as ckk_sy
-    from prtpy.partitioning.sequential_number_partitioning import snp
     from prtpy.partitioning.sequential_number_partitioning import snp as sequential_number_partitioning
+    from prtpy.partitioning.sequential_number_partitioning import snp
 
     # Eli Belkind module
     from prtpy.partitioning.cbldm import cbldm
@@ -46,8 +46,8 @@ class partitioning:
     from prtpy.partitioning.karmarkar_karp_kg import kk as karmarkar_karp_kg
     from prtpy.partitioning.complete_karmarkar_karp_kg import ckk as complete_karmarkar_karp_kg
     from prtpy.partitioning.complete_karmarkar_karp_kg import ckk as ckk_kg
-    from prtpy.partitioning.rnp import rnp
-    from prtpy.partitioning.irnp import irnp
+    from prtpy.partitioning.recursive_number_partitioning_kg import rnp
+    from prtpy.partitioning.improved_recursive_number_partitioning import irnp
 
 partitioning.complete_greedy.__name__ = "complete-greedy"
 partitioning.ilp.__name__ = "integer-programming"
