@@ -41,4 +41,4 @@ multi_plot_results(
      filter={}, 
      x_field="numitems", y_field="runtime", z_field="algorithm", mean=True, 
      subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=3, sharey=True, sharex=True,
-     legend_properties={"size":6})
+     legend_properties={"size":6}, ylim=(0,30), xlim=(0,30))

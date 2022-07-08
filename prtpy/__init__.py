@@ -31,11 +31,13 @@ class partitioning:
     from prtpy.partitioning.multifit import multifit as multifit
 
     # Samuel & Jonathan modules
-    from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp_sy
+    from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp_sy  
     from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp
     from prtpy.partitioning.karmarkar_karp_sy import kk as kk
-    from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition as complete_karmarkar_karp_sy
-    from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition as ckk_sy
+
+    from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as complete_karmarkar_karp_sy
+    from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as ckk_sy
+
     from prtpy.partitioning.sequential_number_partitioning import snp as sequential_number_partitioning
     from prtpy.partitioning.sequential_number_partitioning import snp
 
@@ -43,7 +45,6 @@ class partitioning:
     from prtpy.partitioning.cbldm import cbldm
 
     # Kfir Goldfarb modules
-    from prtpy.partitioning.karmarkar_karp_kg import kk as karmarkar_karp_kg
     from prtpy.partitioning.complete_karmarkar_karp_kg import ckk as complete_karmarkar_karp_kg
     from prtpy.partitioning.complete_karmarkar_karp_kg import ckk as ckk_kg
     from prtpy.partitioning.recursive_number_partitioning_kg import rnp
@@ -52,7 +53,6 @@ class partitioning:
 partitioning.complete_greedy.__name__ = "complete-greedy"
 partitioning.ilp.__name__ = "integer-programming"
 partitioning.dp.__name__ = "dynamic-programming"
-partitioning.karmarkar_karp_kg.__name__ = "karmarkar-karp-kg"
 partitioning.karmarkar_karp_sy.__name__ = "karmarkar-karp-sy"
 partitioning.karmarkar_karp.__name__ = "karmarkar-karp"
 partitioning.complete_karmarkar_karp_kg.__name__ = "complete-karmarkar-karp-kg"

@@ -20,9 +20,9 @@ Since: 03-2022
 from typing import Callable, List
 from prtpy import outputtypes as out, objectives as obj, Bins, Binner, BinsArray, BinsKeepingContents, printbins
 from prtpy.partitioning.karmarkar_karp_sy import kk
+from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as ckk_optimal
 import numpy as np, logging
 from prtpy import partition
-from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition
 from prtpy.inclusion_exclusion_tree import InExclusionBinTree
 
 
@@ -104,7 +104,7 @@ def rec_generate_sets(prior_bins: BinsArray, best_partition_so_far: BinsArray, i
     best_difference_so_far = max(bins_sums) - min(bins_sums)
     if numbins == 2:   # Run two-way CKK on the remaining items.
         ckk_binner = binner.clone_with_new_numbins(2)
-        two_bins = best_ckk_partition(bins=None, binner=ckk_binner, items=items, valueof=valueof)
+        two_bins = ckk_optimal(bins=None, binner=ckk_binner, items=items, valueof=valueof)
         logger.info("  CKK result: %s", two_bins)
         combined_sums = np.append(binner.sums(two_bins), binner.sums(prior_bins))
         diff = max(combined_sums) - min(combined_sums)

@@ -30,85 +30,8 @@ def _possible_partition_difference_lower_bound(current_heap: List[Tuple[int, int
     return lower_bound
 
 
-def ckk(bins: Bins, items: List[int],  valueof: Callable=lambda x: x, best_difference_so_far:float = -np.inf, binner:Binner=None) -> Iterator[Bins]:
-    """
-    Iterator as mentions in CKK algorithms which return better partition than the one found so far.
-    best:  negative upper bound on the difference.
-            -np.inf (default): yield better partitions than the one found so far.
-           other: yield partitions with upper bound "best" on the difference.
 
-    >>> from prtpy import partition
-    >>> for part in ckk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]): part
-    [7.0, 7.0, 9.0, 9.0]
-    >>> for part in ckk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]): part
-    ([6.0, 8.0, 8.0, 8.0], [[1, 5], [4, 4], [3, 5], [3, 5]])
-    """
-    if binner is None: 
-        binner = bins.get_binner()
-
-    numitems = len(items)
-    logger.info("\nComplete-Karmarkar-Karp Partitioning of %d items into %d parts.", numitems, binner.numbins)
-    items = sorted(items, reverse=True, key=binner.valueof)
-
-    stack = []  #: List[List[Tuple[int, int, Bins, List[int]]]]
-    first_heap = BinsSortedByMaxDiff(binner)
-    for item in items:
-        new_bins = binner.add_item_to_bin(binner.new_bins(), item=item, bin_index=binner.numbins-1)
-        first_heap.push(new_bins)
-    stack.append(first_heap)
-
-    logger.info(f"we create the stack - all stack items are possibles branches in the tree (we then combine them in all possible ways). "
-                f"The stack: {stack}")
-
-    isBest = True if best_difference_so_far == -np.inf else False
-    logger.info(f"isBest= {isBest}, "
-                f"True means we search for the best partition, "
-                f"False means we search for partitions with bounded difference.")
-    while stack:
-        current_heap = stack.pop()
-
-        # if could lead to better partition - maybe insert here upper bound constraint
-        lower_bound = _possible_partition_difference_lower_bound(current_heap, binner.numbins) 
-        if lower_bound <= best_difference_so_far:
-            continue
-
-        logger.info(f"This partition/s could lead to a better partition found so far: {current_heap}")
-
-        # if could lead to legal partition
-        if len(current_heap) == 1:
-
-            # diff and best are non-positives numbers
-            diff = current_heap.topdiff()
-
-            logger.info(f"We arrive to a legal partition. Is it better than the best one found so far?\n"
-                        f"is this partition diff ={-diff} < from the best one = {-best_difference_so_far} ?")
-
-            if diff > best_difference_so_far: # consolidate if geq
-                logger.info("We found a better partition!!! Continue to search for better partitions....")
-                if isBest:
-                    best_difference_so_far = diff
-                best_partition_so_far =  current_heap.top()
-                yield best_partition_so_far
-                if diff == 0:
-                    logger.info("Perfect partition is found!!!")
-                    return
-            continue
-
-        logger.info("Combine between the partitions in order to create legal partition.")
-        # continue create legal part
-        bins1 = current_heap.pop()
-        bins2 = current_heap.pop()
-
-        tmp_stack_extension = []
-        for new_bins in binner.all_combinations(bins1, bins2):
-            tmp_heap = current_heap.clone()
-            tmp_heap.push(new_bins)
-            tmp_stack_extension.append(tmp_heap)
-        tmp_stack_extension.sort(key=lambda heap: heap.topdiff())
-        stack.extend(tmp_stack_extension)
-
-
-def best_ckk_partition(bins: Bins, items: List[int],  valueof: Callable=lambda x: x, binner:Binner=None, numbins:int=None) -> Bins:
+def optimal(bins: Bins, items: List[int],  valueof: Callable=lambda x: x, binner:Binner=None, numbins:int=None) -> Bins:
     """
     Finds a partition in which the largest sum is minimal, using the Complete Greedy algorithm.
 
@@ -194,6 +117,85 @@ def best_ckk_partition(bins: Bins, items: List[int],  valueof: Callable=lambda x
 
     binner.sort_by_ascending_sum(best_partition_so_far)
     return best_partition_so_far
+
+
+
+def generator(bins: Bins, items: List[int],  valueof: Callable=lambda x: x, best_difference_so_far:float = -np.inf, binner:Binner=None) -> Iterator[Bins]:
+    """
+    Iterator as mentioned in CKK algorithms which return better partition than the one found so far.
+    best:  negative upper bound on the difference.
+            -np.inf (default): yield better partitions than the one found so far.
+           other: yield partitions with upper bound "best" on the difference.
+
+    >>> from prtpy import partition
+    >>> for part in ckk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]): part
+    [7.0, 7.0, 9.0, 9.0]
+    >>> for part in ckk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]): part
+    ([6.0, 8.0, 8.0, 8.0], [[1, 5], [4, 4], [3, 5], [3, 5]])
+    """
+    if binner is None: 
+        binner = bins.get_binner()
+
+    numitems = len(items)
+    logger.info("\nComplete-Karmarkar-Karp Partitioning of %d items into %d parts.", numitems, binner.numbins)
+    items = sorted(items, reverse=True, key=binner.valueof)
+
+    stack = []  #: List[List[Tuple[int, int, Bins, List[int]]]]
+    first_heap = BinsSortedByMaxDiff(binner)
+    for item in items:
+        new_bins = binner.add_item_to_bin(binner.new_bins(), item=item, bin_index=binner.numbins-1)
+        first_heap.push(new_bins)
+    stack.append(first_heap)
+
+    logger.info(f"we create the stack - all stack items are possibles branches in the tree (we then combine them in all possible ways). "
+                f"The stack: {stack}")
+
+    isBest = True if best_difference_so_far == -np.inf else False
+    logger.info(f"isBest= {isBest}, "
+                f"True means we search for the best partition, "
+                f"False means we search for partitions with bounded difference.")
+    while stack:
+        current_heap = stack.pop()
+
+        # if could lead to better partition - maybe insert here upper bound constraint
+        lower_bound = _possible_partition_difference_lower_bound(current_heap, binner.numbins) 
+        if lower_bound <= best_difference_so_far:
+            continue
+
+        logger.info(f"This partition/s could lead to a better partition found so far: {current_heap}")
+
+        # if could lead to legal partition
+        if len(current_heap) == 1:
+
+            # diff and best are non-positives numbers
+            diff = current_heap.topdiff()
+
+            logger.info(f"We arrive to a legal partition. Is it better than the best one found so far?\n"
+                        f"is this partition diff ={-diff} < from the best one = {-best_difference_so_far} ?")
+
+            if diff > best_difference_so_far: # consolidate if geq
+                logger.info("We found a better partition!!! Continue to search for better partitions....")
+                if isBest:
+                    best_difference_so_far = diff
+                best_partition_so_far =  current_heap.top()
+                yield best_partition_so_far
+                if diff == 0:
+                    logger.info("Perfect partition is found!!!")
+                    return
+            continue
+
+        logger.info("Combine between the partitions in order to create legal partition.")
+        # continue create legal part
+        bins1 = current_heap.pop()
+        bins2 = current_heap.pop()
+
+        tmp_stack_extension = []
+        for new_bins in binner.all_combinations(bins1, bins2):
+            tmp_heap = current_heap.clone()
+            tmp_heap.push(new_bins)
+            tmp_stack_extension.append(tmp_heap)
+        tmp_stack_extension.sort(key=lambda heap: heap.topdiff())
+        stack.extend(tmp_stack_extension)
 
 
 if __name__ == '__main__':

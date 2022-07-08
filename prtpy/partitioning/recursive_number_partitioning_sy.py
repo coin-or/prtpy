@@ -25,7 +25,7 @@ from prtpy import outputtypes as out, objectives as obj, Bins, Binner, BinsArray
 from prtpy.partitioning.karmarkar_karp_sy import kk
 import numpy as np, logging
 from prtpy import partition
-from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition, ckk
+from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as ckk_optimal, generator as ckk_generator
 from prtpy.inclusion_exclusion_tree import InExclusionBinTree
 
 logger = logging.getLogger(__name__)
@@ -101,7 +101,7 @@ def rec_generate_sets(prior_bins: BinsArray, best_partition_so_far: BinsArray, i
     #### Base case: numbins == 2
     if numbins == 2:
         ckk_binner = binner.clone_with_new_numbins(2)
-        return best_ckk_partition(bins=None, binner=ckk_binner, items=items, valueof=valueof)
+        return ckk_optimal(bins=None, binner=ckk_binner, items=items, valueof=valueof)
 
     #### Odd case: numbins is odd
     if numbins % 2 == 1:  
@@ -132,7 +132,7 @@ def rec_generate_sets(prior_bins: BinsArray, best_partition_so_far: BinsArray, i
     #### Even case: numbins is odd
     else:
         ckk_binner = binner.clone_with_new_numbins(2)
-        for top_level_part in ckk(bins=BinsKeepingContents(2, valueof), items=items, valueof=valueof, best_difference_so_far=-best_difference_so_far):
+        for top_level_part in ckk_generator(bins=BinsKeepingContents(2, valueof), items=items, valueof=valueof, best_difference_so_far=-best_difference_so_far):
             bin1items, bin2items = top_level_part[1]
             new_bin1 = rec_generate_sets(prior_bins, best_partition_so_far, bin1items, valueof, numbins/2, trees, binner)
             new_bin2 = rec_generate_sets(prior_bins, best_partition_so_far, bin2items, valueof, numbins/2, trees, binner)

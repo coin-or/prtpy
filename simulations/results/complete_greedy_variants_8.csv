@@ -6414,3 +6414,4 @@ numitems,bitsperitem,instance_id,objective,use_lower_bound,use_fast_lower_bound,
 26,16,8,maximize-smallest-sum,,,,True,-1.0,30.353718299998945
 26,16,9,minimize-largest-sum,,,,True,-1.0,28.863886700000876
 26,16,9,maximize-smallest-sum,,,,True,0.0,27.587515499999427
+26,32,0,minimize-largest-sum,,,,True,1585.0,6976.5567624
