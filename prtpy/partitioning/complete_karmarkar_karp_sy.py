@@ -7,7 +7,7 @@ Credit: based on code by Søren Fuglede Jørgensen in the numberpartitioning pac
 
 """
 from typing import Iterator, List, Tuple, Callable, List, Any
-from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
+from prtpy import outputtypes as out, objectives as obj, Bins, Binner, BinsKeepingContents, BinsKeepingSums
 import logging, numpy as np
 
 from prtpy.partitioning.karmarkar_karp_sy import BinsSortedByMaxDiff
@@ -22,8 +22,7 @@ def _possible_partition_difference_lower_bound(current_heap: List[Tuple[int, int
     best difference we can reach from this node.
     """
     logger.info("  A heap with %d partitions", len(current_heap))
-    # sums_flattened = [size for bins in current_heap for size in bins[2].sums]
-    sums_flattened = [size for bins in current_heap.iterator() for size in current_heap.binner.sums(bins)]
+    sums_flattened = [size for binsarray in current_heap.iterator() for size in current_heap.binner.sums(binsarray)]
     max_sums_flattened = max(sums_flattened)
     sum_sums_flattened = sum(sums_flattened)
     lower_bound = -(max_sums_flattened - (sum_sums_flattened - max_sums_flattened) // (numbins - 1))
@@ -31,7 +30,7 @@ def _possible_partition_difference_lower_bound(current_heap: List[Tuple[int, int
     return lower_bound
 
 
-def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best_difference_so_far:float = -np.inf) -> Iterator[Bins]:
+def ckk(bins: Bins, items: List[int],  valueof: Callable=lambda x: x, best_difference_so_far:float = -np.inf, binner:Binner=None) -> Iterator[Bins]:
     """
     Iterator as mentions in CKK algorithms which return better partition than the one found so far.
     best:  negative upper bound on the difference.
@@ -44,7 +43,9 @@ def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best_differ
     >>> for part in ckk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]): part
     ([6.0, 8.0, 8.0, 8.0], [[1, 5], [4, 4], [3, 5], [3, 5]])
     """
-    binner = bins.get_binner()
+    if binner is None: 
+        binner = bins.get_binner()
+
     numitems = len(items)
     logger.info("\nComplete-Karmarkar-Karp Partitioning of %d items into %d parts.", numitems, binner.numbins)
     items = sorted(items, reverse=True, key=binner.valueof)
@@ -107,7 +108,7 @@ def ckk(bins: Bins,items: List[int],  valueof: Callable=lambda x: x, best_differ
         stack.extend(tmp_stack_extension)
 
 
-def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x: x) -> Bins:
+def best_ckk_partition(bins: Bins, items: List[int],  valueof: Callable=lambda x: x, binner:Binner=None, numbins:int=None) -> Bins:
     """
     Finds a partition in which the largest sum is minimal, using the Complete Greedy algorithm.
 
@@ -140,15 +141,19 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
     >>> partition(algorithm=best_ckk_partition, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     [16.0, 16.0]
     """
-    binner = bins.get_binner()
+    if binner is None: 
+        binner = bins.get_binner()
+    if numbins is None:
+        numbins = binner.numbins
+
     numitems = len(items)
-    logger.info("\nComplete-Karmarkar-Karp Partitioning of %d items into %d parts.", numitems, binner.numbins)
+    logger.info("\nComplete-Karmarkar-Karp Partitioning of %d items into %d parts.", numitems, numbins)
     items = sorted(items, reverse=True, key=binner.valueof)
 
     stack = []  #: List[List[Tuple[int, int, Bins, List[int]]]]
     first_heap = BinsSortedByMaxDiff(binner)
     for item in items:
-        new_bins = binner.add_item_to_bin(binner.new_bins(), item=item, bin_index=binner.numbins-1)
+        new_bins = binner.add_item_to_bin(binner.new_bins(numbins), item=item, bin_index=numbins-1)
         first_heap.push(new_bins)
     stack.append(first_heap)
 
@@ -157,7 +162,7 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
         current_heap = stack.pop()
 
         # if could lead to better partition - maybe insert here upper bound constraint
-        lower_bound = _possible_partition_difference_lower_bound(current_heap, binner.numbins) 
+        lower_bound = _possible_partition_difference_lower_bound(current_heap, numbins) 
         if lower_bound <= best_difference_so_far:
             continue
 

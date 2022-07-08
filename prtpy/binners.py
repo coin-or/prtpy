@@ -18,15 +18,6 @@ from typing import Any, Callable, List, Tuple, Iterator
 
 BinsArray = Any
 
-# def bin2str(bins: BinsArray, bin_index:int):
-#     try:
-#         # bins is a tuple (sums,lists):
-#         sums, lists = bins
-#         return f"{lists[bin_index]}, sum={sums[bin_index]}"
-#     except:
-#         # bins is an array of sums:
-#         return f"sum={bins[bin_index]}"
-
 def bins2str(bins: BinsArray)->str:
     try:
         # bins is a tuple (sums,lists):
@@ -68,6 +59,24 @@ class Binner(ABC):
         Create a new bins-array with the same contents as the given bins-array.
         '''
         return None
+
+    @abstractmethod
+    def add_empty_bins(self, bins: BinsArray, numbins:int)->BinsArray:
+        '''
+        Add some new empty bins at the end of the given BinsArray.
+        Returns a copy of "bins" with the added empty bins.
+        NOTE: This does NOT change bins in-place; it returns a copy.
+        '''
+        pass
+
+    @abstractmethod
+    def remove_bins(self, bins: BinsArray, numbins:int)->BinsArray:
+        '''
+        Remove some bins from the end of the given BinsArray.
+        Returns a copy of "bins" with the removed bins.
+        NOTE: This does NOT change bins in-place; it returns a copy.
+        '''
+        pass
 
     @abstractmethod
     def add_item_to_bin(self, bins:BinsArray, item: Any, bin_index: int)->BinsArray:
@@ -114,6 +123,11 @@ class Binner(ABC):
         NOTE: duplicate combinations are not returned.
         '''
         pass
+
+    @abstractmethod
+    def clone_with_new_numbins(self,  new_numbins:int):
+        pass
+
 
     # @abstractmethod
     # def clear_bins(self, numbins):
@@ -168,6 +182,15 @@ class BinnerKeepingSums(Binner):
     Bin #2: sum=9.0
     >>> binner.sums_as_tuple(bins)
     (0.0, 3.0, 9.0)
+
+    >>> printbins(binner.add_empty_bins(bins, 1))
+    Bin #0: sum=0.0
+    Bin #1: sum=3.0
+    Bin #2: sum=9.0
+    Bin #3: sum=0.0
+    >>> printbins(binner.remove_bins(bins, 1))
+    Bin #0: sum=0.0
+    Bin #1: sum=3.0
     """
 
     BinsArray = np.ndarray    # Here, the bins-array is simply an array of the sums.
@@ -179,6 +202,22 @@ class BinnerKeepingSums(Binner):
 
     def clone(self, bins: BinsArray)->BinsArray:
         return np.array(bins)
+
+    def add_empty_bins(self, bins: BinsArray, numbins:int)->BinsArray:
+        '''
+        Add some new empty bins at the end of the given BinsArray.
+        Returns a copy of "bins" with the added empty bins.
+        NOTE: This does NOT change bins in-place; it returns a copy.
+        '''
+        return np.append(bins, np.zeros(numbins))
+
+    def remove_bins(self, bins: BinsArray, numbins:int)->BinsArray:
+        '''
+        Remove some bins from the end of the given BinsArray.
+        Returns a copy of "bins" with the removed bins.
+        NOTE: This does NOT change bins in-place; it returns a copy.
+        '''
+        return bins[0:len(bins)-numbins]
 
     def add_item_to_bin(self, bins: BinsArray, item: Any, bin_index: int)->BinsArray:
         bins[bin_index] += self.valueof(item)
@@ -225,6 +264,9 @@ class BinnerKeepingSums(Binner):
                 yielded.add(new_sums_tuple)
                 yield new_sums
 
+    def clone_with_new_numbins(self,  new_numbins:int):
+        return BinnerKeepingSums(new_numbins, self.valueof)
+
 
 class BinnerKeepingContents(BinnerKeepingSums):
     """
@@ -270,6 +312,16 @@ class BinnerKeepingContents(BinnerKeepingSums):
     Bin #2: ['b', 'c'], sum=9.0
     >>> binner.sums_as_tuple(bins)
     (0.0, 3.0, 9.0)
+
+
+    >>> printbins(binner.add_empty_bins(bins, 1))
+    Bin #0: [], sum=0.0
+    Bin #1: ['a'], sum=3.0
+    Bin #2: ['b', 'c'], sum=9.0
+    Bin #3: [], sum=0.0
+    >>> printbins(binner.remove_bins(bins, 1))
+    Bin #0: [], sum=0.0
+    Bin #1: ['a'], sum=3.0
     """
 
     BinsArray = Tuple[np.ndarray, List[List]]  # Here, each bins-array is a tuple: sums,lists. sums is an array of sums; lists is a list of lists of items.
@@ -283,6 +335,23 @@ class BinnerKeepingContents(BinnerKeepingSums):
     def clone(self, bins: BinsArray)->BinsArray:
         sums, lists = bins
         return (np.array(sums), list(map(list, lists)))
+
+    def add_empty_bins(self, bins: BinsArray, numbins:int):
+        sums, lists = bins
+        new_sums = np.append(sums, np.zeros(numbins))
+        new_lists = lists + numbins*[[]]
+        return (new_sums, new_lists)
+
+    def remove_bins(self, bins: BinsArray, numbins:int)->BinsArray:
+        '''
+        Remove some bins from the end of the given BinsArray.
+        Returns a copy of "bins" with the removed bins.
+        NOTE: This does NOT change bins in-place; it returns a copy.
+        '''
+        sums, lists = bins
+        new_sums =  sums[0:len(sums)-numbins]
+        new_lists = lists[0:len(lists)-numbins]
+        return (new_sums, new_lists)
 
     def add_item_to_bin(self, bins:BinsArray, item: Any, bin_index: int)->BinsArray:
         sums, lists = bins
@@ -332,6 +401,9 @@ class BinnerKeepingContents(BinnerKeepingSums):
             if new_lists_tuple not in yielded:
                 yielded.add(new_lists_tuple)
                 yield new_bins
+
+    def clone_with_new_numbins(self,  new_numbins:int):
+        return BinnerKeepingContents(new_numbins, self.valueof)
 
 
 if __name__ == "__main__":

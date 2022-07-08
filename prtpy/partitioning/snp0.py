@@ -91,26 +91,27 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     return bins
 
 
-def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees: List) :
-
-    best_diff = max(bins.sums) - min(bins.sums)
-
-    if k_way == 2:
+def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, numbins, trees: List) :
+    """
+    A recursive subroutine of SNP.
+    """
+    best_difference_so_far = max(bins.sums) - min(bins.sums)
+    if numbins == 2:
         # ckk 2 way on remaining numbers
         two_bins = prior_bins.empty_clone(2)
         two_bins = best_ckk_partition(bins=two_bins, items=items, valueof=valueof)
         if isinstance(bins, BinsKeepingContents):
             two_bins_sums, two_bins_lists = two_bins
-            two_bins = BinsKeepingContents(k_way, bins.valueof, two_bins_sums, two_bins_lists)
+            two_bins = BinsKeepingContents(numbins, bins.valueof, two_bins_sums, two_bins_lists)
         else:
             two_bins_sums = two_bins
-            two_bins = BinsKeepingContents(k_way, bins.valueof, two_bins_sums)
+            two_bins = BinsKeepingContents(numbins, bins.valueof, two_bins_sums)
 
-        sums = np.append(two_bins.sums, prior_bins.sums)
-        diff = max(sums) - min(sums)
+        combined_sums = np.append(two_bins.sums, prior_bins.sums)
+        diff = max(combined_sums) - min(combined_sums)
 
         # fill the bins if better partition
-        if diff < best_diff:
+        if diff < best_difference_so_far:
             bins.clear_bins(bins.num)
 
             for ibin in range(2):
@@ -127,20 +128,18 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
     # t is the sum of all the remaining items
     t = sum(map(valueof, items))
     in_ex_tree = InExclusionBinTree(items=items, valueof=valueof,
-                                    lower_bound=(t - (k_way - 1) * best_diff) / k_way, upper_bound=t / k_way)
+        lower_bound=(t - (numbins - 1) * best_difference_so_far) / numbins, 
+        upper_bound=t / numbins
+    )
+    trees.append((in_ex_tree, t, numbins))
 
-    trees.append((in_ex_tree, t, k_way))
-
-    for bounded_subset in in_ex_tree.generate_tree():
-        prior_bins.add_empty_bins()
-
-        for item in bounded_subset:
+    for items_for_last_bin in in_ex_tree.generate_tree():
+        prior_bins.add_empty_bins(1)
+        for item in items_for_last_bin:
             prior_bins.add_item_to_bin(item=item, bin_index=prior_bins.num - 1)
-
-        remaining_items = find_diff(items, bounded_subset)
-        rec_generate_sets(prior_bins, bins, remaining_items, valueof, k_way-1, trees)
-
-        prior_bins.remove_bins()
+        remaining_items = find_diff(items, items_for_last_bin)
+        rec_generate_sets(prior_bins, bins, remaining_items, valueof, numbins-1, trees)
+        prior_bins.remove_bins(1)
 
 
 if __name__ == '__main__':

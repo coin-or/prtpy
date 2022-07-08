@@ -33,7 +33,7 @@ class Bins(ABC):
         pass
 
     @abstractmethod
-    def add_empty_bins(self, numbins: int=1):
+    def add_empty_bins(self, numbins: int):
         """
         Add new empty bins.
         """
@@ -41,7 +41,7 @@ class Bins(ABC):
         pass
 
     @abstractmethod
-    def remove_bins(self, numbins: int=1):
+    def remove_bins(self, numbins: int):
         """
         Remove bins from the end.
         """
@@ -168,7 +168,7 @@ class BinsKeepingSums(Bins):
         self.sums = np.concatenate((self.sums, np.zeros(numbins)))
         return self
 
-    def remove_bins(self, numbins: int=1):
+    def remove_bins(self, numbins: int):
         super().remove_bins(numbins)
         self.sums = self.sums[:-numbins]
         return self

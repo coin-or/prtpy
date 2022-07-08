@@ -60,7 +60,7 @@ class BinsSortedByMaxDiff:
 
 
 
-def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
+def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x, binner:Binner = None) -> BinsArray:
     """
     Karmarkar-Karp number partitioning algorithm, for any number of bins.
 
@@ -99,7 +99,9 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x) -> Bins:
     >>> partition(algorithm=kk, numbins=4, items=[1,2,3,3,5,9,9])
     [[3, 3, 1], [5, 2], [9], [9]]
     """
-    binner = bins.get_binner()
+    if binner is None:
+        binner = bins.get_binner()
+    
     numitems = len(items)
     logger.info("\nKarmarkar-Karp Partitioning of %d items into %d parts.", numitems, binner.numbins)
     items = sorted(items, reverse=True, key=binner.valueof)
