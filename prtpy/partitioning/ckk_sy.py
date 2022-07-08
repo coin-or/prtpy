@@ -16,7 +16,7 @@ import logging, numpy as np
 logger = logging.getLogger(__name__)
 
 
-def _possible_partition_difference_lower_bound(current_heap: List[Tuple[int, int, Bins, List[int]]], numBins: int) -> int:
+def _possible_partition_difference_lower_bound(current_heap: List[Tuple[int, int, Bins, List[int]]], numbins: int) -> int:
     """
     This function check if from the current node we can yield to a better partition or not by checking the
     best difference we can reach from this node.
@@ -25,8 +25,8 @@ def _possible_partition_difference_lower_bound(current_heap: List[Tuple[int, int
     sums_flattened = [size for bins in current_heap for size in bins[2].sums]
     max_sums_flattened = max(sums_flattened)
     sum_sums_flattened = sum(sums_flattened)
-    lower_bound = -(max_sums_flattened - (sum_sums_flattened - max_sums_flattened) // (numBins - 1))
-    logger.info(f"  Max sums = {max_sums_flattened}, sum of all sums = {sum_sums_flattened}, lower_bound = {lower_bound}")
+    lower_bound = -(max_sums_flattened - (sum_sums_flattened - max_sums_flattened) // (numbins - 1))
+    logger.info(f"    Max sums = {max_sums_flattened}, sum of all sums = {sum_sums_flattened}, lower_bound = {lower_bound}")
     return lower_bound
 
 
