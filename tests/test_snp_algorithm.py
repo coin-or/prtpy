@@ -10,7 +10,7 @@ Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
 import unittest
 
 import prtpy
-from prtpy.partitioning.snp import snp
+from prtpy.partitioning.sequential_number_partitioning import snp
 
 
 class TestSNP(unittest.TestCase):
