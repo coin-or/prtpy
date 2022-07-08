@@ -42,7 +42,7 @@ if __name__ == "__main__":
     #     "instance_id": range(10),
     # }
     # experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=TIME_LIMIT)
-    
+
     input_ranges = {
         "numitems": [10, 12, 14, 16, 18, 20],
         "bitsperitem": [32],
@@ -56,5 +56,5 @@ if __name__ == "__main__":
 RESULTS: 
   * karmarkar_karp_sy is much faster than karmarkar_karp_kg; its runtime is approximately linear in the number of items.
     The runtime of karmarkar_karp_kg increases super-linearly with the number of items.
-  * complete_karmarkar_karp_sy is slightly faster than complete_karmarkar_kg for at most 16 bits, but slightly slower for 20 bits.
+  * complete_karmarkar_karp_sy is slightly faster than complete_karmarkar_kg for at most 16 bits, but slightly slower for 20-32 bits.
 """
