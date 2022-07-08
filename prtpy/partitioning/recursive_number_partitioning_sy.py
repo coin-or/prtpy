@@ -20,22 +20,20 @@ remaining numbers two ways, etc.
 Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
 """
 
-from typing import Callable, List, Any
-
-import numpy as np
-
-from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents
-from prtpy.partitioning.complete_karmarkar_karp_sy import ckk, best_ckk_partition
+from typing import Callable, List
+from prtpy import outputtypes as out, objectives as obj, Bins, Binner, BinsArray, BinsKeepingContents, printbins
 from prtpy.partitioning.karmarkar_karp_sy import kk
+import numpy as np, logging
+from prtpy import partition
+from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition, ckk
 from prtpy.inclusion_exclusion_tree import InExclusionBinTree
 
+logger = logging.getLogger(__name__)
 
 def find_diff(l1: List, l2: List):
     from collections import Counter
-
     c1 = Counter(l1)
     c2 = Counter(l2)
-
     diff = c1 - c2
     return list(diff.elements())
 
@@ -54,23 +52,22 @@ def rnp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
 
     return: a Bins structure with the partition (according to the algorithm output)
 
-
-     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> rnp(BinsKeepingContents(3), items=[4, 5, 7, 8, 6]).bins
+    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
+    >>> rnp(BinsKeepingContents(3), items=[4, 5, 7, 8, 6])[1]
     [[8], [4, 7], [5, 6]]
-    >>> list(rnp(BinsKeepingContents(3), items=[4, 5, 7, 8, 6]).sums)
+    >>> list(rnp(BinsKeepingContents(3), items=[4, 5, 7, 8, 6])[0])
     [8.0, 11.0, 11.0]
-    >>> rnp(BinsKeepingContents(4), items=[4, 5, 7, 8, 6]).bins
+    >>> rnp(BinsKeepingContents(4), items=[4, 5, 7, 8, 6])[1]
     [[6], [7], [8], [4, 5]]
-    >>> list(rnp(BinsKeepingContents(4), items=[4, 5, 7, 8, 6]).sums)
+    >>> list(rnp(BinsKeepingContents(4), items=[4, 5, 7, 8, 6])[0])
     [6.0, 7.0, 8.0, 9.0]
-    >>> rnp(BinsKeepingContents(4), items=[1,3,3,4,4,5,5,5]).bins
+    >>> rnp(BinsKeepingContents(4), items=[1,3,3,4,4,5,5,5])[1]
     [[1, 5], [3, 5], [3, 5], [4, 4]]
-    >>> list(rnp(BinsKeepingContents(3), items=[1,3,3,4,4,5,5,5]).sums)
+    >>> list(rnp(BinsKeepingContents(3), items=[1,3,3,4,4,5,5,5])[0])
     [10.0, 10.0, 10.0]
-    >>> rnp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9]).bins
+    >>> rnp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9])[1]
     [[2, 7], [4, 5], [9], [3, 6], [1, 8]]
-    >>> list(rnp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9]).sums)
+    >>> list(rnp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9])[0])
     [9.0, 9.0, 9.0, 9.0, 9.0]
 
     >>> from prtpy import partition
@@ -79,101 +76,84 @@ def rnp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     >>> partition(algorithm=rnp, numbins=4, items={"a":1, "b":1, "c":1, "d":1}, outputtype=out.Sums)
     [1.0, 1.0, 1.0, 1.0]
     """
+    binner = bins.get_binner()
 
-    k_way = bins.num
+    best_partition_so_far = kk(bins=None, binner=binner, items=items, valueof=valueof)
+    sums = binner.sums(best_partition_so_far)
+    best_difference_so_far = max(sums) - min(sums)
+    if best_difference_so_far == 0:  
+        return best_partition_so_far     # 0 is the best possible value
 
-    # bins will always remember the best partition found so far
-    bins = kk(bins, items, valueof)
-    best_diff = max(bins.sums) - min(bins.sums)
-    upper_bound = best_diff
-
-    if best_diff == 0:
-        return bins
-
-    prior_bins = bins.empty_clone(0)
-
-    rec_generate_sets(prior_bins, bins, items, valueof, k_way, trees=[])
-
-    return bins
+    prior_bins = binner.new_bins(0)
+    best_partition_so_far = rec_generate_sets(prior_bins, best_partition_so_far, items, valueof, binner.numbins, trees=[], binner=binner)
+    return best_partition_so_far
 
 
-def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees: List) :
+def rec_generate_sets(prior_bins: BinsArray, best_partition_so_far: BinsArray, items: List, valueof: Callable, numbins:int, trees: List, binner: Binner):
+    """
+    A recursive subroutine of RNP.
+    """
+    logger.info("Recursive call: best_partition_so_far=%s, prior_bins=%s, items=%s, numbins=%d", best_partition_so_far, prior_bins, items, numbins)
+    num_prior_bins = binner.numbins - numbins
+    bins_sums = binner.sums(best_partition_so_far)
+    best_difference_so_far = max(bins_sums) - min(bins_sums)
 
-    best_diff = max(bins.sums) - min(bins.sums)
+    #### Base case: numbins == 2
+    if numbins == 2:
+        ckk_binner = binner.clone_with_new_numbins(2)
+        return best_ckk_partition(bins=None, binner=ckk_binner, items=items, valueof=valueof)
 
-    if k_way == 2:
-        return best_ckk_partition(bins=BinsKeepingContents(2, valueof), items=items, valueof=valueof)
-
-    if k_way % 2: # %2 == 1
+    #### Odd case: numbins is odd
+    if numbins % 2 == 1:  
         # take one with in_ex_tree end then split in 2
+        t = sum(map(valueof, items))  # t is the sum of all the remaining items
+        in_ex_tree = InExclusionBinTree(
+            items=items,
+            valueof=valueof,
+            lower_bound=(t - (numbins - 1) * best_difference_so_far) / numbins, upper_bound=t / numbins
+        )
+        trees.append((in_ex_tree, t, numbins))
 
-        t = sum(map(valueof, items))
-        in_ex_tree = InExclusionBinTree(items=items, valueof=valueof,
-                                        lower_bound=(t - (k_way - 1) * best_diff) / k_way, upper_bound=t / k_way)
-        trees.append((in_ex_tree, t, k_way))
-
-        for bounded_subset in in_ex_tree.generate_tree():
-
-            prior_bins.add_empty_bins(1)
-
-            for item in bounded_subset:
-                prior_bins.add_item_to_bin(item=item, bin_index=prior_bins.num - 1)
-
-            remaining_items = find_diff(items, bounded_subset)
-            new_bins = rec_generate_sets(prior_bins, bins, remaining_items, valueof, k_way - 1, trees)
-
+        for items_for_last_bin in in_ex_tree.generate_tree():
+            prior_bins = binner.add_empty_bins(prior_bins, 1)
+            for item in items_for_last_bin:
+                binner.add_item_to_bin(prior_bins, item=item, bin_index=num_prior_bins)
+            remaining_items = find_diff(items, items_for_last_bin)
+            new_bins = rec_generate_sets(prior_bins, best_partition_so_far, remaining_items, valueof, numbins - 1, trees, binner)
             if new_bins:
-                best_diff = max(bins.sums) - min(bins.sums)
-                sums = np.append(new_bins.sums, prior_bins.sums)
-                diff = max(sums) - min(sums)
-
-                if diff < best_diff:
-                    bins.clear_bins(bins.num)
-
-                    bin_index = 0
-                    for ibin in range(bin_index, prior_bins.num):
-                        bins.combine_bins(ibin=ibin, other_bin=prior_bins, other_ibin=ibin)
-
-                    bin_index = prior_bins.num
-                    for bin in new_bins.bins:
-                        for item in bin:
-                            bins.add_item_to_bin(item, bin_index)
-                        bin_index += 1
-
-            prior_bins.remove_bins(1)
+                bins_sums = binner.sums(best_partition_so_far)
+                best_difference_so_far = max(bins_sums) - min(bins_sums)
+                combined_sums = np.append(binner.sums(new_bins), binner.sums(prior_bins))
+                diff = max(combined_sums) - min(combined_sums)
+                if diff < best_difference_so_far:
+                    best_partition_so_far = binner.concatenate_bins(prior_bins, new_bins)
+            prior_bins = binner.remove_bins(prior_bins, 1)
+    
+    #### Even case: numbins is odd
     else:
-        for top_level_part in ckk(bins=BinsKeepingContents(2, valueof), items=items,valueof=valueof,best_difference_so_far= -best_diff):
-            bin1 = top_level_part.bins[0]
-            new_bin1 = rec_generate_sets(prior_bins, bins, bin1, valueof, k_way/2, trees)
+        ckk_binner = binner.clone_with_new_numbins(2)
+        for top_level_part in ckk(bins=BinsKeepingContents(2, valueof), items=items, valueof=valueof, best_difference_so_far=-best_difference_so_far):
+            bin1items, bin2items = top_level_part[1]
+            new_bin1 = rec_generate_sets(prior_bins, best_partition_so_far, bin1items, valueof, numbins/2, trees, binner)
+            new_bin2 = rec_generate_sets(prior_bins, best_partition_so_far, bin2items, valueof, numbins/2, trees, binner)
 
-            bin2 = top_level_part.bins[1]
-            new_bin2 = rec_generate_sets(prior_bins, bins, bin2, valueof, k_way/2, trees)
+            combined_sums = np.append(binner.sums(new_bin1), binner.sums(new_bin2))
+            diff = max(combined_sums) - min(combined_sums)
+            if diff < best_difference_so_far:
+                best_partition_so_far = binner.concatenate_bins(new_bin1, new_bin2)
 
-            temp_sums = np.append(new_bin1.sums, new_bin2.sums)
-            sums = np.append(temp_sums, prior_bins.sums)
-            diff = max(sums) - min(sums)
-
-            if diff < best_diff:
-                bins.clear_bins(bins.num)
-
-                bin_index = 0
-                for ibin in range(bin_index, prior_bins.num):
-                    bins.combine_bins(ibin=ibin, other_bin=prior_bins, other_ibin=ibin)
-
-                bin_index = prior_bins.num
-                for bin in new_bin1.bins:
-                    for item in bin:
-                        bins.add_item_to_bin(item, bin_index)
-                    bin_index += 1
-
-                for bin in new_bin2.bins:
-                    for item in bin:
-                        bins.add_item_to_bin(item, bin_index)
-                    bin_index += 1
-
+    return best_partition_so_far
 
 if __name__ == '__main__':
     import doctest
-
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
+    from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
+    # print(rnp(BinsKeepingSums(2), [4,5,6,7,8]))
+    # print(rnp(BinsKeepingSums(3), [4,5,6,7,8]))
+    # print(snp(BinsKeepingSums(4), [4,5,6,7,8]))
+    # print(snp(BinsKeepingSums(5), [4,5,6,7,8]))
+    # print(snp(BinsKeepingContents(3), items=[1,3,3,4,4,5,5,5]))

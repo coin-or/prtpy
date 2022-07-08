@@ -61,7 +61,7 @@ def cbldm(                  # max items length can be between 900 and 1000 due t
     [25390.0, 25390.0]
 
     >>> items = rng.integers(1, 1000, 899)
-    >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums, time_limit=1)
+    >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums, time_limit=10)
     [225368.0, 225369.0]
     """
     start = time.perf_counter()

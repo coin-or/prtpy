@@ -61,13 +61,20 @@ class Binner(ABC):
         return None
 
     @abstractmethod
+    def concatenate_bins(self, bins1:BinsArray, bins2:BinsArray):
+        """
+        Concatenate the bins in bins1 with the bins in bins2.
+        NOTE: Returns a new BinsArray. bins1 and bins2 are not modified.
+        """
+        pass
+
     def add_empty_bins(self, bins: BinsArray, numbins:int)->BinsArray:
         '''
         Add some new empty bins at the end of the given BinsArray.
         Returns a copy of "bins" with the added empty bins.
         NOTE: This does NOT change bins in-place; it returns a copy.
         '''
-        pass
+        return self.concatenate_bins(bins, self.new_bins(numbins))
 
     @abstractmethod
     def remove_bins(self, bins: BinsArray, numbins:int)->BinsArray:
@@ -203,13 +210,12 @@ class BinnerKeepingSums(Binner):
     def clone(self, bins: BinsArray)->BinsArray:
         return np.array(bins)
 
-    def add_empty_bins(self, bins: BinsArray, numbins:int)->BinsArray:
-        '''
-        Add some new empty bins at the end of the given BinsArray.
-        Returns a copy of "bins" with the added empty bins.
-        NOTE: This does NOT change bins in-place; it returns a copy.
-        '''
-        return np.append(bins, np.zeros(numbins))
+    def concatenate_bins(self, bins1:BinsArray, bins2:BinsArray):
+        """
+        Concatenate the bins in bins1 with the bins in bins2.
+        NOTE: Returns a new BinsArray. bins1 and bins2 are not modified.
+        """
+        return np.append(bins1, bins2)
 
     def remove_bins(self, bins: BinsArray, numbins:int)->BinsArray:
         '''
@@ -336,10 +342,15 @@ class BinnerKeepingContents(BinnerKeepingSums):
         sums, lists = bins
         return (np.array(sums), list(map(list, lists)))
 
-    def add_empty_bins(self, bins: BinsArray, numbins:int):
-        sums, lists = bins
-        new_sums = np.append(sums, np.zeros(numbins))
-        new_lists = lists + numbins*[[]]
+    def concatenate_bins(self, bins1:BinsArray, bins2:BinsArray):
+        """
+        Concatenate the bins in bins1 with the bins in bins2.
+        NOTE: Returns a new BinsArray. bins1 and bins2 are not modified.
+        """
+        sums1, lists1 = bins1
+        sums2, lists2 = bins2
+        new_sums = np.append(sums1, sums2)
+        new_lists = lists1 + lists2
         return (new_sums, new_lists)
 
     def remove_bins(self, bins: BinsArray, numbins:int)->BinsArray:

@@ -3,12 +3,12 @@ An implementation of the Sequential Number Partitioning (SNP) algorithm.
 Based on "Multi-Way Number Partitioning" by: Richard E. Korf , 2009 
 
 The main purpose of this article is to solve the known Number Partitioning problem, in focus 
-on multi way Partitioning (more than 2 bins).
+on multi way Partitioning (more than 2).
 In this article he develops two new linear-space algorithms for multi-way partitioning, and demonstrate their
 performance on three, four, and five-way partitioning.
 
 SNP Description (in few words - for the complete explanation see the link below):
-Given N numbers to partition into K bins, the algorithm first choose K-2 complete (bins) subsets (using bounds on the subsets sums), 
+Given N numbers to partition into K subsets, the algorithm first choose K-2 complete subsets (using bounds on the subsets sums), 
 and then optimally partition the remaining numbers two ways (using CKK algorithm- which is optimal for two-way partitioning).
 
 Link to the article: https://www.ijcai.org/Proceedings/09/Papers/096.pdf
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> BinsArray:
     """
-    Given N numbers to partition into K bins, the algorithm first choose K-2 complete (bins) subsets (using bounds on the subsets sums),
+    Given N numbers to partition into K subsets, the algorithm first choose K-2 complete subsets (using bounds on the subsets sums),
     and then optimally partition the remaining numbers two ways (using CKK algorithm- which is optimally for two ways partitioning).
 
     bins - a Bins structure. It is initialized with no bins at all. It contains a function for adding new empty bins.
@@ -46,8 +46,7 @@ def snp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> BinsArra
 
     return: a Bins structure with the partition (according to the algorithm output)
 
-    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-
+    >>> from prtpy import BinsKeepingContents, BinsKeepingSums
     >>> snp(BinsKeepingContents(2), items=[4, 5, 7, 8, 6])
     (array([15., 15.]), [[4, 5, 6], [7, 8]])
     >>> snp(BinsKeepingContents(3), items=[4, 5, 7, 8, 6])
@@ -103,7 +102,7 @@ def rec_generate_sets(prior_bins: BinsArray, best_partition_so_far: BinsArray, i
     num_prior_bins = binner.numbins - numbins
     bins_sums = binner.sums(best_partition_so_far)
     best_difference_so_far = max(bins_sums) - min(bins_sums)
-    if numbins == 2:   # Run CKK on the remaining two bins.
+    if numbins == 2:   # Run two-way CKK on the remaining items.
         ckk_binner = binner.clone_with_new_numbins(2)
         two_bins = best_ckk_partition(bins=None, binner=ckk_binner, items=items, valueof=valueof)
         logger.info("  CKK result: %s", two_bins)
@@ -112,14 +111,8 @@ def rec_generate_sets(prior_bins: BinsArray, best_partition_so_far: BinsArray, i
 
         # Better partition found - update best_partition_so_far
         if diff < best_difference_so_far:
-            best_partition_so_far = binner.new_bins(binner.numbins)
-
-            for ibin in range(0, 2):
-                binner.combine_bins(best_partition_so_far, ibin, two_bins, ibin)
-            for ibin in range(2, binner.numbins):
-                binner.combine_bins(best_partition_so_far, ibin, prior_bins, ibin-2)
-
-            logger.info("  Combined with prior bins: %s", best_partition_so_far)
+            best_partition_so_far = binner.concatenate_bins(two_bins, prior_bins)
+            logger.info("  Combined with prior: %s", best_partition_so_far)
 
             # update lower bounds
             for tree in trees:

@@ -6400,3 +6400,17 @@ numitems,bitsperitem,instance_id,objective,use_lower_bound,use_fast_lower_bound,
 26,16,1,maximize-smallest-sum,,,,True,-1.0,30.62841120000121
 26,16,2,minimize-largest-sum,,,,True,1.0,28.620997999998508
 26,16,2,maximize-smallest-sum,,,,True,0.0,26.49020120000023
+26,16,3,minimize-largest-sum,,,,True,0.0,28.764621199999965
+26,16,3,maximize-smallest-sum,,,,True,1.0,30.208053300000756
+26,16,4,minimize-largest-sum,,,,True,0.0,27.604746399998476
+26,16,4,maximize-smallest-sum,,,,True,-1.0,28.49962130000131
+26,16,5,minimize-largest-sum,,,,True,0.0,23.325733699999546
+26,16,5,maximize-smallest-sum,,,,True,0.0,21.911684599999717
+26,16,6,minimize-largest-sum,,,,True,0.0,25.88516560000062
+26,16,6,maximize-smallest-sum,,,,True,0.0,27.01882569999907
+26,16,7,minimize-largest-sum,,,,True,0.0,28.258099099999527
+26,16,7,maximize-smallest-sum,,,,True,0.0,29.98315469999943
+26,16,8,minimize-largest-sum,,,,True,1.0,24.553518799999438
+26,16,8,maximize-smallest-sum,,,,True,-1.0,30.353718299998945
+26,16,9,minimize-largest-sum,,,,True,-1.0,28.863886700000876
+26,16,9,maximize-smallest-sum,,,,True,0.0,27.587515499999427
