@@ -72,6 +72,4 @@ For an example, see the implementation of existing algorithms, e.g. [first_fit](
 
 ## Limitations
 
-The package is tested only on Python 3.8 and 3.9. Earlier versions, as well as 3.10, are not supported.
-
-
+The package is tested on Python versions 3.8, 3.9 and 3.10. Other versions are not supported.
