@@ -138,14 +138,14 @@ class BinsKeepingSums(Bins):
     Bin #2: sum=5.0
     >>> bins.num
     3
-    >>> bins.add_empty_bins()
+    >>> bins.add_empty_bins(1)
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=0.0
     Bin #3: sum=0.0
     >>> bins.num
     4
-    >>> bins.remove_bins()
+    >>> bins.remove_bins(1)
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=0.0
@@ -163,7 +163,7 @@ class BinsKeepingSums(Bins):
             sums = np.zeros(numbins)
         self.sums = sums
 
-    def add_empty_bins(self, numbins: int=1):
+    def add_empty_bins(self, numbins: int):
         super().add_empty_bins(numbins)
         self.sums = np.concatenate((self.sums, np.zeros(numbins)))
         return self
@@ -256,14 +256,14 @@ class BinsKeepingContents(BinsKeepingSums):
     Bin #2: ['d'], sum=5.0
     >>> bins.num
     3
-    >>> bins.add_empty_bins()
+    >>> bins.add_empty_bins(1)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: [], sum=0.0
     Bin #3: [], sum=0.0
     >>> bins.num
     4
-    >>> bins.remove_bins()
+    >>> bins.remove_bins(1)
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: [], sum=0.0
@@ -287,7 +287,7 @@ class BinsKeepingContents(BinsKeepingSums):
             self.bins.append([])
         return self
 
-    def remove_bins(self, numbins: int=1):
+    def remove_bins(self, numbins: int):
         super().remove_bins(numbins)
         self.bins = self.bins[:-numbins]
         return self

@@ -25,7 +25,7 @@ def online(
         [18.0, 18.0, 10.0]
         """
 
-    bins.add_empty_bins()
+    bins.add_empty_bins(1)
     for item in items:
         value = valueof(item)
         if value > binsize:

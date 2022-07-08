@@ -85,7 +85,7 @@ def bin_completion(
 
         for x in cb.items:
             # Add a new bin and add x to that bin
-            cb.bins.add_empty_bins()
+            cb.bins.add_empty_bins(1)
             cb.bins.add_item_to_bin(x, cb.bin_index)
 
             # Now we consider all items except for x.

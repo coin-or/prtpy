@@ -114,7 +114,7 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
 
         for bounded_subset in in_ex_tree.generate_tree():
 
-            prior_bins.add_empty_bins()
+            prior_bins.add_empty_bins(1)
 
             for item in bounded_subset:
                 prior_bins.add_item_to_bin(item=item, bin_index=prior_bins.num - 1)
@@ -140,7 +140,7 @@ def rec_generate_sets(prior_bins: Bins, bins: Bins, items, valueof, k_way, trees
                             bins.add_item_to_bin(item, bin_index)
                         bin_index += 1
 
-            prior_bins.remove_bins()
+            prior_bins.remove_bins(1)
     else:
         for top_level_part in ckk(bins=BinsKeepingContents(2, valueof), items=items,valueof=valueof,best_difference_so_far= -best_diff):
             bin1 = top_level_part.bins[0]
