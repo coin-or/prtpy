@@ -21,7 +21,7 @@ def optimal(
     valueof: Callable[[Any], float] = lambda x: x,
     objective: obj.Objective = obj.MinimizeDifference,
     copies=1,
-    max_seconds=inf,
+    time_limit=inf,
     additional_constraints:Callable=lambda sums:[],
     weights:List[float]=None,
     verbose=0
@@ -35,7 +35,7 @@ def optimal(
     :param objective: whether to maximize the smallest sum, minimize the largest sum, etc.
     :param outputtype: whether to return the entire partition, or just the sums, etc.
     :param copies: how many copies there are of each item. Default: 1.
-    :param max_seconds: stop the computation after this number of seconds have passed.
+    :param time_limit: stop the computation after this number of seconds have passed.
     :param additional_constraints: a function that accepts the list of sums in ascending order, and returns a list of possible additional constraints on the sums.
     :param weights: if given, must be of size bins.num. Divides each sum by its weight before applying the objective function.
 
@@ -80,6 +80,11 @@ def optimal(
     [['a', 'g'], ['c', 'd', 'e'], ['b', 'f']]
     >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     [16.0, 16.0]
+
+    >>> traversc_example = [18, 12, 22, 22]
+    >>> partition(algorithm=optimal, numbins=2, items=traversc_example, outputtype=out.PartitionAndSums)
+    Bin #0: [12, 22], sum=34.0
+    Bin #1: [18, 22], sum=40.0
     """
 
     ibins = range(bins.num)
@@ -92,11 +97,13 @@ def optimal(
 
     model = mip.Model("partition")
     counts: dict = {
-        iitem: [model.add_var(var_type=mip.INTEGER) for ibin in ibins] for iitem in iitems
-    }  # counts[i][j] determines how many times item i appears in bin j.
+        iitem: [model.add_var(var_type=mip.INTEGER) for ibin in ibins] 
+        for iitem in iitems
+    }  # counts[i][j] is a variable that represents how many times item i appears in bin j.
     bin_sums = [
-        sum([counts[iitem][ibin] * valueof(items[iitem]) for iitem in iitems])/weights[ibin] for ibin in ibins
-    ]
+        sum([counts[iitem][ibin] * valueof(items[iitem]) for iitem in iitems])/weights[ibin] 
+        for ibin in ibins
+    ]  # bin_sums[j] is a variable-expression that represents the sum of values in bin j.
 
     model.objective = mip.minimize(
         objective.value_to_minimize(bin_sums, are_sums_in_ascending_order=True)        
@@ -115,7 +122,7 @@ def optimal(
 
     # Solve the ILP:
     model.verbose = verbose
-    status = model.optimize(max_seconds=max_seconds)
+    status = model.optimize(max_seconds=time_limit)
     if status != mip.OptimizationStatus.OPTIMAL:
         raise ValueError(f"Problem status is not optimal - it is {status}.")
 

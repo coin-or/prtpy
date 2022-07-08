@@ -9,11 +9,9 @@ such as: a list of values, and a dict that maps an item to its value.
 """
 import numpy as np
 
+import prtpy
 from prtpy import outputtypes as out, objectives as obj, Bins
 from typing import Callable, List, Any
-
-from prtpy.partitioning.greedy import greedy
-
 
 def partition(
     algorithm: Callable,
@@ -46,7 +44,6 @@ def partition(
 
     :return: a partition, or a list of sums - depending on outputtype.
 
-    >>> import prtpy
     >>> dp = prtpy.partitioning.dynamic_programming
     >>> import numpy as np
     >>> partition(algorithm=dp, numbins=2, items=[1,2,3,3,5,9,9])
@@ -61,6 +58,11 @@ def partition(
     [['b', 'e', 'f'], ['a', 'c', 'd', 'g']]
     >>> partition(algorithm=dp, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['b', 'g'], ['a', 'f'], ['c', 'd', 'e']]
+
+    >>> traversc_example = [18, 12, 22, 22]
+    >>> prtpy.partition(algorithm=prtpy.partitioning.integer_programming, numbins=2, items=traversc_example, outputtype=prtpy.out.PartitionAndSums)
+    Bin #0: [12, 22], sum=34.0
+    Bin #1: [18, 22], sum=40.0
     """
     if isinstance(items, dict):  # items is a dict mapping an item to its value.
         item_names = items.keys()
@@ -95,4 +97,4 @@ if __name__ == "__main__":
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
 
-    print(partition_random_items(10, 16, algorithm=greedy, numbins=2, outputtype=out.PartitionAndSums))
+    print(partition_random_items(10, 16, algorithm=prtpy.partitioning.greedy, numbins=2, outputtype=out.PartitionAndSums))
