@@ -39,29 +39,29 @@ def optimal(bins: Bins, items: List[int],  valueof: Callable=lambda x: x, binner
     :param time_limit: determines how much time (in seconds) the function should run before it stops. Default is infinity.
 
     >>> from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
-    >>> printbins(best_ckk_partition(BinsKeepingContents(2), [4,5,6,7,8]))
+    >>> printbins(optimal(BinsKeepingContents(2), [4,5,6,7,8]))
     Bin #0: [4, 5, 6], sum=15.0
     Bin #1: [7, 8], sum=15.0
 
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> printbins(best_ckk_partition(BinsKeepingContents(3), walter_numbers))
+    >>> printbins(optimal(BinsKeepingContents(3), walter_numbers))
     Bin #0: [16, 39], sum=55.0
     Bin #1: [13, 46], sum=59.0
     Bin #2: [10, 26, 27], sum=63.0
 
-    >>> best_ckk_partition(BinsKeepingSums(5), items=[1, 2, 3, 4, 5])
+    >>> optimal(BinsKeepingSums(5), items=[1, 2, 3, 4, 5])
     [1.0, 2.0, 3.0, 4.0, 5.0]
 
-    >>> best_ckk_partition(BinsKeepingSums(5), items=[1,9,8,2,3,7,6,5,4])
+    >>> optimal(BinsKeepingSums(5), items=[1,9,8,2,3,7,6,5,4])
     [9.0, 9.0, 9.0, 9.0, 9.0]
 
     Partitioning items with names:
     >>> from prtpy import partition, outputtypes as out
-    >>> partition(algorithm=best_ckk_partition, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['a', 'g'], ['c', 'd', 'e'], ['b', 'f']]
-    >>> partition(algorithm=best_ckk_partition, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
+    >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     [16.0, 16.0]
     """
     if binner is None: 
@@ -128,9 +128,9 @@ def generator(bins: Bins, items: List[int],  valueof: Callable=lambda x: x, best
            other: yield partitions with upper bound "best" on the difference.
 
     >>> from prtpy import partition
-    >>> for part in ckk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]): part
+    >>> for part in generator(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]): part
     [7.0, 7.0, 9.0, 9.0]
-    >>> for part in ckk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]): part
+    >>> for part in generator(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]): part
     ([6.0, 8.0, 8.0, 8.0], [[1, 5], [4, 4], [3, 5], [3, 5]])
     """
     if binner is None: 
@@ -208,4 +208,4 @@ if __name__ == '__main__':
     # logger.setLevel(logging.INFO)
     # logger.addHandler(logging.StreamHandler())
     # from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
-    # print(best_ckk_partition(BinsKeepingContents(2), [4,5,6,7,8]))
+    # print(optimal(BinsKeepingContents(2), [4,5,6,7,8]))

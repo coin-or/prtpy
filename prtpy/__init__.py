@@ -32,55 +32,53 @@ class partitioning:
 
     # Samuel & Jonathan modules
     from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp_sy  
-    from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp
+    from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp      # Default implementation
     from prtpy.partitioning.karmarkar_karp_sy import kk as kk
 
     from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as complete_karmarkar_karp_sy
+    from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as complete_karmarkar_karp     # Default implementation
     from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as ckk_sy
 
     from prtpy.partitioning.sequential_number_partitioning import snp as sequential_number_partitioning
     from prtpy.partitioning.sequential_number_partitioning import snp
 
+    from prtpy.partitioning.recursive_number_partitioning_sy import rnp as recursive_number_partitioning_sy
+    from prtpy.partitioning.recursive_number_partitioning_sy import rnp as rnp_sy
+
     # Eli Belkind module
     from prtpy.partitioning.cbldm import cbldm
 
     # Kfir Goldfarb modules
-    from prtpy.partitioning.complete_karmarkar_karp_kg import ckk as complete_karmarkar_karp_kg
-    from prtpy.partitioning.complete_karmarkar_karp_kg import ckk as ckk_kg
-    from prtpy.partitioning.recursive_number_partitioning_kg import rnp
+    from prtpy.partitioning.complete_karmarkar_karp_kg import optimal as complete_karmarkar_karp_kg  #  Alternative implementation
+    from prtpy.partitioning.complete_karmarkar_karp_kg import optimal as ckk_kg
+
+    from prtpy.partitioning.recursive_number_partitioning_kg import rnp as recursive_number_partitioning_kg
+    from prtpy.partitioning.recursive_number_partitioning_kg import rnp as rnp_kg
+    
+    from prtpy.partitioning.improved_recursive_number_partitioning import irnp as improved_recursive_number_partitioning
     from prtpy.partitioning.improved_recursive_number_partitioning import irnp
 
 partitioning.complete_greedy.__name__ = "complete-greedy"
-partitioning.ilp.__name__ = "integer-programming"
-partitioning.dp.__name__ = "dynamic-programming"
+partitioning.integer_programming.__name__ = "integer-programming"
+partitioning.dynamic_programming.__name__ = "dynamic-programming"
 partitioning.karmarkar_karp_sy.__name__ = "karmarkar-karp-sy"
 partitioning.karmarkar_karp.__name__ = "karmarkar-karp"
-partitioning.complete_karmarkar_karp_kg.__name__ = "complete-karmarkar-karp-kg"
 partitioning.complete_karmarkar_karp_sy.__name__ = "complete-karmarkar-karp-sy"
-partitioning.rnp.__name__ = "recursive-number-partitioning"
-partitioning.irnp.__name__ = "improved-recursive-number-partitioning"
-partitioning.snp.__name__ = "sequential-number-partitioning"
+partitioning.complete_karmarkar_karp_kg.__name__ = "complete-karmarkar-karp-kg"
+partitioning.recursive_number_partitioning_sy.__name__ = "recursive-number-partitioning-sy"
+partitioning.recursive_number_partitioning_kg.__name__ = "recursive-number-partitioning-kg"
+partitioning.sequential_number_partitioning.__name__ = "sequential-number-partitioning"
+partitioning.improved_recursive_number_partitioning.__name__ = "improved-recursive-number-partitioning"
+
 
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing
     from prtpy.packing.first_fit import online as ff, decreasing as ffd
 
+packing.first_fit.__name__ = "first-fit"
+packing.first_fit_decreasing.__name__ = "first-fit-decreasing"
 
 class covering:
     from prtpy.packing.greedy_covering import decreasing as decreasing
     from prtpy.packing.cflz_covering import twothirds as twothirds
     from prtpy.packing.cflz_covering import threequarters as threequarters
-
-# class exact:  # Algorithms that return the exact optimal partition
-#     from prtpy.complete_greedy import optimal as cg
-#     from prtpy.complete_greedy import optimal as complete_greedy
-#     from prtpy.dp import optimal as dp
-#     from prtpy.dp import optimal as dynamic_programming
-#     from prtpy.ilp import optimal as ilp
-#     from prtpy.ilp import optimal as integer_programming
-
-
-# class approx:  # Algorithms that return an approximately-optimal partition
-#     from prtpy.greedy import greedy
-#     from prtpy.first_fit import online as first_fit, decreasing as first_fit_decreasing
-#     from prtpy.first_fit import online as ff, decreasing as ffd

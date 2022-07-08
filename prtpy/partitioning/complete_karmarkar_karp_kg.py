@@ -23,50 +23,50 @@ from prtpy import Bins, printbins
 from prtpy.partitioning.trivial import trivial_partition
 
 
-def ckk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
+def optimal(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     """
     Partition the items using the complete Karmarkar-Karp Heuristic partitioning algorithm.
     Finds a partition that minimizes the difference between the largest and smallest sum.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> ckk(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
+    >>> optimal(BinsKeepingContents(1), items=[1, 6, 2, 3, 4, 7]).bins
     [[1, 6, 2, 3, 4, 7]]
 
-    >>> ckk(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).bins
+    >>> optimal(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).bins
     [[85, 75], [95, 25, 15, 5]]
 
-    >>> ckk(bins=BinsKeepingContents(2), items=[5, 8, 6, 4, 7]).bins
+    >>> optimal(bins=BinsKeepingContents(2), items=[5, 8, 6, 4, 7]).bins
     [[7, 5, 4], [8, 6]]
 
-    >>> list(ckk(BinsKeepingContents(2), items=[1, 6, 2, 3, 4, 7]).sums)
+    >>> list(optimal(BinsKeepingContents(2), items=[1, 6, 2, 3, 4, 7]).sums)
     [12.0, 11.0]
 
-    >>> ckk(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).bins
+    >>> optimal(BinsKeepingContents(2), items=[95, 15, 75, 25, 85, 5]).bins
     [[85, 75], [95, 25, 15, 5]]
 
-    >>> list(ckk(BinsKeepingContents(3), items=[8, 7, 6, 5, 4]).bins)
+    >>> list(optimal(BinsKeepingContents(3), items=[8, 7, 6, 5, 4]).bins)
     [[7, 4], [6, 5], [8]]
 
-    >>> list(ckk(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).bins)
+    >>> list(optimal(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).bins)
     [[95, 5], [85, 15], [75, 25]]
 
-    >>> ckk(BinsKeepingContents(5), items=[1, 2, 3, 4, 5]).bins
+    >>> optimal(BinsKeepingContents(5), items=[1, 2, 3, 4, 5]).bins
     [[1], [2], [3], [4], [5]]
 
-    >>> ckk(BinsKeepingContents(5), items=[1,9,8,2,3,7,6,5,4]).bins
+    >>> optimal(BinsKeepingContents(5), items=[1,9,8,2,3,7,6,5,4]).bins
     [[8, 1], [7, 2], [6, 3], [5, 4], [9]]
 
-    >>> ckk(BinsKeepingContents(5), items=[1,9,8,2,3,7,6,5,4]).sums
+    >>> optimal(BinsKeepingContents(5), items=[1,9,8,2,3,7,6,5,4]).sums
     array([9., 9., 9., 9., 9.])
 
-    >>> ckk(BinsKeepingContents(2), items=[1, 2]).bins
+    >>> optimal(BinsKeepingContents(2), items=[1, 2]).bins
     [[1], [2]]
 
-    >>> ckk(BinsKeepingContents(0), items=[number for number in range(10)]).bins
+    >>> optimal(BinsKeepingContents(0), items=[number for number in range(10)]).bins
     []
 
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> ckk(BinsKeepingContents(3), walter_numbers).sort_by_ascending_sum()  # objective=obj.MinimizeDifference
+    >>> optimal(BinsKeepingContents(3), walter_numbers).sort_by_ascending_sum()  # objective=obj.MinimizeDifference
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
