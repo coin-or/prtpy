@@ -36,7 +36,8 @@ class partitioning:
     from prtpy.partitioning.karmarkar_karp_sy import kk as kk
     from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition as complete_karmarkar_karp_sy
     from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition as ckk_sy
-    from prtpy.partitioning.snp import snp
+    from prtpy.partitioning.sequential_number_partitioning import snp
+    from prtpy.partitioning.sequential_number_partitioning import snp as sequential_number_partitioning
 
     # Eli Belkind module
     from prtpy.partitioning.cbldm import cbldm
