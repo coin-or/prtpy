@@ -51,7 +51,7 @@ class BinsSortedByMaxDiff:
 
     def clone(self):
         the_clone = BinsSortedByMaxDiff(self.binner)
-        the_clone.bins_heap = self.bins_heap
+        the_clone.bins_heap = list(self.bins_heap)
         the_clone.heap_count = self.heap_count
         return the_clone
 

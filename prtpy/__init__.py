@@ -9,7 +9,7 @@ from prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
 from prtpy.binners import BinsArray, Binner, BinnerKeepingContents, BinnerKeepingSums, printbins
 
 from prtpy.packing import pack, pack_random_items
-from prtpy.partitioning import partition, partition_random_items
+from prtpy.partitioning import complete_karmarkar_karp_kg, partition, partition_random_items
 
 
 
@@ -34,6 +34,7 @@ class partitioning:
     from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp_sy
     from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp
     from prtpy.partitioning.karmarkar_karp_sy import kk as kk
+    from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition as complete_karmarkar_karp_sy
     from prtpy.partitioning.complete_karmarkar_karp_sy import best_ckk_partition as ckk_sy
     from prtpy.partitioning.snp import snp
 
@@ -42,7 +43,8 @@ class partitioning:
 
     # Kfir Goldfarb modules
     from prtpy.partitioning.karmarkar_karp_kg import kk as karmarkar_karp_kg
-    from prtpy.partitioning.complete_karmarkar_karp_kg import ckk
+    from prtpy.partitioning.complete_karmarkar_karp_kg import ckk as complete_karmarkar_karp_kg
+    from prtpy.partitioning.complete_karmarkar_karp_kg import ckk as ckk_kg
     from prtpy.partitioning.rnp import rnp
     from prtpy.partitioning.irnp import irnp
 
@@ -52,8 +54,8 @@ partitioning.dp.__name__ = "dynamic-programming"
 partitioning.karmarkar_karp_kg.__name__ = "karmarkar-karp-kg"
 partitioning.karmarkar_karp_sy.__name__ = "karmarkar-karp-sy"
 partitioning.karmarkar_karp.__name__ = "karmarkar-karp"
-partitioning.ckk.__name__ = "complete-karmarkar-karp"
-partitioning.ckk_sy.__name__ = "complete-karmarkar-karp-sy"
+partitioning.complete_karmarkar_karp_kg.__name__ = "complete-karmarkar-karp-kg"
+partitioning.complete_karmarkar_karp_sy.__name__ = "complete-karmarkar-karp-sy"
 partitioning.rnp.__name__ = "recursive-number-partitioning"
 partitioning.irnp.__name__ = "improved-recursive-number-partitioning"
 partitioning.snp.__name__ = "sequential-number-partitioning"

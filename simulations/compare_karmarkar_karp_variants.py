@@ -38,7 +38,7 @@ if __name__ == "__main__":
     input_ranges = {
         "numitems": [10, 12, 14, 16, 18, 20, 22, 24, 26, 30, 35, 40, 45, 50, 60, 80, 100, 150, 200],
         "bitsperitem": [4, 8, 12, 16, 20],
-        "algorithm": [prt.karmarkar_karp_kg, prt.karmarkar_karp_sy],
+        "algorithm": [prt.karmarkar_karp_kg, prt.karmarkar_karp_sy, prt.complete_karmarkar_karp_kg, prt.complete_karmarkar_karp_sy],
         "instance_id": range(10),
     }
     experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=TIME_LIMIT)

@@ -8,9 +8,9 @@ Credit: based on code by Søren Fuglede Jørgensen in the numberpartitioning pac
 """
 from typing import Iterator, List, Tuple, Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingContents, BinsKeepingSums
-import heapq
-from itertools import count
 import logging, numpy as np
+
+from prtpy.partitioning.karmarkar_karp_sy import BinsSortedByMaxDiff
 
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,8 @@ def _possible_partition_difference_lower_bound(current_heap: List[Tuple[int, int
     best difference we can reach from this node.
     """
     logger.info("  A heap with %d partitions", len(current_heap))
-    sums_flattened = [size for bins in current_heap for size in bins[2].sums]
+    # sums_flattened = [size for bins in current_heap for size in bins[2].sums]
+    sums_flattened = [size for bins in current_heap.iterator() for size in current_heap.binner.sums(bins)]
     max_sums_flattened = max(sums_flattened)
     sum_sums_flattened = sum(sums_flattened)
     lower_bound = -(max_sums_flattened - (sum_sums_flattened - max_sums_flattened) // (numbins - 1))
@@ -122,22 +123,22 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
     :param time_limit: determines how much time (in seconds) the function should run before it stops. Default is infinity.
 
     >>> from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
-    >>> print(best_ckk_partition(BinsKeepingContents(2), [4,5,6,7,8]))
-    Bin #0: [4, 5, 6], sum=15
-    Bin #1: [7, 8], sum=15
+    >>> printbins(best_ckk_partition(BinsKeepingContents(2), [4,5,6,7,8]))
+    Bin #0: [4, 5, 6], sum=15.0
+    Bin #1: [7, 8], sum=15.0
 
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> print(best_ckk_partition(BinsKeepingContents(3), walter_numbers))
-    Bin #0: [16, 39], sum=55
-    Bin #1: [13, 46], sum=59
-    Bin #2: [10, 26, 27], sum=63
+    >>> printbins(best_ckk_partition(BinsKeepingContents(3), walter_numbers))
+    Bin #0: [16, 39], sum=55.0
+    Bin #1: [13, 46], sum=59.0
+    Bin #2: [10, 26, 27], sum=63.0
 
     Partitioning items with names:
     >>> from prtpy import partition, outputtypes as out
     >>> partition(algorithm=best_ckk_partition, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['a', 'g'], ['b', 'f'], ['c', 'd', 'e']]
+    [['a', 'g'], ['c', 'd', 'e'], ['b', 'f']]
     >>> partition(algorithm=best_ckk_partition, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     [16.0, 16.0]
     """
@@ -147,11 +148,15 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
     items = sorted(items, reverse=True, key=binner.valueof)
 
     stack = []  #: List[List[Tuple[int, int, Bins, List[int]]]]
-    first_heap = []
-    heap_count = count()  # To avoid ambiguity in heaps
+    # first_heap = []
+    # heap_count = count()  # To avoid ambiguity in heaps
+    # for item in items:
+    #     new_bins = bins.clone().add_item_to_bin(item=item, bin_index=(bins.num - 1))
+    #     heapq.heappush(            first_heap, (-valueof(item), next(heap_count), new_bins))
+    first_heap = BinsSortedByMaxDiff(binner)
     for item in items:
-        new_bins = bins.clone().add_item_to_bin(item=item, bin_index=(bins.num - 1))
-        heapq.heappush(            first_heap, (-valueof(item), next(heap_count), new_bins))
+        new_bins = binner.add_item_to_bin(binner.new_bins(), item=item, bin_index=binner.numbins-1)
+        first_heap.push(new_bins)
     stack.append(first_heap)
 
     best_difference_so_far = -np.inf  # maybe insert here upper bound constraint : best = upper
@@ -166,41 +171,46 @@ def best_ckk_partition(bins: Bins,items: List[int],  valueof: Callable=lambda x:
         # if could lead to complete partition
         if len(current_heap) == 1:
             # diff and best are non-positives numbers
-            diff = current_heap[0][0]
+            diff = current_heap.topdiff()
 
             if diff > best_difference_so_far:
                 best_difference_so_far = diff
-                _, _, best_partition_so_far = current_heap[0]
+                # _, _, best_partition_so_far = current_heap[0]
+                best_partition_so_far =  current_heap.top()
                 if diff == 0:
                     return best_partition_so_far
             continue
 
         # continue create legal part
-        _, _, bins1 = heapq.heappop(current_heap)
-        _, _, bins2 = heapq.heappop(current_heap)
+        # _, _, bins1 = heapq.heappop(current_heap)
+        # _, _, bins2 = heapq.heappop(current_heap)
+        bins1 = current_heap.pop()
+        bins2 = current_heap.pop()
 
         tmp_stack_extension = []
 
-        for new_bins in bins1.all_combinations(bins2):
-            tmp_heap = current_heap[:]
-
-            diff = max(new_bins.sums) - min(new_bins.sums)
-            heapq.heappush(
-                tmp_heap, (-diff, next(heap_count), new_bins)
-            )
-
+        # for new_bins in bins1.all_combinations(bins2):
+        for new_bins in binner.all_combinations(bins1, bins2):
+            # tmp_heap = current_heap[:]
+            # diff = max(new_bins.sums) - min(new_bins.sums)
+            # heapq.heappush(tmp_heap, (-diff, next(heap_count), new_bins))
+            tmp_heap = current_heap.clone()
+            tmp_heap.push(new_bins)
             tmp_stack_extension.append(tmp_heap)
-        tmp_stack_extension.sort(key=lambda heap: heap[0])
+        # tmp_stack_extension.sort(key=lambda heap: heap[0])
+        tmp_stack_extension.sort(key=lambda heap: heap.topdiff())
         stack.extend(tmp_stack_extension)
 
-    best_partition_so_far.sort_by_ascending_sum()
+    binner.sort_by_ascending_sum(best_partition_so_far)
     return best_partition_so_far
 
 
 if __name__ == '__main__':
-    # import doctest
-    # (failures, tests) = doctest.testmod(report=True)
-    # print("{} failures, {} tests".format(failures, tests))
+    import doctest, sys
+    (failures, tests) = doctest.testmod(report=True)
+    print("{} failures, {} tests".format(failures, tests))
+    if failures>0: 
+        sys.exit(1)
 
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
