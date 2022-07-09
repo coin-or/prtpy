@@ -1,9 +1,5 @@
 
 """
-Authors: Jonathan Escojido & Samuel Harroch
-
-Since = 03-2022
-
 This class is based on "Multi-Way Number Partitioning" by: Richard E. Korf , 2009 
 The main purpose of this article is to solve the known Number Partitioning problem, in focus 
 on multy way Partitioning (more than 2 bins). 
@@ -18,6 +14,9 @@ With an odd number of subsets, RNP searches an inclusion-exclusion tree for a fi
 remaining numbers two ways, etc.
 
 Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
+
+Authors: Jonathan Escojido & Samuel Harroch
+Date:    03-2022
 """
 
 from typing import Callable, List

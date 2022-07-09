@@ -1,20 +1,21 @@
 """
-    Partition the items using the complete Karmarkar-Karp Heuristic partitioning algorithm
+Implementation of the complete Karmarkar-Karp algorithm, by Korf (1998).
 
-    Taken help from:
-        "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
-        By Richard E. Korf
+Taken help from:
+    "A Hybrid Recursive Multi-Way Number Partitioning Algorithm (2011)" Paper
+    By Richard E. Korf
 
-    Algorithm number in Paper:
-        2.3
+Algorithm number in Paper:
+    2.3
 
-    Paper link:
-        http://citeseerx.ist.psu.edu/viewdoc/download?rep=rep1&type=pdf&doi=10.1.1.208.2132
+Paper link:
+    http://citeseerx.ist.psu.edu/viewdoc/download?rep=rep1&type=pdf&doi=10.1.1.208.2132
 
-    Author: Kfir Goldfarb
-    Date: 26/04/2022
-    Email: kfir.goldfarb@msmail.ariel.ac.il
+Author: Kfir Goldfarb
+Date: 2022-04-26
+Email: kfir.goldfarb@msmail.ariel.ac.il
 """
+
 import heapq
 import numpy as np
 from typing import Callable, List

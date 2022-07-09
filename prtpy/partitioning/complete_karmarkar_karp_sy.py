@@ -1,11 +1,13 @@
 """
-Authors: Jonathan Escojido & Samuel Harroch
-Since = 03-2022
+Implementation of the complete Karmarkar-Karp algorithm, by Korf (1998).
 
 Credit: based on code by Søren Fuglede Jørgensen in the numberpartitioning package:
         https://github.com/fuglede/numberpartitioning/blob/master/src/numberpartitioning
 
+Authors: Jonathan Escojido & Samuel Harroch
+Date:    2022-03
 """
+
 from typing import Iterator, List, Tuple, Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Bins, Binner, BinsKeepingContents, BinsKeepingSums
 import logging, numpy as np

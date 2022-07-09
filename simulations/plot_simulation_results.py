@@ -36,12 +36,12 @@ from matplotlib import pyplot as plt
 #      subplot_field = "bitsperitem", subplot_rows=1, subplot_cols=3, sharey=True, sharex=True,
 #      legend_properties={"size":6}, ylim=(0,30))
 
-multi_plot_results(
-     "results/karmarkar_karp_variants_1.csv", save_to_file=True,
-     filter={}, 
-     x_field="numitems", y_field="runtime", z_field="algorithm", mean=True, 
-     subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=3, sharey=True, sharex=True,
-     legend_properties={"size":6}, ylim=(0,30), xlim=(0,30))
+# multi_plot_results(
+#      "results/karmarkar_karp_variants_1.csv", save_to_file=True,
+#      filter={}, 
+#      x_field="numitems", y_field="runtime", z_field="algorithm", mean=True, 
+#      subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=3, sharey=True, sharex=True,
+#      legend_properties={"size":6}, ylim=(0,30), xlim=(0,30))
 
 # multi_plot_results(
 #      "results/complete_greedy_variants_8.csv", save_to_file=True,
@@ -50,3 +50,10 @@ multi_plot_results(
 #      subplot_field = "bitsperitem", subplot_rows=1, subplot_cols=3, sharey=True, sharex=True,
 #      legend_properties={"size":6}, ylim=(0,30))
 
+
+multi_plot_results(
+     "results/rnp_variants_1.csv", save_to_file=True,
+     filter={}, 
+     x_field="numitems", y_field="runtime", z_field="algorithm", mean=True, 
+     subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=3, sharey=True, sharex=True,
+     legend_properties={"size":6}, ylim=(0,30), xlim=(0,30))
