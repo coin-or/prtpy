@@ -19,9 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def optimal(
-    bins: Bins,
-    items: List[Any],
-    valueof: Callable[[Any], float] = lambda x: x,
+    binner: Binner, numbins: int, items: List[any],
     objective: obj.Objective = obj.MinimizeDifference,
     **kwargs
 ):
@@ -30,21 +28,21 @@ def optimal(
     The following examples are based on:
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
 
-    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> printbins(optimal(BinsKeepingContents(2), [1,1,1,1,2], objective=obj.MaximizeSmallestSum))
+    >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums
+    >>> printbins(optimal(BinnerKeepingContents(), 2, [1,1,1,1,2], objective=obj.MaximizeSmallestSum))
     Bin #0: [1, 1, 1], sum=3.0
     Bin #1: [1, 2], sum=3.0
 
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    >>> printbins(optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeDifference))
+    >>> printbins(optimal(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MinimizeDifference))
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
-    >>> printbins(optimal(BinsKeepingContents(3), walter_numbers, objective=obj.MinimizeLargestSum))
+    >>> printbins(optimal(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MinimizeLargestSum))
     Bin #0: [46, 16], sum=62.0
     Bin #1: [39, 13, 10], sum=62.0
     Bin #2: [27, 26], sum=53.0
-    >>> printbins(optimal(BinsKeepingSums(3), walter_numbers, objective=obj.MaximizeSmallestSum))
+    >>> printbins(optimal(BinnerKeepingSums(), 3, walter_numbers, objective=obj.MaximizeSmallestSum))
     Bin #0: sum=56.0
     Bin #1: sum=56.0
     Bin #2: sum=65.0
@@ -53,21 +51,18 @@ def optimal(
     >>> partition(algorithm=optimal, numbins=3, items={"a":46, "b":39, "c":27, "d":26, "e":16, "f":13, "g":10}, objective=obj.MinimizeDifference, outputtype=out.Partition)
     [['b', 'e'], ['a', 'f'], ['c', 'd', 'g']]
     """
-    binner = bins.get_binner()
     if isinstance(binner, BinnerKeepingSums):
         # We need the entire partition.
-        return _optimal_partition(binner, items, valueof, objective, **kwargs)
+        return _optimal_partition(binner, numbins, items, objective, **kwargs)
     else:
         # We need only the sums - not the entire partition.
-        return _optimal_sums(binner, items, valueof, objective, **kwargs)
+        return _optimal_sums(binner, numbins, items, objective, **kwargs)
 
 
 
 
 def _optimal_sums(
-    binner: Binner,
-    items: List[Any],
-    valueof: Callable[[Any], float] = lambda x: x,
+    binner: Binner, numbins: int, items: List[any],
     objective: obj.Objective = obj.MinimizeDifference,
 ):
     """
@@ -77,20 +72,20 @@ def _optimal_sums(
     The "vi" is the current sum in bin i.
     """
 
-    logger.info("\nDynamic Programming %s Partitioning of %d items into %d bins.", objective, len(items), binner.numbins)
+    logger.info("\nDynamic Programming %s Partitioning of %d items into %d bins.", objective, len(items), numbins)
 
-    first_state = binner.new_bins()
+    first_state = binner.new_bins(numbins)
     num_of_processed_states = 1
 
     # Construct initial states:
     current_states = {tuple(binner.sums(first_state))}
     for item in items:
-        value = valueof(item)
+        value = binner.valueof(item)
 
         # Construct next states:
         next_states = set()
         for state in current_states:
-            for ibin in range(binner.numbins):
+            for ibin in range(numbins):
                 next_state = binner.add_item_to_bin(binner.clone(state), item, ibin)
                 binner.sort_by_ascending_sum(next_state)
                 next_states.add(tuple(binner.sums(next_state)))
@@ -109,9 +104,7 @@ def _optimal_sums(
 
 
 def _optimal_partition(
-    binner: Binner,
-    items: List[Any],
-    valueof: Callable[[Any], float] = lambda x: x,
+    binner: Binner, numbins: int, items: List[any],
     objective: obj.Objective = obj.MinimizeDifference,
 ):
     """
@@ -135,17 +128,17 @@ def _optimal_partition(
             return self.state == other.state
 
     # Construct initial states:
-    zero_values = binner.numbins * (0,)
+    zero_values = numbins * (0,)
     current_state_records = {StateRecord(zero_values, None, None)}
     num_of_processed_states = len(current_state_records)
 
     for item in items:
-        value = valueof(item)
+        value = binner.valueof(item)
 
         # Construct next state records:
         next_state_records = set()
         for record in current_state_records:
-            for ibin in range(binner.numbins):
+            for ibin in range(numbins):
                 next_state = list(record.state)
                 next_state[ibin] += value
                 next_state_record = StateRecord(tuple(next_state), record, ibin)
@@ -170,7 +163,7 @@ def _optimal_partition(
     logger.info("Path to best solution: %s", path)
 
     # construct solution
-    result_bins = binner.new_bins()
+    result_bins = binner.new_bins(numbins)
     for item_index, item in enumerate(items):
         ibin = path[item_index]
         logger.info("  Item %d (%s): bin %d", item_index, item, ibin,)
@@ -181,7 +174,7 @@ def _optimal_partition(
 if __name__ == "__main__":
     # DOCTEST
     import doctest, sys
-    (failures, tests) = doctest.testmod(report=True)
+    (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
     print("{} failures, {} tests".format(failures, tests))
     if failures>0:
         sys.exit(1)
@@ -192,12 +185,7 @@ if __name__ == "__main__":
 
     from prtpy.bins import BinsKeepingContents, BinsKeepingSums
 
-    optimal(BinsKeepingSums(2), [4,5,6,7,8], objective=obj.MinimizeLargestSum)
+    optimal(BinnerKeepingSums(), 2, [4,5,6,7,8], objective=obj.MinimizeLargestSum)
     walter_numbers = [46, 39, 27, 26, 16, 13, 10]
-    optimal(BinsKeepingSums(3), walter_numbers, objective=obj.MaximizeSmallestSum)
-    optimal(BinsKeepingSums(3), walter_numbers, objective=obj.MinimizeLargestSum)
-
-    # random_numbers = np.random.randint(1, 2**8-1, 15, dtype=np.int64)
-    # optimal(BinsKeepingSums(3), random_numbers, objective=obj.MaximizeSmallestSum)
-    # optimal(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeLargestSum)
-    # optimal(BinsKeepingSums(3), random_numbers, objective=obj.MinimizeDifference)
+    optimal(BinnerKeepingSums(), 3, walter_numbers, objective=obj.MaximizeSmallestSum)
+    optimal(BinnerKeepingSums(), 3, walter_numbers, objective=obj.MinimizeLargestSum)
