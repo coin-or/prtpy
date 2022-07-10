@@ -132,32 +132,36 @@ class CBLDM_algo:
             if 2 * max_m - sum_mi > self.len_delta:  # or sum_mi < self.difference:
                 return
             if len(sub_partitions) <= math.ceil(self.numitems / 2):
-                sub_partitions = sorted(sub_partitions, key=lambda sub_partition: abs(sub_partition.sums[0] - sub_partition.sums[1]), reverse=True) # Sort by descending difference.
+                sub_partitions.sort(key=lambda sub_partition: -abs(sub_partition.sums[0] - sub_partition.sums[1])) # Sort by descending difference.
+                
             # Split items to left branch and right branch according to partition type
-            left = sub_partitions[2:]
-            right = sub_partitions[2:]
+            left_sub_partitions  = sub_partitions[2:]
+            right_sub_partitions = sub_partitions[2:]
 
             combined_bins = BinsKeepingContents(2, self.binner.valueof)  # merge partition according to sum of bins
+            # combined_bins.combine_bins(0, sub_partitions[0], 0)
+            # combined_bins.combine_bins(0, sub_partitions[1], 0)
+            # combined_bins.combine_bins(1, sub_partitions[0], 1)
+            # combined_bins.combine_bins(1, sub_partitions[1], 1)
             for section in range(2):  # [small, big] + [small, big] -> [small + small, big + big]
-                for bin_i in range(2):
-                    for i in sub_partitions[section].bins[bin_i]:
-                        combined_bins.add_item_to_bin(i, bin_i)
+                for bin_index in range(2):
+                    combined_bins.combine_bins(bin_index, sub_partitions[section], bin_index)
             combined_bins.sort_by_ascending_sum()
 
             split_bins    = BinsKeepingContents(2, self.binner.valueof)  # split partition according to sum of bins
-            for i in sub_partitions[0].bins[0]:  # [small, big] + [small, big] -> [small + big, small + big]
-                split_bins.add_item_to_bin(i, 1)
-            for i in sub_partitions[0].bins[1]:
-                split_bins.add_item_to_bin(i, 0)
-            for bin_i in range(2):
-                for i in sub_partitions[1].bins[bin_i]:
-                    split_bins.add_item_to_bin(i, bin_i)
+            # split_bins.combine_bins(0, sub_partitions[0], 1)
+            # split_bins.combine_bins(0, sub_partitions[1], 0)
+            # split_bins.combine_bins(1, sub_partitions[0], 0)
+            # split_bins.combine_bins(1, sub_partitions[1], 1)
+            for section in range(2):  # [small, big] + [small, big] -> [small + small, big + big]
+                for bin_index in range(2):
+                    split_bins.combine_bins(bin_index, sub_partitions[section], (bin_index+section+1)%2)
             split_bins.sort_by_ascending_sum()
 
-            right.append(combined_bins)
-            left.append(split_bins)
-            self.part(left)
-            self.part(right)
+            right_sub_partitions.append(combined_bins)
+            left_sub_partitions.append(split_bins)
+            self.part(left_sub_partitions)
+            self.part(right_sub_partitions)
 
 
 if __name__ == "__main__":
