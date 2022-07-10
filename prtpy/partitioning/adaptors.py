@@ -42,29 +42,29 @@ def partition(
 
     :param valueof: optional; required only if `items` is a list of item-names.
 
-    :param outputtype: defines the output format. See `outputtypes.py'.
+    :param outputtype: what output to return. See `outputtypes.py'.
 
     :param kwargs: any other arguments expected by `algorithm`.
 
     :return: a partition, or a list of sums - depending on outputtype.
 
-    >>> dp = prtpy.partitioning.dynamic_programming
+    >>> prt = prtpy.partitioning
     >>> import numpy as np
-    >>> partition(algorithm=dp, numbins=2, items=[1,2,3,3,5,9,9])
+    >>> partition(algorithm=prt.dp, numbins=2, items=[1,2,3,3,5,9,9])
     [[2, 5, 9], [1, 3, 3, 9]]
-    >>> partition(algorithm=dp, numbins=3, items=[1,2,3,3,5,9,9])
+    >>> partition(algorithm=prt.dp, numbins=3, items=[1,2,3,3,5,9,9])
     [[2, 9], [1, 9], [3, 3, 5]]
-    >>> partition(algorithm=dp, numbins=2, items=np.array([1,2,3,3,5,9,9]), outputtype=out.Sums)
+    >>> partition(algorithm=prt.dp, numbins=2, items=np.array([1,2,3,3,5,9,9]), outputtype=out.Sums)
     [16.0, 16.0]
-    >>> int(partition(algorithm=dp, numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.LargestSum))
+    >>> int(partition(algorithm=prt.dp, numbins=3, items=[1,2,3,3,5,9,9], outputtype=out.LargestSum))
     11
-    >>> partition(algorithm=dp, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    >>> partition(algorithm=prt.dp, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['b', 'e', 'f'], ['a', 'c', 'd', 'g']]
-    >>> partition(algorithm=dp, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
+    >>> partition(algorithm=prt.dp, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['b', 'g'], ['a', 'f'], ['c', 'd', 'e']]
 
     >>> traversc_example = [18, 12, 22, 22]
-    >>> prtpy.partition(algorithm=prtpy.partitioning.integer_programming, numbins=2, items=traversc_example, outputtype=prtpy.out.PartitionAndSums)
+    >>> prtpy.partition(algorithm=prt.integer_programming, numbins=2, items=traversc_example, outputtype=out.PartitionAndSums)
     Bin #0: [12, 22], sum=34.0
     Bin #1: [18, 22], sum=40.0
     """
@@ -96,9 +96,72 @@ def partition_random_items(numitems: int, bitsperitem: int, **kwargs):
     return partition(items=items, **kwargs)
 
 
+
+def compare_algorithms(
+    numbins: int,
+    items: Any,
+    outputtype: out.OutputType,
+    algorithm1: Callable,
+    kwargs1: dict,
+    algorithm2: Callable,
+    kwargs2: dict
+)->bool:
+    """
+    Compare the output of two algorithms on the given items.
+
+    :param numbins: int - how many parts should be in the partition?
+    :param items: what items to partition (as in the `partition` function).
+    :param outputtype: what output to return for comparison. See `outputtypes.py'.
+    :param algorithm1. algorithm2: algorithms to compare.
+    :param kwargs1, kwargs2: keyword arguments to send to algorithms 1 and 2 respectively.
+
+    >>> prt = prtpy.partitioning
+    >>> compare_algorithms(2, [4,5,6,7,8], out.Difference, algorithm1=prt.ilp, kwargs1={"objective":obj.MinimizeDifference}, algorithm2=prt.snp, kwargs2={})
+    True
+    >>> compare_algorithms(2, [4,5,6,7,8], out.Difference, algorithm1=prt.ilp, kwargs1={"objective":obj.MinimizeDifference}, algorithm2=prt.greedy, kwargs2={}) #doctest: +NORMALIZE_WHITESPACE
+    Algorithms differ on input [4, 5, 6, 7, 8]:
+        integer-programming:   0.0
+        greedy:   4.0
+    False
+    >>> compare_algorithms(2, [4,5,6,7,8], out.SortedSums, algorithm1=prt.ilp, kwargs1={"objective":obj.MinimizeDifference}, algorithm2=prt.snp, kwargs2={})
+    True
+    >>> compare_algorithms(2, [4,5,6,7,8], out.SortedSums, algorithm1=prt.ilp, kwargs1={"objective":obj.MinimizeDifference}, algorithm2=prt.greedy, kwargs2={}) #doctest: +NORMALIZE_WHITESPACE
+    Algorithms differ on input [4, 5, 6, 7, 8]:
+        integer-programming:   [15.0, 15.0]
+        greedy:   [13.0, 17.0]
+    False
+    """
+    output1 = partition(algorithm1, numbins, items, outputtype=outputtype, **kwargs1)
+    output2 = partition(algorithm2, numbins, items, outputtype=outputtype, **kwargs2)
+    if output1 != output2:
+        print(f"Algorithms differ on input {items}:\n\t{algorithm1.__name__}:   {output1}\n\t{algorithm2.__name__}:   {output2}")
+        return False
+    else:
+        return True
+    
+
+
+def compare_algorithms_on_random_items(numitems: int, bitsperitem: int, **kwargs)->bool:
+    """
+    Compare the output of two algorithms on randomly-generated items.
+
+    :param numitems: how many items to generate.
+    :param bitsperitem: how many bits in each item.
+    :param kwargs: keyword arguments delegated to `partition`.
+    """
+    items = np.random.randint(1, 2**bitsperitem-1, numitems, dtype=np.int64)
+    return compare_algorithms(items=items, **kwargs)
+
+
 if __name__ == "__main__":
-    import doctest
+    import doctest, sys
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+    if failures > 0:
+        sys.exit(1)
 
-    print(partition_random_items(10, 16, algorithm=prtpy.partitioning.greedy, numbins=2, outputtype=out.PartitionAndSums))
+    prt = prtpy.partitioning
+    print("\nPartition random items:")
+    print(partition_random_items(10, 16, algorithm=prt.greedy, numbins=2, outputtype=out.PartitionAndSums))
+    print("\nCompare on random items:")
+    print(compare_algorithms_on_random_items(10, 16, numbins=2, outputtype=out.SortedSums, algorithm1=prt.greedy, kwargs1={}, algorithm2=prt.ilp, kwargs2={"objective": obj.MaximizeSmallestSum}))

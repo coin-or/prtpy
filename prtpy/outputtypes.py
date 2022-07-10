@@ -83,6 +83,12 @@ class ExtremeSums(Sums):
     def extract_output_from_sums(cls, sums: List[float]) -> List:
         return (min(sums), max(sums))
 
+class SortedSums(Sums):
+    """ Output the sums sorted from small to large. """
+    @classmethod
+    def extract_output_from_sums(cls, sums: List[float]) -> List:
+        return sorted(sums)
+
 class Difference(Sums):
     """ Output the difference between largest and smallest sum. """
     @classmethod
