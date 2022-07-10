@@ -6,8 +6,7 @@ Date: 2022
 """
 
 from typing import Callable, List, Any
-from prtpy import outputtypes as out, Binner, printbins
-from prtpy.binners import BinsArray
+from prtpy import outputtypes as out, Binner, printbins, BinsArray
 
 
 def online(binner: Binner, binsize: float, items: List[any])->BinsArray:

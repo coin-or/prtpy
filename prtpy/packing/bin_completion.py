@@ -6,28 +6,23 @@
     Since: 05-2022
 """
 
-from typing import Callable, Any
+from typing import Any
 from prtpy.packing import best_fit
 from prtpy.packing.bin_completion_utils import *
-from functools import partial
 import copy
-from prtpy import Bins, BinsKeepingContents, BinsArray
+from prtpy import Binner, BinnerKeepingContents, BinsArray
 
-def bin_completion(
-        bins: Bins,
-        binsize: float,
-        items: List[any],
-) -> BinsArray:
+def bin_completion(binner: Binner, binsize: float, items: List[Any])->BinsArray:
     """
     "A New Algorithm for Optimal Bin Packing", by Richard E. Korf (2002).
     Given a set of numbers, and a set of bins of fixed capacity,
     the algorithm finds the minimum number of bins needed to contain all the numbers,
     such that the sum of the numbers assigned to each bin does not exceed the bin capacity.
 
-    >>> from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
+    >>> from prtpy import BinnerKeepingContents, BinsKeepingSums, printbins
 
     Example 1: max capacity
-    >>> printbins(bin_completion(BinsKeepingContents(0), binsize=100, items=[100,100,100,100,100,100]))
+    >>> printbins(bin_completion(BinnerKeepingContents(), binsize=100, items=[100,100,100,100,100,100]))
     Bin #0: [100], sum=100.0
     Bin #1: [100], sum=100.0
     Bin #2: [100], sum=100.0
@@ -36,11 +31,11 @@ def bin_completion(
     Bin #5: [100], sum=100.0
 
     Example 2: min capacity
-    >>> printbins(bin_completion(BinsKeepingContents(0), binsize=100, items=[1,2,3,4,5,85]))
+    >>> printbins(bin_completion(BinnerKeepingContents(), binsize=100, items=[1,2,3,4,5,85]))
     Bin #0: [85, 5, 4, 3, 2, 1], sum=100.0
 
     Example 3: Complex input
-    >>> printbins(bin_completion(BinsKeepingContents(0), binsize=100, items=[99,94,79,64,50,44,43,37,32,19,18,7,3]))
+    >>> printbins(bin_completion(BinnerKeepingContents(), binsize=100, items=[99,94,79,64,50,44,43,37,32,19,18,7,3]))
     Bin #0: [99], sum=99.0
     Bin #1: [94, 3], sum=97.0
     Bin #2: [79, 19], sum=98.0
@@ -49,7 +44,7 @@ def bin_completion(
     Bin #5: [44, 37, 18], sum=99.0
 
     Example 4: Article Example #1
-    >>> printbins(bin_completion(BinsKeepingContents(0), binsize=100, items=[100, 98, 96, 93, 91, 87, 81, 59, 58, 55, 50, 43, 22, 21, 20, 15, 14, 10, 8, 6, 5, 4, 3, 1, 0]))
+    >>> printbins(bin_completion(BinnerKeepingContents(), binsize=100, items=[100, 98, 96, 93, 91, 87, 81, 59, 58, 55, 50, 43, 22, 21, 20, 15, 14, 10, 8, 6, 5, 4, 3, 1, 0]))
     Bin #0: [100], sum=100.0
     Bin #1: [98], sum=98.0
     Bin #2: [96, 4], sum=100.0
@@ -63,20 +58,18 @@ def bin_completion(
     Bin #10: [50], sum=50.0
 
     Example 5: Article Example #2
-    >>> printbins(bin_completion(BinsKeepingContents(0), binsize=100, items=[6, 12, 15, 40, 43, 82]))
+    >>> printbins(bin_completion(BinnerKeepingContents(), binsize=100, items=[6, 12, 15, 40, 43, 82]))
     Bin #0: [82, 12, 6], sum=100.0
     Bin #1: [43, 40, 15], sum=98.0
 
     Example 6: Article Example #3
-    >>> printbins(bin_completion(BinsKeepingContents(0), binsize=100, items=[99, 97, 94, 93, 8, 5, 4, 2]))
+    >>> printbins(bin_completion(BinnerKeepingContents(), binsize=100, items=[99, 97, 94, 93, 8, 5, 4, 2]))
     Bin #0: [99], sum=99.0
     Bin #1: [97, 2], sum=99.0
     Bin #2: [94, 5], sum=99.0
     Bin #3: [93, 4], sum=97.0
     Bin #4: [8], sum=8.0
     """
-    binner = bins.get_binner()
-
     # Test if there is an item which is not a number OR larger than binsize.
     for item in items:
         if not isinstance(item, int) or item > binsize:
@@ -86,7 +79,7 @@ def bin_completion(
     items = list(filter((0).__ne__, items))
 
     # Find the BFD solution and check if it's optimal using the lower bound calculation.
-    bfd_solution = best_fit.decreasing(BinsKeepingContents(0), binsize, items.copy())
+    bfd_solution = best_fit.decreasing(BinnerKeepingContents(), binsize, items.copy())
     lb = lower_bound(binsize, items)
 
     # If the BFD solution is optimal - return it.

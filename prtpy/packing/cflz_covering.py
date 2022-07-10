@@ -8,53 +8,47 @@ AUTHOR: Erel Segal-Halevi
 SINCE: 2021-04
 """
 
-from prtpy import outputtypes as out, Bins
+from prtpy import outputtypes as out, Binner, BinsArray
 from typing import Callable, List, Any
 from prtpy.packing.greedy_covering import decreasing_subroutine
 
 
 
-def twothirds(
-    bins: Bins,
-    binsize: float,
-    items: List[any],
-    valueof: Callable[[Any], float] = lambda x: x,
-):
+def twothirds(binner: Binner, binsize: float, items: List[any])->BinsArray:
     """
     Run the 2/3-approximation algorithm for bin covering.
     From Csirik et al (1999).
 
-    >>> from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
-    >>> printbins(twothirds(BinsKeepingContents(0), 10, [11,12,13]))   # large items
+    >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums, printbins
+    >>> printbins(twothirds(BinnerKeepingContents(), 10, [11,12,13]))   # large items
     Bin #0: [13], sum=13.0
     Bin #1: [12], sum=12.0
     Bin #2: [11], sum=11.0
-    >>> printbins(twothirds(BinsKeepingContents(0), 10, [3,3,3,3, 3,3,3,3, 3,3,3]))   # identical items
+    >>> printbins(twothirds(BinnerKeepingContents(), 10, [3,3,3,3, 3,3,3,3, 3,3,3]))   # identical items
     Bin #0: [3, 3, 3, 3], sum=12.0
     Bin #1: [3, 3, 3, 3], sum=12.0
-    >>> printbins(twothirds(BinsKeepingContents(0), 10, [1,2,3,4,5,6,7,8,9,10]))   # different items
+    >>> printbins(twothirds(BinnerKeepingContents(), 10, [1,2,3,4,5,6,7,8,9,10]))   # different items
     Bin #0: [10], sum=10.0
     Bin #1: [9, 1], sum=10.0
     Bin #2: [8, 2], sum=10.0
     Bin #3: [7, 3], sum=10.0
     Bin #4: [6, 4], sum=10.0
-    >>> printbins(twothirds(BinsKeepingContents(0), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]))   # worst-case example (k=1)
+    >>> printbins(twothirds(BinnerKeepingContents(), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]))   # worst-case example (k=1)
     Bin #0: [994, 1, 1, 1, 1, 1, 1], sum=1000.0
     Bin #1: [499, 499, 499], sum=1497.0
     Bin #2: [499, 499, 499], sum=1497.0
-    >>> printbins(twothirds(BinsKeepingContents(0), 1000, [988] + 12*[499] + 12*[1]))   # worst-case example (k=2)
+    >>> printbins(twothirds(BinnerKeepingContents(), 1000, [988] + 12*[499] + 12*[1]))   # worst-case example (k=2)
     Bin #0: [988, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], sum=1000.0
     Bin #1: [499, 499, 499], sum=1497.0
     Bin #2: [499, 499, 499], sum=1497.0
     Bin #3: [499, 499, 499], sum=1497.0
     Bin #4: [499, 499, 499], sum=1497.0
-    >>> printbins(twothirds(BinsKeepingContents(0), 1200, [594,594] + 12*[399] + 12*[1]))  # worst-case example for 3/4 (k=1)
+    >>> printbins(twothirds(BinnerKeepingContents(), 1200, [594,594] + 12*[399] + 12*[1]))  # worst-case example for 3/4 (k=1)
     Bin #0: [594, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 399, 399], sum=1404.0
     Bin #1: [594, 399, 399], sum=1392.0
     Bin #2: [399, 399, 399, 399], sum=1596.0
     Bin #3: [399, 399, 399, 399], sum=1596.0
     """
-    binner = bins.get_binner()
     bins = binner.new_bins(1)
     items = sorted(items, key=binner.valueof, reverse=True)
     while len(items)>0:
@@ -76,59 +70,53 @@ def twothirds(
 
 
 
-def threequarters(
-    bins: Bins,
-    binsize: float,
-    items: List[any],
-    valueof: Callable[[Any], float] = lambda x: x,
-):
+def threequarters(binner: Binner, binsize: float, items: List[any])->BinsArray:
     """
     Run the 3/4-approximation algorithm for bin covering.
     From Csirik et al (1999).
 
-    >>> from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
-    >>> printbins(threequarters(BinsKeepingContents(0), 10, [11,12,13]))   # large items
+    >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums, printbins
+    >>> printbins(threequarters(BinnerKeepingContents(), 10, [11,12,13]))   # large items
     Bin #0: [13], sum=13.0
     Bin #1: [12], sum=12.0
     Bin #2: [11], sum=11.0
-    >>> printbins(threequarters(BinsKeepingContents(0), 10, [3,3,3,3, 3,3,3,3, 3,3,3]))   # identical items
+    >>> printbins(threequarters(BinnerKeepingContents(), 10, [3,3,3,3, 3,3,3,3, 3,3,3]))   # identical items
     Bin #0: [3, 3, 3, 3], sum=12.0
     Bin #1: [3, 3, 3, 3], sum=12.0
-    >>> printbins(threequarters(BinsKeepingContents(0), 10, [1,2,3,4,5,6,7,8,9,10]))   # different items
+    >>> printbins(threequarters(BinnerKeepingContents(), 10, [1,2,3,4,5,6,7,8,9,10]))   # different items
     Bin #0: [10], sum=10.0
     Bin #1: [9, 1], sum=10.0
     Bin #2: [8, 2], sum=10.0
     Bin #3: [7, 3], sum=10.0
     Bin #4: [6, 5], sum=11.0
-    >>> printbins(threequarters(BinsKeepingContents(0), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]))   # worst-case example for 2/3 (k=1)
+    >>> printbins(threequarters(BinnerKeepingContents(), 1000, [994, 499,499,499,499,499,499, 1,1,1,1,1,1]))   # worst-case example for 2/3 (k=1)
     Bin #0: [499, 499, 1, 1], sum=1000.0
     Bin #1: [499, 499, 1, 1], sum=1000.0
     Bin #2: [499, 499, 1, 1], sum=1000.0
-    >>> printbins(threequarters(BinsKeepingContents(0), 1000, [988] + 12*[499] + 12*[1]))   # worst-case example for 2/3 (k=2)
+    >>> printbins(threequarters(BinnerKeepingContents(), 1000, [988] + 12*[499] + 12*[1]))   # worst-case example for 2/3 (k=2)
     Bin #0: [499, 499, 1, 1], sum=1000.0
     Bin #1: [499, 499, 1, 1], sum=1000.0
     Bin #2: [499, 499, 1, 1], sum=1000.0
     Bin #3: [499, 499, 1, 1], sum=1000.0
     Bin #4: [499, 499, 1, 1], sum=1000.0
     Bin #5: [499, 499, 1, 1], sum=1000.0
-    >>> printbins(threequarters(BinsKeepingContents(0), 1200, [594,594] + 12*[399] + 12*[1]))   # worst-case example for 3/4 (k=1)
+    >>> printbins(threequarters(BinnerKeepingContents(), 1200, [594,594] + 12*[399] + 12*[1]))   # worst-case example for 3/4 (k=1)
     Bin #0: [594, 594, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], sum=1200.0
     Bin #1: [399, 399, 399, 399], sum=1596.0
     Bin #2: [399, 399, 399, 399], sum=1596.0
     Bin #3: [399, 399, 399, 399], sum=1596.0
-    >>> printbins(threequarters(BinsKeepingContents(0), 1000, [994, 501,501, 499,499,499,499]+12*[1]))
+    >>> printbins(threequarters(BinnerKeepingContents(), 1000, [994, 501,501, 499,499,499,499]+12*[1]))
     Bin #0: [499, 499, 1, 1], sum=1000.0
     Bin #1: [499, 499, 1, 1], sum=1000.0
     Bin #2: [994, 1, 1, 1, 1, 1, 1], sum=1000.0
     Bin #3: [501, 1, 1, 501], sum=1004.0
     """
-    binner = bins.get_binner()
     bins = binner.new_bins(1)
     items = sorted(items, key=binner.valueof, reverse=True)
 
-    big_items = [item for item in items if binsize/2 <= valueof(item)]  # X
-    medium_items = [item for item in items if binsize/3 <= valueof(item) < binsize/2]  # Y
-    small_items = [item for item in items if valueof(item) < binsize/3]  # Z
+    big_items = [item for item in items if binsize/2 <= binner.valueof(item)]  # X
+    medium_items = [item for item in items if binsize/3 <= binner.valueof(item) < binsize/2]  # Y
+    small_items = [item for item in items if binner.valueof(item) < binsize/3]  # Z
 
     while True:
         if len(small_items)==0:
