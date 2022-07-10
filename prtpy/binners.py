@@ -54,14 +54,6 @@ class Binner(ABC):
         return None
 
     @abstractmethod
-    def new_bins_structure(self, numbins:int):
-        '''
-        Create a new Bins structure with numbins bins.
-        '''
-        return None
-
-
-    @abstractmethod
     def clone(self, bins:BinsArray)->BinsArray:
         '''
         Create a new bins-array with the same contents as the given bins-array.
@@ -217,9 +209,6 @@ class BinnerKeepingSums(Binner):
         bins = np.zeros(numbins)
         return bins
 
-    def new_bins_structure(self, numbins:int):
-        return prtpy.BinsKeepingSums(numbins, self.valueof)
-
     def clone(self, bins: BinsArray)->BinsArray:
         return np.array(bins)
 
@@ -361,9 +350,6 @@ class BinnerKeepingContents(BinnerKeepingSums):
         sums  = np.zeros(numbins)
         lists = [[] for _ in range(numbins)]
         return (sums, lists)
-
-    def new_bins_structure(self, numbins:int):
-        return prtpy.BinsKeepingContents(numbins, self.valueof)
 
     def clone(self, bins: BinsArray)->BinsArray:
         sums, lists = bins
