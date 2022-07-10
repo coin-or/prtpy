@@ -87,7 +87,7 @@ def _optimal_sums(
         next_states = set()
         for state in current_states:
             for ibin in range(numbins):
-                next_state = binner.add_item_to_bin(binner.clone(state), item, ibin)
+                next_state = binner.add_item_to_bin(binner.copy_bins(state), item, ibin)
                 binner.sort_by_ascending_sum(next_state)
                 next_states.add(tuple(binner.sums(next_state)))
         states_added = len(next_states)

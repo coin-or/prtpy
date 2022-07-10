@@ -140,7 +140,7 @@ def anytime(
         # Note that this heuristic is valid only for the objective "minimize largest sum"!
         if use_heuristic_3 and objective==obj.MinimizeLargestSum:
             if sums_of_remaining_items[depth] + current_sums[0] <= current_sums[-1]:
-                new_bins = binner.clone(current_bins)
+                new_bins = binner.copy_bins(current_bins)
                 for i in range(depth,numitems):
                     binner.add_item_to_bin(new_bins, sorted_items[i], 0)
                 binner.sort_by_ascending_sum(new_bins)
@@ -186,7 +186,7 @@ def anytime(
                     times_fast_lower_bound_activated += 1
                     continue
 
-            new_bins = binner.add_item_to_bin(binner.clone(current_bins), next_item, bin_index)
+            new_bins = binner.add_item_to_bin(binner.copy_bins(current_bins), next_item, bin_index)
             binner.sort_by_ascending_sum(new_bins)
             new_sums = tuple(binner.sums(new_bins))
 

@@ -54,7 +54,7 @@ class Binner(ABC):
         return None
 
     @abstractmethod
-    def clone(self, bins:BinsArray)->BinsArray:
+    def copy_bins(self, bins:BinsArray)->BinsArray:
         '''
         Create a new bins-array with the same contents as the given bins-array.
         '''
@@ -110,7 +110,7 @@ class Binner(ABC):
         return None
 
     @abstractmethod
-    def numofbins(self, bins: BinsArray) -> int:
+    def numbins(self, bins: BinsArray) -> int:
         """
         Return the number of bins in the given bins-array.
         """
@@ -139,14 +139,6 @@ class Binner(ABC):
         '''
         pass
 
-    # @abstractmethod
-    # def clear_bins(self, numbins):
-    #     """
-    #     @param: numbins - the number of the bins
-    #      clear the content of the bins.
-    #     """
-    #     pass
-
 
 class BinnerKeepingSums(Binner):
     """
@@ -171,7 +163,7 @@ class BinnerKeepingSums(Binner):
     Bin #2: sum=0.0
 
     Adding to a clone should not change the original:
-    >>> printbins(binner.add_item_to_bin(binner.clone(bins), item="d", bin_index=1))
+    >>> printbins(binner.add_item_to_bin(binner.copy_bins(bins), item="d", bin_index=1))
     Bin #0: sum=3.0
     Bin #1: sum=14.0
     Bin #2: sum=0.0
@@ -179,7 +171,7 @@ class BinnerKeepingSums(Binner):
     Bin #0: sum=3.0
     Bin #1: sum=9.0
     Bin #2: sum=0.0
-    >>> bins2 = binner.clone(bins)
+    >>> bins2 = binner.copy_bins(bins)
     >>> _=binner.add_item_to_bin(bins2, item="e", bin_index=2)
     >>> printbins(bins2)
     Bin #0: sum=3.0
@@ -209,7 +201,7 @@ class BinnerKeepingSums(Binner):
         bins = np.zeros(numbins)
         return bins
 
-    def clone(self, bins: BinsArray)->BinsArray:
+    def copy_bins(self, bins: BinsArray)->BinsArray:
         return np.array(bins)
 
     def concatenate_bins(self, bins1:BinsArray, bins2:BinsArray):
@@ -234,7 +226,7 @@ class BinnerKeepingSums(Binner):
     def numitems(self, bins: BinsArray, bin_index:int) -> Tuple[float]:
         raise NotImplementedError("Bins keeping sums do not keep track of the number of items.")
 
-    def numofbins(self, bins: BinsArray) -> int:
+    def numbins(self, bins: BinsArray) -> int:
         """
         Return the number of bins in the given bins-array.
         """
@@ -271,7 +263,7 @@ class BinnerKeepingSums(Binner):
         [70, 304, 601]
         """
         yielded = set()   # prevent duplicates
-        numbins = self.numofbins(bins1)
+        numbins = self.numbins(bins1)
         for perm in itertools.permutations(range(numbins)):
             # print("perm=",perm)
             new_sums = [bins1[perm[i]] + bins2[i] for i in range(numbins)]
@@ -305,7 +297,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
     Bin #2: [], sum=0.0
 
     Adding to a clone should not change the original:
-    >>> printbins(binner.add_item_to_bin(binner.clone(bins), item="d", bin_index=1))
+    >>> printbins(binner.add_item_to_bin(binner.copy_bins(bins), item="d", bin_index=1))
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c', 'd'], sum=14.0
     Bin #2: [], sum=0.0
@@ -313,7 +305,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
     Bin #0: ['a'], sum=3.0
     Bin #1: ['b', 'c'], sum=9.0
     Bin #2: [], sum=0.0
-    >>> bins2 = binner.clone(bins)
+    >>> bins2 = binner.copy_bins(bins)
     >>> _=binner.add_item_to_bin(bins2, item="e", bin_index=2)
     >>> printbins(bins2)
     Bin #0: ['a'], sum=3.0
@@ -351,7 +343,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
         lists = [[] for _ in range(numbins)]
         return (sums, lists)
 
-    def clone(self, bins: BinsArray)->BinsArray:
+    def copy_bins(self, bins: BinsArray)->BinsArray:
         sums, lists = bins
         return (np.array(sums), list(map(list, lists)))
 
@@ -394,7 +386,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
         sums, lists = bins
         return len(lists[bin_index])
 
-    def numofbins(self, bins: BinsArray) -> int:
+    def numbins(self, bins: BinsArray) -> int:
         """
         Return the number of bins in the given bins-array.
         """
@@ -402,7 +394,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
 
     def sort_by_ascending_sum(self, bins: BinsArray) -> BinsArray:
         sums, lists = bins
-        numbins = self.numofbins(bins)
+        numbins = self.numbins(bins)
         sorted_indices = sorted(range(numbins), key=lambda i: sums[i])
         sums[:] = list(map(sums.__getitem__, sorted_indices))
         lists[:] = list(map(lists.__getitem__, sorted_indices))
@@ -445,7 +437,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
 
 
 if __name__ == "__main__":
-    import doctest, sys
+    import doctest, syscd ..
     (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
     print("{} failures, {} tests".format(failures, tests))
     if failures>0:

@@ -83,7 +83,7 @@ def bin_completion(binner: Binner, binsize: float, items: List[Any])->BinsArray:
     lb = lower_bound(binsize, items)
 
     # If the BFD solution is optimal - return it.
-    if binner.numofbins(bfd_solution) == lb:
+    if binner.numbins(bfd_solution) == lb:
         logging.info(f"BFD has returned an optimal solution with {lb} bins.")
         return bfd_solution
 
@@ -133,8 +133,8 @@ def bin_completion(binner: Binner, binsize: float, items: List[Any])->BinsArray:
 
                     # We can calculate the partial lower bound in O(1) and pass on the branch if we are working on
                     # a solution that is worse than our best solution so far.
-                    partial_lower_bound = binner.numofbins(new_bins) + (sum(new_items) / binsize)
-                    best_numbins_so_far = binner.numofbins(best_solution_so_far)
+                    partial_lower_bound = binner.numbins(new_bins) + (sum(new_items) / binsize)
+                    best_numbins_so_far = binner.numbins(best_solution_so_far)
                     if partial_lower_bound >= best_numbins_so_far:
                         logging.info(
                             f"Redundant branch. partial lower bound - {partial_lower_bound}, exceeds or equals best lower "
@@ -155,8 +155,8 @@ def bin_completion(binner: Binner, binsize: float, items: List[Any])->BinsArray:
 
             # We can calculate the partial lower bound in O(1) and prune the branch if we are working on a solution that
             # is worse than our best solution so far.
-            partial_lower_bound = binner.numofbins(cb.bins) + (sum(updated_list) / binsize)
-            best_numbins_so_far = binner.numofbins(best_solution_so_far)
+            partial_lower_bound = binner.numbins(cb.bins) + (sum(updated_list) / binsize)
+            best_numbins_so_far = binner.numbins(best_solution_so_far)
             if partial_lower_bound >= best_numbins_so_far:
                 logging.info(
                     f"branch pruned. partial lower bound - {partial_lower_bound}, exceeds or equals best lower "
@@ -168,13 +168,13 @@ def bin_completion(binner: Binner, binsize: float, items: List[Any])->BinsArray:
                 break
 
         # If we completed an arrangement successfully, and it's better than the best solution we had - update it.
-        best_numbins_so_far = binner.numofbins(best_solution_so_far)
-        if not cb.items and binner.numofbins(cb.bins) < best_numbins_so_far:
-            logging.info(f"Updated best solution from {best_numbins_so_far} bins to {binner.numofbins(cb.bins)} bins.")
+        best_numbins_so_far = binner.numbins(best_solution_so_far)
+        if not cb.items and binner.numbins(cb.bins) < best_numbins_so_far:
+            logging.info(f"Updated best solution from {best_numbins_so_far} bins to {binner.numbins(cb.bins)} bins.")
             best_solution_so_far = cb.bins
 
         # If we found a solution with number of bins that equals the lower bound - it's optimal! Hurray!
-        best_numbins_so_far = binner.numofbins(best_solution_so_far)
+        best_numbins_so_far = binner.numbins(best_solution_so_far)
         if best_numbins_so_far == lb:
             logging.info(f"found and optimal solution with {lb} bins.")
             break

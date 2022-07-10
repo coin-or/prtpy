@@ -46,28 +46,35 @@ For more features and examples, see:
 
 To add a new algorithm for number partitioning, write a function that accepts the following parameters:
 
-* `bins` - a [Bins](prtpy/bins.py) structure. It is already initialized with the right number of empty bins (`bins.num`). It contains a function for adding items to bins.
-* `items` - a list of item-names.
-* `valueof` - a function that accepts an item-name and returns its value.
+* `binner` - an item of class `Binner` structure (see below).
+* `numbins` - an integer - how many bins to put the items into.
+* `items` - a list of item-names (the item values are given by the function `binner.valueof`).
 * Any other parameters that are required by your algorithm.
 
 For an example, see the implementation of existing algorithms, e.g. [greedy](prtpy/partitioning/greedy.py).
 
 To add a new algorithm for bin packing or bin covering, write a function that accepts the following parameters:
 
-* `bins` - a [Bins](prtpy/bins.py) structure. It is initialized with no bins at all. It contains a function for adding new empty bins.
+* `binner` - an item of class `Binner` structure (see below).
 * `binsize` - the capacity of a bin (maximum sum in bin-packing; minimum sum in bin-covering).
-* `items` - a list of item-names.
-* `valueof` - a function that accepts an item and returns its value.
+* `items` - a list of item-names (the item values are given by the function `binner.valueof`).
 * Any other parameters that are required by your algorithm.
 
 For an example, see the implementation of existing algorithms, e.g. [first_fit](prtpy/packing/first_fit.py).
 
+The [Binner](prtpy/binner.py) class contains methods for handling bins in a generic way --- handling both item-names and item-values with a single interface. The main supported methods are:
+
+* `bins = binner.new_bins(numbins)` --- constructs a new array of empty bins.
+* `binner.add_item_to_bin(bins, item, index)` --- updates the given `bins` array by adding the given item to the bin with the given index. 
+* `binner.sums(bins)` --- extracts, from the bins array, only the array of sums.
+* `bins = binner.add_empty_bins(bins, numbins)` --- creates a new `bins` array with some additional empty bins at the end.
+* `bins = binner.remove_bins(bins, numbins)` --- creates a new `bins` array with some bins removed at the end.
+* `binner.valueof(item)` --- returns the value (size) of the given item.
 
 
 ## Related libraries
 
-* [numberpartitioning](https://github.com/fuglede/numberpartitioning) by Søren Fuglede Jørgensen - the code for [complete_greedy](prtpy/complete_greedy.py) is adapted from there.
+* [numberpartitioning](https://github.com/fuglede/numberpartitioning) by Søren Fuglede Jørgensen - the code for [complete_greedy](prtpy/partitioning/complete_greedy.py) and [complete_karmarkar_karp](prtpy/partitioning/complete_karmarkar_karp_sy.py)  was originally adapted from there.
 * [binpacking](https://github.com/benmaier/binpacking) by Ben Maier.
 
 ## Limitations
