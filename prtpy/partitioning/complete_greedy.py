@@ -118,6 +118,10 @@ def anytime(
     times_seen_state_skipped = 0
 
     while len(stack) > 0:
+        if time.perf_counter() > end_time:
+            logger.info("Time-limit of %s reached - stopping", time_limit)
+            break
+
         current_bins, depth = stack.pop()
         current_sums = tuple(binner.sums(current_bins))
 
@@ -131,9 +135,6 @@ def anytime(
                 if new_objective_value<=global_lower_bound:
                     logger.info("    Solution matches global lower bound - stopping")
                     break
-            if time.perf_counter() > end_time:
-                logger.info("Time-limit of %s reached - stopping", time_limit)
-                break
             continue
 
         # Heuristic 3: "If the sum of the remaining unassigned integers plus the smallest current subset sum is <= the largest subset sum, all remaining integers are assigned to the subset with the smallest sum, terminating that branch of the tree."

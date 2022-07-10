@@ -19,9 +19,9 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[55606.0, 55606.0, 55606.0, 55606.0, 55606.0, 55605.0, 55605.0,
-55605.0, 55605.0]
-         0.24113940000000156 seconds
+[55605.0, 55604.0, 55604.0, 55604.0, 55604.0, 55604.0, 55604.0,
+55604.0, 55604.0]
+         0.23440219999999812 seconds
 ```
 
 
@@ -36,9 +36,9 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[5578.0, 5578.0, 5578.0, 5578.0, 5578.0, 5578.0, 5578.0, 5578.0,
-5532.0]
-         0.5636685999999997 seconds
+[5567.0, 5567.0, 5567.0, 5567.0, 5567.0, 5567.0, 5567.0, 5567.0,
+5520.0]
+         0.4883513999999991 seconds
 ```
 
 
@@ -55,8 +55,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[135.0, 135.0, 135.0, 136.0]
-         0.3820400000000035 seconds
+[118.0, 119.0, 119.0, 119.0]
+         0.18726790000000193 seconds
 ```
 
 
@@ -71,8 +71,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[31.0, 30.0, 31.0]
-         0.14241910000000502 seconds
+[35.0, 35.0, 34.0]
+         0.15508069999999918 seconds
 ```
 
 
@@ -87,9 +87,34 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[554386.0, 554386.0, 554386.0, 554386.0, 554386.0, 554386.0, 554386.0,
-554387.0, 554387.0]
-         5.468529799999999 seconds
+---------------------------------------------------------------------------TypeError
+Traceback (most recent call last)Input In [1], in <module>
+      1 start = perf_counter()
+      2 values = np.random.randint(1,1000, 10000)
+----> 3
+print(prtpy.partition(algorithm=prtpy.partitioning.complete_greedy,
+numbins=9, items=values, outputtype=prtpy.out.Sums, time_limit=1))
+      4 print(f"\t {perf_counter()-start} seconds")
+File
+d:\dropbox\papers\electricitydivision__dinesh\code\prtpy\prtpy\partitioning\adaptors.py:82,
+in partition(algorithm, numbins, items, valueof, outputtype, **kwargs)
+     80 binner = outputtype.create_binner(valueof)
+     81 bins   = algorithm(binner, numbins, item_names, **kwargs)
+---> 82 return outputtype.extract_output_from_binsarray(bins)
+File
+d:\dropbox\papers\electricitydivision__dinesh\code\prtpy\prtpy\outputtypes.py:47,
+in Sums.extract_output_from_binsarray(cls, bins)
+     45 except:
+     46     sums = bins          # If it fails, it means that bins is
+a singleton: sums.
+---> 47 return cls.extract_output_from_sums(sums)
+File
+d:\dropbox\papers\electricitydivision__dinesh\code\prtpy\prtpy\outputtypes.py:38,
+in Sums.extract_output_from_sums(cls, sums)
+     36 @classmethod
+     37 def extract_output_from_sums(cls, sums: List[float]) -> List:
+---> 38     return list(sums)
+TypeError: 'NoneType' object is not iterable
 ```
 
 
@@ -104,8 +129,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[187.0, 419.0, 490.0, 503.0, 531.0, 726.0, 874.0, 909.0, 920.0]
-         8.094508399999995 seconds
+[254.0, 299.0, 403.0, 496.0, 553.0, 579.0, 828.0, 937.0, 943.0]
+         10.203577499999998 seconds
 ```
 
 
