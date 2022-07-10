@@ -8,7 +8,7 @@ items = [46, 39, 27, 26, 16, 13, 10]
 
 import prtpy
 from prtpy.outputtypes import PartitionAndSums
-from prtpy.objectives import MaximizeSmallestSum, MinimizeLargestSum, MinimizeDifference
+from prtpy.objectives import MaximizeSmallestSum, MinimizeLargestSum, MinimizeDifference, Objective
 dp = prtpy.partitioning.dynamic_programming
 
 #' MinimizeLargestSum:
@@ -22,10 +22,10 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=Partition
 
 #' To define a custom objective, create an Objective object with a lamdba function, 
 #'    describing the expression that should be *minimized*.
-MinimizeSmallestSum = prtpy.obj.Objective(
-    lambda sums, are_sums_in_ascending_order=False: 
-        sums[0] if are_sums_in_ascending_order else min(sums)
-)
+class MinimizeTheSmallestSum(Objective):
+    def value_to_minimize(self, sums:list, are_sums_in_ascending_order:bool=False)->float:
+        return sums[0] if are_sums_in_ascending_order else min(sums)
+MinimizeSmallestSum = MinimizeTheSmallestSum()
 print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=PartitionAndSums, objective=MinimizeSmallestSum))
 
 #' Some other useful objectives are:

@@ -13,3 +13,6 @@ print(prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=60, items
 #' This example is interesting since it shows that the FFD algorithm is not monotone - increasing the bin-size may counter-intuitively increase the number of bins:
 
 print(prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=61, items=items))
+
+#' The advanced Bin Completion algorithm; programmed by Avshalom and Tehilla
+print(prtpy.pack(algorithm=prtpy.packing.bin_completion, binsize=61, items=items))

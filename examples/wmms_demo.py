@@ -17,7 +17,7 @@ def weighted_maximin_share_partition(valuation:list, weights:list):
     if len(valuation)==0:
         raise ValueError("Valuation is empty")
 
-    bins:prtpy.Bins = prtpy.partition(
+    sums, lists = prtpy.partition(
         algorithm=prtpy.partitioning.integer_programming,
         numbins=len(weights),
         items=valuation,
@@ -25,10 +25,9 @@ def weighted_maximin_share_partition(valuation:list, weights:list):
         outputtype=prtpy.out.PartitionAndSums,
         weights = weights
     )
-
-    min_weighted_sum = min([s/w for s,w in zip(bins.sums,weights)])
+    min_weighted_sum = min([s/w for s,w in zip(sums,weights)])
     wmms_values = [min_weighted_sum * w for w in weights]
-    return (bins.bins, list(bins.sums), wmms_values)
+    return (lists, list(sums), wmms_values)
 
 
 

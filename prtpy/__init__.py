@@ -68,6 +68,7 @@ partitioning.sequential_number_partitioning.__name__ = "sequential-number-partit
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing
     from prtpy.packing.first_fit import online as ff, decreasing as ffd
+    from prtpy.packing.bin_completion import bin_completion
 
 packing.first_fit.__name__ = "first-fit"
 packing.first_fit_decreasing.__name__ = "first-fit-decreasing"

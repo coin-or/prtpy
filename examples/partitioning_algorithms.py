@@ -41,3 +41,9 @@ start = perf_counter()
 values = np.random.randint(1,1000, 10000)
 print(prtpy.partition(algorithm=prtpy.partitioning.complete_greedy, numbins=9, items=values, outputtype=prtpy.out.Sums, time_limit=1))
 print(f"\t {perf_counter()-start} seconds")
+
+#' The *sequential number partitioning* algorithm (Korf, 2009) is an advanced optimal partitioning algorithm. Programmed by Shmuel and Jonathan.
+start = perf_counter()
+values = np.random.randint(1,1000, 10)
+print(prtpy.partition(algorithm=prtpy.partitioning.sequential_number_partitioning, numbins=9, items=values, outputtype=prtpy.out.Sums))
+print(f"\t {perf_counter()-start} seconds")

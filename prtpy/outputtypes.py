@@ -110,8 +110,10 @@ class PartitionAndSums(Partition):
     """ Output the set of all bins with their sums. """
     @classmethod
     def extract_output_from_sums_and_lists(cls, sums: List[float], lists: List[List[Any]]) -> List:
-        return bins2str((sums,lists))
+        # return bins2str((sums,lists))
+        return (sums,lists)
 
     @classmethod
     def extract_output_from_binsarray(cls, bins: BinsArray) -> List:
-        return bins2str(bins)
+        # return bins2str(bins)
+        return bins

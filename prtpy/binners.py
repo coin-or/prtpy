@@ -437,7 +437,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
 
 
 if __name__ == "__main__":
-    import doctest, syscd ..
+    import doctest, sys
     (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
     print("{} failures, {} tests".format(failures, tests))
     if failures>0:

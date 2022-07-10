@@ -43,7 +43,7 @@ def maximin_share_partition(c:int, valuation:list, items:Collection[Any]=None, n
     if items is None:
         items = list(range(num_of_items))
 
-    bins:prtpy = prtpy.partition(
+    sums, lists = prtpy.partition(
         algorithm=prtpy.partitioning.integer_programming,
         numbins=c,
         items=items,
@@ -52,8 +52,7 @@ def maximin_share_partition(c:int, valuation:list, items:Collection[Any]=None, n
         outputtype=prtpy.out.PartitionAndSums,
         **kwargs
     )
-
-    return (bins.bins, list(bins.sums), sum(sorted(bins.sums)[:numerator]))
+    return (lists, list(sums), sum(sorted(sums)[:numerator]))
 
 
 
