@@ -7,6 +7,7 @@ Date: 2022
 
 from typing import Callable, List, Any
 from prtpy import outputtypes as out, Bins, printbins
+from prtpy.binners import BinsArray
 
 
 def online(
@@ -14,7 +15,7 @@ def online(
     binsize: float,
     items: List[any],
     valueof: Callable[[Any], float] = lambda x: x,
-):
+)->BinsArray:
     """
         Pack the given items into bins using the online best-fit algorithm.
         The online algorithm handles the items in the order they are given.
@@ -61,7 +62,7 @@ def decreasing(
     binsize: float,
     items: List[any],
     valueof: Callable[[Any], float] = lambda x: x,
-):
+)->BinsArray:
 
     return online(
         bins,
