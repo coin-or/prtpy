@@ -1,7 +1,9 @@
 # Number-partitioning algorithms
 
 ## Approximate algorithms
-Currently, `prtpy` supports a single approximate algorithm - `greedy` - based on [Greedy number partitioning](https://en.wikipedia.org/wiki/Greedy_number_partitioning).
+`prtpy` supports single approximate algorithms. 
+The simplest one is `greedy` - based on [Greedy number partitioning](https://en.wikipedia.org/wiki/Greedy_number_partitioning).
+(also called: Longest Processing Time First).
 It is very fast, and attains very good result on random instances with many items and bins.
 
 
@@ -17,8 +19,26 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[55530. 55530. 55530. 55530. 55530. 55530. 55530. 55530. 55529.]
-         0.28508469999999875 seconds
+[55606.0, 55606.0, 55606.0, 55606.0, 55606.0, 55605.0, 55605.0,
+55605.0, 55605.0]
+         0.24113940000000156 seconds
+```
+
+
+
+The *multifit* algorithm (Coffman et al, 1978) has a better asymptotic approximation ratio:
+
+```python
+start = perf_counter()
+values = np.random.randint(1,10, 10000)
+print(prtpy.partition(algorithm=prtpy.partitioning.multifit, numbins=9, items=values, outputtype=prtpy.out.Sums))
+print(f"\t {perf_counter()-start} seconds")
+```
+
+```
+[5578.0, 5578.0, 5578.0, 5578.0, 5578.0, 5578.0, 5578.0, 5578.0,
+5532.0]
+         0.5636685999999997 seconds
 ```
 
 
@@ -35,8 +55,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[125. 126. 127. 130.]
-         0.3779532000000003 seconds
+[135.0, 135.0, 135.0, 136.0]
+         0.3820400000000035 seconds
 ```
 
 
@@ -51,26 +71,43 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-(28, 27, 28)
-         0.03369320000000009 seconds
+[31.0, 30.0, 31.0]
+         0.14241910000000502 seconds
 ```
 
 
 
-The *complete greedy* algorithm (Korf, 1995) is also available, though it is not very useful without further heuristics and optimizations.
+The *complete greedy* algorithm (Korf, 1995) allows you to determine how much time you are willing to spend to find an optimal solution.
 
 ```python
 start = perf_counter()
-values = np.random.randint(1,10, 10)
-print(prtpy.partition(algorithm=prtpy.partitioning.complete_greedy, numbins=2, items=values, outputtype=prtpy.out.Sums))
+values = np.random.randint(1,1000, 10000)
+print(prtpy.partition(algorithm=prtpy.partitioning.complete_greedy, numbins=9, items=values, outputtype=prtpy.out.Sums, time_limit=1))
 print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[18. 19.]
-         0.009161999999999892 seconds
+[554386.0, 554386.0, 554386.0, 554386.0, 554386.0, 554386.0, 554386.0,
+554387.0, 554387.0]
+         5.468529799999999 seconds
+```
+
+
+
+The *sequential number partitioning* algorithm (Korf, 2009) is an advanced optimal partitioning algorithm. Programmed by Shmuel and Jonathan.
+
+```python
+start = perf_counter()
+values = np.random.randint(1,1000, 10)
+print(prtpy.partition(algorithm=prtpy.partitioning.sequential_number_partitioning, numbins=9, items=values, outputtype=prtpy.out.Sums))
+print(f"\t {perf_counter()-start} seconds")
+```
+
+```
+[187.0, 419.0, 490.0, 503.0, 531.0, 726.0, 874.0, 909.0, 920.0]
+         8.094508399999995 seconds
 ```
 
 
 ---
-Markdown generated automatically from [partitioning.py](partitioning.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.
+Markdown generated automatically from [partitioning_algorithms.py](partitioning_algorithms.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.

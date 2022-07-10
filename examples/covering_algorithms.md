@@ -38,4 +38,4 @@ print(prtpy.pack(algorithm=prtpy.covering.threequarters, binsize=60, items=items
 
 
 ---
-Markdown generated automatically from [covering.py](covering.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.
+Markdown generated automatically from [covering_algorithms.py](covering_algorithms.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.

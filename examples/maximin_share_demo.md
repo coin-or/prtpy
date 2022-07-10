@@ -11,7 +11,7 @@ from typing import Collection, Any
 import numpy as np
 
 
-def maximin_share_partition(c:int, valuation:list, items:Collection[Any]=None, numerator:int=1, **kwargs)->int:
+def maximin_share_partition(c:int, valuation:list, items:Collection[Any]=None, numerator:int=1, **kwargs):
     """	
     Compute the of 1-of-c MMS of the given items, by the given valuation.
     :return (partition, part_values, maximin-share value)
@@ -76,7 +76,6 @@ def check_example(valuation, c:int, verbose=True):
 	(partition12, part_values12, value12) = maximin_share_partition(c, valuation, numerator=2, 
 		additional_constraints=lambda bin_sums: [bin_sums[0]==value1])
 	(partition2, part_values2, value2) = maximin_share_partition(c, valuation, numerator=2)
-	# if part_values2[0] < part_values1[0] and sum(part_values2[0:2]) > sum(part_values1[0:2]):
 	if verbose or (part_values2[0] < part_values12[0] and sum(part_values2[0:2]) > sum(part_values12[0:2])):
 		print("Found interesting example!")
 		print(f"Valuation = {valuation}")
@@ -100,9 +99,6 @@ import doctest
 doctest.testmod()
 mms_demo(3, [5, 5, 5, 7, 7, 7, 11, 17, 23, 23, 23, 31, 31, 31, 65])  # The APS example of Babaioff, Ezra and Feige (2021), Lemma C.3.
 mms_demo(3, [29, 29, 28, 16, 2])
-# check_example([5,5,5,7,8,11], c=3, verbose=False)
-# # check_example([7,7,7,10,11,16], c=3, verbose=True)
-# # find_example()
 ```
 
 ```
@@ -122,4 +118,4 @@ Valuation:  [29, 29, 28, 16, 2]
 
 
 ---
-Markdown generated automatically from [maximin_share_demo.py](maximin_share_demo.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.
+Markdown generated automatically from [maximin_share_demo.py](maximin_share_demo.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.

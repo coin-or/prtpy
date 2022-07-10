@@ -10,7 +10,7 @@ items = [46, 39, 27, 26, 16, 13, 10]
 
 import prtpy
 from prtpy.outputtypes import PartitionAndSums
-from prtpy.objectives import MaximizeSmallestSum, MinimizeLargestSum, MinimizeDifference
+from prtpy.objectives import MaximizeSmallestSum, MinimizeLargestSum, MinimizeDifference, Objective
 dp = prtpy.partitioning.dynamic_programming
 ```
 
@@ -23,9 +23,7 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=Partition
 ```
 
 ```
-Bin #0: [46, 16], sum=62.0
-Bin #1: [39, 13, 10], sum=62.0
-Bin #2: [27, 26], sum=53.0
+(array([62., 62., 53.]), [[46, 16], [39, 13, 10], [27, 26]])
 ```
 
 
@@ -37,9 +35,7 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=Partition
 ```
 
 ```
-Bin #0: [46, 10], sum=56.0
-Bin #1: [27, 16, 13], sum=56.0
-Bin #2: [39, 26], sum=65.0
+(array([56., 56., 65.]), [[46, 10], [27, 16, 13], [39, 26]])
 ```
 
 
@@ -51,9 +47,7 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=Partition
 ```
 
 ```
-Bin #0: [39, 16], sum=55.0
-Bin #1: [46, 13], sum=59.0
-Bin #2: [27, 26, 10], sum=63.0
+(array([55., 59., 63.]), [[39, 16], [46, 13], [27, 26, 10]])
 ```
 
 
@@ -62,17 +56,15 @@ To define a custom objective, create an Objective object with a lamdba function,
    describing the expression that should be *minimized*.
 
 ```python
-MinimizeSmallestSum = prtpy.obj.Objective(
-    lambda sums, are_sums_in_ascending_order=False: 
-        sums[0] if are_sums_in_ascending_order else min(sums)
-)
+class MinimizeTheSmallestSum(Objective):
+    def value_to_minimize(self, sums:list, are_sums_in_ascending_order:bool=False)->float:
+        return sums[0] if are_sums_in_ascending_order else min(sums)
+MinimizeSmallestSum = MinimizeTheSmallestSum()
 print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=PartitionAndSums, objective=MinimizeSmallestSum))
 ```
 
 ```
-Bin #0: [], sum=0.0
-Bin #1: [26, 13, 10], sum=49.0
-Bin #2: [46, 39, 27, 16], sum=128.0
+(array([  0.,  49., 128.]), [[], [26, 13, 10], [46, 39, 27, 16]])
 ```
 
 
@@ -92,9 +84,7 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, objective=MaximizeKS
 ```
 
 ```
-Bin #0: [46, 16], sum=62.0
-Bin #1: [39, 13, 10], sum=62.0
-Bin #2: [27, 26], sum=53.0
+(array([62., 62., 53.]), [[46, 16], [39, 13, 10], [27, 26]])
 ```
 
 
@@ -106,11 +96,9 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, objective=MinimizeKL
 ```
 
 ```
-Bin #0: [46, 10], sum=56.0
-Bin #1: [27, 16, 13], sum=56.0
-Bin #2: [39, 26], sum=65.0
+(array([56., 56., 65.]), [[46, 10], [27, 16, 13], [39, 26]])
 ```
 
 
 ---
-Markdown generated automatically from [objectives.py](objectives.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.
+Markdown generated automatically from [objectives.py](objectives.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.

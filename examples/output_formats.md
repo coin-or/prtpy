@@ -23,7 +23,7 @@ print(prtpy.partition(algorithm=greedy, numbins=2, items=values, outputtype=prtp
 ```
 
 ```
-[20. 23.]
+[20.0, 23.0]
 ```
 
 
@@ -60,10 +60,9 @@ prtpy.partition(algorithm=greedy, numbins=2, items=values, outputtype=prtpy.out.
 ```
 
 ```
-Bin #0: [8, 7, 5], sum=20.0
-Bin #1: [8, 6, 5, 4], sum=23.0
+(array([20., 23.]), [[8, 7, 5], [8, 6, 5, 4]])
 ```
 
 
 ---
-Markdown generated automatically from [output_formats.py](output_formats.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.
+Markdown generated automatically from [output_formats.py](output_formats.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.

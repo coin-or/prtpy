@@ -1,6 +1,6 @@
 # Bin-packing algorithms
 
-Currently, `prtpy` supports only two simple approximate bin-packing algorithms.
+Currently, `prtpy` supports the following approximate bin-packing algorithms.
 [First Fit](https://en.wikipedia.org/wiki/First-fit_bin_packing):
 
 ```python
@@ -40,5 +40,17 @@ print(prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=61, items
 ```
 
 
+
+The advanced Bin Completion algorithm; programmed by Avshalom and Tehilla
+
+```python
+print(prtpy.pack(algorithm=prtpy.packing.bin_completion, binsize=61, items=items))
+```
+
+```
+[[44, 17], [24, 21, 8, 8], [24, 22, 6, 6]]
+```
+
+
 ---
-Markdown generated automatically from [packing.py](packing.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-03-08.
+Markdown generated automatically from [packing_algorithms.py](packing_algorithms.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.
