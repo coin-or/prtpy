@@ -11,6 +11,9 @@ import unittest
 
 import prtpy
 from prtpy.partitioning.sequential_number_partitioning import snp
+prt = prtpy.partitioning
+out = prtpy.outputtypes
+obj = prtpy.objectives
 
 
 class TestSNP(unittest.TestCase):
@@ -137,22 +140,17 @@ class TestSNP(unittest.TestCase):
     def test_snp_9Bins_with_8Nums(self):
         items = [1,2,3,4,5,6,7,8]
         numbins = 9
-        bins_sums = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.Sums)
-        assert (sorted(bins_sums) ==[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0])
+        bins_sums = prtpy.partition(algorithm=snp, numbins=numbins, items=items, outputtype=prtpy.out.SortedSums)
+        assert (bins_sums ==[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0])
 
+    def test_on_random_inputs(self):
+        for numbins in [2,3,4,5]:
+            assert prtpy.compare_algorithms_on_random_items(
+                numitems=8, bitsperitem=8, numbins=numbins, 
+                outputtype=out.Difference, 
+                algorithm1=prt.integer_programming, kwargs1={"objective": obj.MinimizeDifference}, 
+                algorithm2=prt.sequential_number_partitioning, kwargs2={})
 
-# #-------------wrong input cases that should throw exeption---------
-#     def exeption(self):
-#         items = [1,2,3,4,5]
-#         numbins = 9
-#         algo = []
-#         for algorithm in functions_in_class(theclass):
-#             algo.append(algorithm)
-#         with self.assertRaises(Exception) as context:
-#             snp(items,numbins)
-#         self.assertTrue("wrong algorithm" in context.exception)
-#         self.assertRaises("wrong outputtype" in context.exception)
-#
 
 if __name__ == '__main__':
     unittest.main()

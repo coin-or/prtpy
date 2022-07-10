@@ -9,7 +9,7 @@ from prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
 from prtpy.binners import BinsArray, Binner, BinnerKeepingContents, BinnerKeepingSums, printbins
 
 from prtpy.packing.adaptors import pack, pack_random_items
-from prtpy.partitioning.adaptors import partition, partition_random_items
+from prtpy.partitioning.adaptors import partition, partition_random_items, compare_algorithms, compare_algorithms_on_random_items
 
 
 class partitioning:

@@ -69,6 +69,9 @@ def rnp(bins: Bins, items: List[any], valueof: Callable=lambda x: x) -> Bins:
     >>> list(rnp(BinsKeepingContents(5), items=[1,2,3,4,5,6,7,8,9])[0])
     [9.0, 9.0, 9.0, 9.0, 9.0]
 
+    >>> sorted(rnp(BinsKeepingContents(5), items=[3, 16, 22, 24, 24, 29])[0])
+    [19.0, 22.0, 24.0, 24.0, 29.0]
+
     >>> from prtpy import partition
     >>> partition(algorithm=rnp, numbins=4, items={"a":1, "b":1, "c":1, "d":1})
     [['c'], ['d'], ['b'], ['a']]
@@ -119,13 +122,13 @@ def rec_generate_sets(prior_bins: BinsArray, best_partition_so_far: BinsArray, i
                 binner.add_item_to_bin(prior_bins, item=item, bin_index=num_prior_bins)
             remaining_items = find_diff(items, items_for_last_bin)
             new_bins = rec_generate_sets(prior_bins, best_partition_so_far, remaining_items, valueof, numbins - 1, trees, binner)
-            if new_bins:
-                bins_sums = binner.sums(best_partition_so_far)
-                best_difference_so_far = max(bins_sums) - min(bins_sums)
-                combined_sums = np.append(binner.sums(new_bins), binner.sums(prior_bins))
-                diff = max(combined_sums) - min(combined_sums)
-                if diff < best_difference_so_far:
-                    best_partition_so_far = binner.concatenate_bins(prior_bins, new_bins)
+            # if new_bins:
+            bins_sums = binner.sums(best_partition_so_far)
+            best_difference_so_far = max(bins_sums) - min(bins_sums)
+            combined_sums = np.append(binner.sums(new_bins), binner.sums(prior_bins))
+            diff = max(combined_sums) - min(combined_sums)
+            if diff < best_difference_so_far:
+                best_partition_so_far = binner.concatenate_bins(prior_bins, new_bins)
             prior_bins = binner.remove_bins(prior_bins, 1)
     
     #### Even case: numbins is odd

@@ -41,6 +41,9 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)
     [100.0, 100.0, 100.0]
 
+    >>> sorted(rnp(BinsKeepingContents(5), items=[3, 16, 22, 24, 24, 29]).sums)
+    [19.0, 22.0, 24.0, 24.0, 29.0]
+
     >>> rnp(BinsKeepingContents(4), items=[3, 6, 13, 20, 30, 40, 73]).bins
     [[73], [40], [30, 6], [20, 13, 3]]
 

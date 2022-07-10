@@ -1,5 +1,8 @@
 """
 Test all supported packing and covering algorithms on small inputs of all supported types.
+
+Programmer: Erel Segal-Halevi
+Since: 2022
 """
 import prtpy, unittest, itertools
 from utils import functions_in_class

@@ -11,6 +11,9 @@ import unittest
 
 import prtpy
 from prtpy.partitioning.recursive_number_partitioning_sy import rnp
+prt = prtpy.partitioning
+out = prtpy.outputtypes
+obj = prtpy.objectives
 
 
 class TestRNP(unittest.TestCase):
@@ -131,6 +134,22 @@ class TestRNP(unittest.TestCase):
         bins = prtpy.partition(algorithm=rnp, numbins=numbins, items=items, outputtype=prtpy.out.Partition)
         assert (bins == [[0], [], [0], [0]] or bins == [[], [0], [0], [0]]  or bins == [[0], [0], [], [0]]
                 or bins ==  [[0], [], [], [0, 0]] )
+
+    def test_on_random_inputs(self):
+        for numbins in [2,3,4,5]:
+            assert prtpy.compare_algorithms_on_random_items(
+                numitems=8, bitsperitem=8, numbins=numbins, 
+                outputtype=out.Difference, 
+                algorithm1=prt.integer_programming, kwargs1={"objective": obj.MinimizeDifference}, 
+                algorithm2=prt.recursive_number_partitioning_sy, kwargs2={})
+
+            # assert prtpy.compare_algorithms_on_random_items(
+            #     numitems=6, bitsperitem=5, numbins=numbins, 
+            #     outputtype=out.SortedSums, 
+            #     algorithm1=prt.integer_programming, kwargs1={"objective": obj.MinimizeDifference}, 
+            #     algorithm2=prt.recursive_number_partitioning_kg, kwargs2={})
+            # Fails
+
 
 
 if __name__ == '__main__':
