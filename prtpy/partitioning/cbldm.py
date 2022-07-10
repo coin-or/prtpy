@@ -77,7 +77,7 @@ def cbldm(
     if numitems == 0:  # empty items returns empty partition
         return binner.new_bins(numbins)
 
-    binner = BinnerKeepingContents(numbins, binner.valueof)  # Must keep contents, because we need to count the number of items in each bin!
+    binner = BinnerKeepingContents(binner.valueof)  # Must keep contents, because we need to count the number of items in each bin!
 
     sub_partitions = []    # list of bin-arrays, each of which contains a possible sub-partition.
     for item in sorted_items:
