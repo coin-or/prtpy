@@ -15,6 +15,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np, itertools
 from typing import Any, Callable, List, Tuple, Iterator
+import prtpy
 
 BinsArray = Any
 
@@ -46,11 +47,19 @@ class Binner(ABC):
         self.valueof = valueof
 
     @abstractmethod
-    def new_bins(self, numbins)->BinsArray:
+    def new_bins(self, numbins:int)->BinsArray:
         '''
         Create a new bins-array with numbins bins.
         '''
         return None
+
+    @abstractmethod
+    def new_bins_structure(self, numbins:int):
+        '''
+        Create a new Bins structure with numbins bins.
+        '''
+        return None
+
 
     @abstractmethod
     def clone(self, bins:BinsArray)->BinsArray:
@@ -208,6 +217,9 @@ class BinnerKeepingSums(Binner):
         bins = np.zeros(numbins)
         return bins
 
+    def new_bins_structure(self, numbins:int):
+        return prtpy.BinsKeepingSums(numbins, self.valueof)
+
     def clone(self, bins: BinsArray)->BinsArray:
         return np.array(bins)
 
@@ -349,6 +361,9 @@ class BinnerKeepingContents(BinnerKeepingSums):
         sums  = np.zeros(numbins)
         lists = [[] for _ in range(numbins)]
         return (sums, lists)
+
+    def new_bins_structure(self, numbins:int):
+        return prtpy.BinsKeepingContents(numbins, self.valueof)
 
     def clone(self, bins: BinsArray)->BinsArray:
         sums, lists = bins

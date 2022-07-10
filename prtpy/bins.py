@@ -222,7 +222,7 @@ class BinsKeepingSums(Bins):
         return BinsKeepingSums(numbins, self.valueof)
 
     def get_binner(self)->Binner:
-        return BinnerKeepingSums(self.num, self.valueof)
+        return BinnerKeepingSums(self.valueof)
 
 
 class BinsKeepingContents(BinsKeepingSums):
@@ -348,7 +348,7 @@ class BinsKeepingContents(BinsKeepingSums):
         return BinsKeepingContents(numbins, self.valueof)
 
     def get_binner(self)->Binner:
-        return BinnerKeepingContents(self.num, self.valueof)
+        return BinnerKeepingContents(self.valueof)
 
 
 if __name__ == "__main__":
