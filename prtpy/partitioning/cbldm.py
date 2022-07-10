@@ -85,39 +85,39 @@ def cbldm(
         sub_partitions.append(b)
     alg = CBLDM_algo(numitems=numitems, time_limit=time_limit, len_delta=partition_difference, start_time=start, binner=binner)
     alg.part(sub_partitions)
-    return alg.best
+    return alg.best_partition_so_far
 
 
 class CBLDM_algo:
 
     def __init__(self, numitems:int, time_limit:float, len_delta:int, start_time:float, binner:Binner):
         self.sum_delta = np.inf  # partition sum difference
-        self.length = numitems
+        self.numitems = numitems
         self.time_limit = time_limit
         self.len_delta = len_delta  # partition cardinal difference
-        self.start = start_time
-        self.best = BinsKeepingContents(2)
-        self.best.add_item_to_bin(np.inf, 1)
-        self.opt = False
+        self.start_time = start_time
+        self.best_partition_so_far = BinsKeepingContents(2)    # valueof = identity
+        self.best_partition_so_far.add_item_to_bin(np.inf, 1)
+        self.is_optimal = False
         self.binner = binner
 
-    def part(self, items):
-        if time.perf_counter() - self.start >= self.time_limit or self.opt:
+    def part(self, sub_partitions):
+        if time.perf_counter() - self.start_time >= self.time_limit or self.is_optimal:
             return
-        if len(items) == 1:  # possible partition
-            if abs(len(items[0].bins[0]) - len(items[0].bins[1])) <= self.len_delta and abs(
-                    items[0].sums[0] - items[0].sums[1]) < self.sum_delta:
-                self.best = items[0]
-                self.sum_delta = abs(items[0].sums[0] - items[0].sums[1])
+        if len(sub_partitions) == 1:  # possible partition
+            if abs(len(sub_partitions[0].bins[0]) - len(sub_partitions[0].bins[1])) <= self.len_delta and abs(
+                    sub_partitions[0].sums[0] - sub_partitions[0].sums[1]) < self.sum_delta:
+                self.best_partition_so_far = sub_partitions[0]
+                self.sum_delta = abs(sub_partitions[0].sums[0] - sub_partitions[0].sums[1])
                 if self.sum_delta == 0:
-                    self.opt = True
+                    self.is_optimal = True
                 return
         else:
             sum_xi = 0  # calculate the sum of the sum differences in items
             max_x = 0  # max sum difference
             sum_mi = 0  # calculate the sum of the cardinal differences in items
             max_m = 0  # max cardinal difference
-            for i in items:
+            for i in sub_partitions:
                 xi = abs(i.sums[0] - i.sums[1])
                 sum_xi += xi
                 mi = abs(len(i.bins[0]) - len(i.bins[1]))
@@ -128,34 +128,34 @@ class CBLDM_algo:
                     max_x = xi
             if 2 * max_x - sum_xi >= self.sum_delta:
                 return
-            # despite being in the paper, or condition breaks algorithm. for example breaks on [1,1,1,1,1,1,1,1,1,1]
+            # Despite being in the paper, the "or" condition breaks the algorithm. For example, it breaks on [1,1,1,1,1,1,1,1,1,1].
             if 2 * max_m - sum_mi > self.len_delta:  # or sum_mi < self.difference:
                 return
-            if len(items) <= math.ceil(self.length / 2):
-                items = sorted(items, key=lambda item: abs(item.sums[0] - item.sums[1]), reverse=True)
-            # split items to left branch and right branch according to partition type
-            left = items[2:]
-            right = items[2:]
-            split = BinsKeepingContents(2, self.binner.valueof)  # split partition according to sum of bins
-            combine = BinsKeepingContents(2, self.binner.valueof)  # merge partition according to sum of bins
+            if len(sub_partitions) <= math.ceil(self.numitems / 2):
+                sub_partitions = sorted(sub_partitions, key=lambda sub_partition: abs(sub_partition.sums[0] - sub_partition.sums[1]), reverse=True) # Sort by descending difference.
+            # Split items to left branch and right branch according to partition type
+            left = sub_partitions[2:]
+            right = sub_partitions[2:]
 
+            combined_bins = BinsKeepingContents(2, self.binner.valueof)  # merge partition according to sum of bins
             for section in range(2):  # [small, big] + [small, big] -> [small + small, big + big]
                 for bin_i in range(2):
-                    for i in items[section].bins[bin_i]:
-                        combine.add_item_to_bin(i, bin_i)
-            combine.sort_by_ascending_sum()
+                    for i in sub_partitions[section].bins[bin_i]:
+                        combined_bins.add_item_to_bin(i, bin_i)
+            combined_bins.sort_by_ascending_sum()
 
-            for i in items[0].bins[0]:  # [small, big] + [small, big] -> [small + big, small + big]
-                split.add_item_to_bin(i, 1)
-            for i in items[0].bins[1]:
-                split.add_item_to_bin(i, 0)
+            split_bins    = BinsKeepingContents(2, self.binner.valueof)  # split partition according to sum of bins
+            for i in sub_partitions[0].bins[0]:  # [small, big] + [small, big] -> [small + big, small + big]
+                split_bins.add_item_to_bin(i, 1)
+            for i in sub_partitions[0].bins[1]:
+                split_bins.add_item_to_bin(i, 0)
             for bin_i in range(2):
-                for i in items[1].bins[bin_i]:
-                    split.add_item_to_bin(i, bin_i)
-            split.sort_by_ascending_sum()
+                for i in sub_partitions[1].bins[bin_i]:
+                    split_bins.add_item_to_bin(i, bin_i)
+            split_bins.sort_by_ascending_sum()
 
-            right.append(combine)
-            left.append(split)
+            right.append(combined_bins)
+            left.append(split_bins)
             self.part(left)
             self.part(right)
 
@@ -170,6 +170,7 @@ if __name__ == "__main__":
     # Demonstrating the efficiency of the algorithm on large inputs
     from prtpy import partition, out
     rng = np.random.default_rng(1)
+
     items = rng.integers(1, 1000, 100)
     assert partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums) == [25390.0, 25390.0]
 
