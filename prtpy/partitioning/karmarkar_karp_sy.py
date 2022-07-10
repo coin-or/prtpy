@@ -7,7 +7,8 @@ Credit: based on code by Søren Fuglede Jørgensen in the numberpartitioning pac
            https://github.com/fuglede/numberpartitioning/blob/master/src/numberpartitioning
 """
 from typing import Callable, List, Any
-from prtpy import outputtypes as out, objectives as obj, Bins, Binner, BinsArray, printbins
+from prtpy import outputtypes as out, objectives as obj
+from prtpy.binners import Binner, BinsArray, printbins
 import heapq, logging
 from itertools import count
 

@@ -13,7 +13,8 @@ Since: 2022-07
 import numpy as np
 
 import prtpy
-from prtpy import outputtypes as out, objectives as obj, Bins, Binner
+from prtpy import outputtypes as out, objectives as obj
+from prtpy.binners import Binner
 from typing import Callable, List, Any
 
 def partition(
@@ -23,7 +24,7 @@ def partition(
     valueof: Callable[[Any], float] = None,
     outputtype: out.OutputType = out.Partition,
     **kwargs
-) -> List[List[int]]:
+):
     """
     An adaptor partition function.
 
@@ -64,7 +65,7 @@ def partition(
     [['b', 'g'], ['a', 'f'], ['c', 'd', 'e']]
 
     >>> traversc_example = [18, 12, 22, 22]
-    >>> prtpy.partition(algorithm=prt.integer_programming, numbins=2, items=traversc_example, outputtype=out.PartitionAndSums)
+    >>> print(prtpy.partition(algorithm=prt.integer_programming, numbins=2, items=traversc_example, outputtype=out.PartitionAndSums))
     Bin #0: [12, 22], sum=34.0
     Bin #1: [18, 22], sum=40.0
     """
@@ -76,14 +77,10 @@ def partition(
         item_names = items
         if valueof is None:
             valueof = lambda item: item
-    # bins = outputtype.create_empty_bins(numbins, valueof)
     binner = outputtype.create_binner(valueof)
     bins   = algorithm(binner, numbins, item_names, **kwargs)
+    return outputtype.extract_output_from_binsarray(bins)
 
-    if isinstance(bins, Bins):
-        return outputtype.extract_output_from_bins(bins)
-    else:
-        return outputtype.extract_output_from_binsarray(bins)
 
 def partition_random_items(numitems: int, bitsperitem: int, **kwargs):
     """

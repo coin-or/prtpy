@@ -19,7 +19,7 @@ def bin_completion(binner: Binner, binsize: float, items: List[Any])->BinsArray:
     the algorithm finds the minimum number of bins needed to contain all the numbers,
     such that the sum of the numbers assigned to each bin does not exceed the bin capacity.
 
-    >>> from prtpy import BinnerKeepingContents, BinsKeepingSums, printbins
+    >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums, printbins
 
     Example 1: max capacity
     >>> printbins(bin_completion(BinnerKeepingContents(), binsize=100, items=[100,100,100,100,100,100]))

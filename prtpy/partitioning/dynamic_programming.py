@@ -10,8 +10,9 @@ Author: Erel Segal-Halevi
 Since: 2022-02
 """
 
-from prtpy import outputtypes as out, objectives as obj, Bins, Binner, BinnerKeepingContents, BinnerKeepingSums, printbins
-from typing import Callable, List, Any, Tuple
+from prtpy import outputtypes as out, objectives as obj
+from prtpy.binners import Binner, BinnerKeepingContents, BinnerKeepingSums, printbins
+from typing import List, Any, Tuple
 from dataclasses import dataclass
 import logging, numpy as np
 
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 def optimal(
-    binner: Binner, numbins: int, items: List[any],
+    binner: Binner, numbins: int, items: List[Any],
     objective: obj.Objective = obj.MinimizeDifference,
     **kwargs
 ):
@@ -182,8 +183,6 @@ if __name__ == "__main__":
     # DEMO
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
-
-    from prtpy.bins import BinsKeepingContents, BinsKeepingSums
 
     optimal(BinnerKeepingSums(), 2, [4,5,6,7,8], objective=obj.MinimizeLargestSum)
     walter_numbers = [46, 39, 27, 26, 16, 13, 10]

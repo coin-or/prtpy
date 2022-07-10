@@ -5,7 +5,6 @@ __version__ = (HERE / "VERSION").read_text().strip()
 
 import prtpy.outputtypes as out
 import prtpy.objectives as obj
-from prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
 from prtpy.binners import BinsArray, Binner, BinnerKeepingContents, BinnerKeepingSums, printbins
 
 from prtpy.packing.adaptors import pack, pack_random_items

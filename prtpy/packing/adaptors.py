@@ -11,7 +11,8 @@ Since: 2022-07
 """
 import numpy as np
 
-from prtpy import outputtypes as out, Binner, Bins
+from prtpy import outputtypes as out
+from prtpy.binners import Binner
 from typing import Callable, List, Any
 from prtpy.packing.first_fit import decreasing as ffd
 
@@ -69,10 +70,7 @@ def pack(
             valueof = lambda item: item
     binner = outputtype.create_binner(valueof)
     bins = algorithm(binner, binsize, item_names, **kwargs)
-    if isinstance(bins, Bins):
-        return outputtype.extract_output_from_bins(bins)
-    else:
-        return outputtype.extract_output_from_binsarray(bins)
+    return outputtype.extract_output_from_binsarray(bins)
 
 def pack_random_items(numitems: int, bitsperitem: int, **kwargs):
     """

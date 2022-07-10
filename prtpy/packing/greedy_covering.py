@@ -5,16 +5,15 @@ AUTHOR: Erel Segal-Halevi
 SINCE: 2021-04
 """
 
-from prtpy import outputtypes as out, Bins, Binner, BinsArray
-from typing import Callable, List, Any
+from prtpy import outputtypes as out
+from prtpy.binners import Binner, BinsArray
+from typing import List, Any
 
 
 
 
 
-
-
-def decreasing(binner: Binner, binsize: float, items: List[any])->BinsArray:
+def decreasing(binner: Binner, binsize: float, items: List[Any])->BinsArray:
     """
     Run a simple bin-covering algorithm:
     it orders the items in descending order, and puts them into a bin until it is filled.

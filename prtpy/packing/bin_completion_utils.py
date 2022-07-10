@@ -9,13 +9,13 @@ import math
 from itertools import combinations, product
 from typing import List, Iterable
 import logging
-from prtpy.bins import Bins, BinsKeepingContents
+from prtpy.binners import BinsArray
 
 
 # A simple class to store a state of bins arrangement.
 # We keep the current bin arrangement and index of the next bin, as well as the items left to arrange in those bins.
 class BinBranch:
-    def __init__(self, items: List, bins: Bins, bin_index: int):
+    def __init__(self, items: List, bins: BinsArray, bin_index: int):
         self.items = items
         self.bins = bins
         self.bin_index = bin_index

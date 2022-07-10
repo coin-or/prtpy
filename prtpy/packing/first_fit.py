@@ -7,12 +7,12 @@ Programmer: Erel Segal-Halevi.
 Date: 2022
 """
 
-from typing import Callable, List, Any
-from prtpy import outputtypes as out, Bins, Binner, printbins
-from prtpy.binners import BinsArray
+from typing import List, Any
+from prtpy import outputtypes as out
+from prtpy.binners import BinsArray, Binner, printbins
 
 
-def online(binner: Binner, binsize: float, items: List[any])->BinsArray:
+def online(binner: Binner, binsize: float, items: List[Any])->BinsArray:
     """
     Pack the given items into bins using the online *First-Fit* algorithm.
     The online algorithm handles the items in the order they are given.

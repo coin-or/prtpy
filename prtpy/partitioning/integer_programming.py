@@ -80,7 +80,7 @@ def optimal(
     [16.0, 16.0]
 
     >>> traversc_example = [18, 12, 22, 22]
-    >>> partition(algorithm=optimal, numbins=2, items=traversc_example, outputtype=out.PartitionAndSums)
+    >>> print(partition(algorithm=optimal, numbins=2, items=traversc_example, outputtype=out.PartitionAndSums))
     Bin #0: [12, 22], sum=34.0
     Bin #1: [18, 22], sum=40.0
     """

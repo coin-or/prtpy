@@ -147,12 +147,3 @@ if __name__ == '__main__':
     import doctest
     (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
     print("{} failures, {} tests".format(failures, tests))
-
-    logger.setLevel(logging.INFO)
-    logger.addHandler(logging.StreamHandler())
-    from prtpy import BinnerKeepingContents, BinnerKeepingSums, printbins
-    # print(rnp(BinsKeepingSums(2), [4,5,6,7,8]))
-    # print(rnp(BinsKeepingSums(3), [4,5,6,7,8]))
-    # print(snp(BinsKeepingSums(4), [4,5,6,7,8]))
-    # print(snp(BinsKeepingSums(5), [4,5,6,7,8]))
-    # print(snp(BinsKeepingContents(3), items=[1,3,3,4,4,5,5,5]))

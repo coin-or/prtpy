@@ -15,7 +15,7 @@ Date: 2022-06-03
 import sys
 from typing import Callable, List, Any
 import numpy as np
-from prtpy import Bins, BinsKeepingContents, Binner, BinsArray, printbins
+from prtpy import Binner, BinsArray, printbins
 import time
 import math
 
@@ -25,7 +25,7 @@ from prtpy.binners import BinnerKeepingContents
 def cbldm(
     binner: Binner, numbins: int, items: List[any],
     time_limit: float = np.inf, 
-    partition_difference: int = sys.maxsize) -> Bins:
+    partition_difference: int = sys.maxsize) -> BinsArray:
     """
     Balanced number partitioning into two bins.
     :param items - the items to partition. The length must be at most 900--1000 due to stack limitations; the exact maximum can vary between computers.
@@ -81,7 +81,6 @@ def cbldm(
 
     sub_partitions = []    # list of bin-arrays, each of which contains a possible sub-partition.
     for item in sorted_items:
-        # b = BinsKeepingContents(2, valueof)
         b = binner.new_bins(numbins)
         binner.add_item_to_bin(b, item=item, bin_index=1)
         sub_partitions.append(b)
@@ -148,12 +147,7 @@ class CBLDM_algo:
             left_sub_partitions  = sub_partitions[2:]
             right_sub_partitions = sub_partitions[2:]
 
-            # combined_bins = BinsKeepingContents(2, self.binner.valueof)  # merge partition according to sum of bins
             combined_bins = binner.new_bins(2)
-            # combined_bins.combine_bins(0, sub_partitions[0], 0)
-            # combined_bins.combine_bins(0, sub_partitions[1], 0)
-            # combined_bins.combine_bins(1, sub_partitions[0], 1)
-            # combined_bins.combine_bins(1, sub_partitions[1], 1)
             for section in range(2):  # [small, big] + [small, big] -> [small + small, big + big]
                 for bin_index in range(2):
                     # combined_bins.combine_bins(bin_index, sub_partitions[section], bin_index)
@@ -161,12 +155,7 @@ class CBLDM_algo:
             # combined_bins.sort_by_ascending_sum()
             binner.sort_by_ascending_sum(combined_bins)
 
-            # split_bins    = BinsKeepingContents(2, self.binner.valueof)  # split partition according to sum of bins
             split_bins = binner.new_bins(2)
-            # split_bins.combine_bins(0, sub_partitions[0], 1)
-            # split_bins.combine_bins(0, sub_partitions[1], 0)
-            # split_bins.combine_bins(1, sub_partitions[0], 0)
-            # split_bins.combine_bins(1, sub_partitions[1], 1)
             for section in range(2):  # [small, big] + [small, big] -> [small + small, big + big]
                 for bin_index in range(2):
                     # split_bins.combine_bins(bin_index, sub_partitions[section], (bin_index+section+1)%2)

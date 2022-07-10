@@ -9,9 +9,8 @@ Date:    2022-03
 """
 
 from typing import Iterator, List, Tuple, Callable, List, Any
-from prtpy import outputtypes as out, objectives as obj, Bins, Binner, BinsKeepingContents, BinsKeepingSums
+from prtpy import outputtypes as out, objectives as obj, Binner, BinsArray
 import logging, numpy as np
-from prtpy.binners import BinsArray
 
 from prtpy.partitioning.karmarkar_karp_sy import BinsSortedByMaxDiff
 
@@ -19,7 +18,7 @@ from prtpy.partitioning.karmarkar_karp_sy import BinsSortedByMaxDiff
 logger = logging.getLogger(__name__)
 
 
-def _possible_partition_difference_lower_bound(current_heap: List[Tuple[int, int, Bins, List[int]]], numbins: int) -> int:
+def _possible_partition_difference_lower_bound(current_heap: BinsSortedByMaxDiff, numbins: int) -> int:
     """
     This function check if from the current node we can yield to a better partition or not by checking the
     best difference we can reach from this node.
@@ -200,8 +199,3 @@ if __name__ == '__main__':
     print("{} failures, {} tests".format(failures, tests))
     if failures>0: 
         sys.exit(1)
-
-    # logger.setLevel(logging.INFO)
-    # logger.addHandler(logging.StreamHandler())
-    # from prtpy import BinsKeepingContents, BinsKeepingSums, printbins
-    # print(optimal(BinsKeepingContents(2), [4,5,6,7,8]))
