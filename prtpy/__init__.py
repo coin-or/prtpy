@@ -19,8 +19,8 @@ class partitioning:
     from prtpy.partitioning.dynamic_programming import optimal as dp
     from prtpy.partitioning.dynamic_programming import optimal as dynamic_programming
 
-    from prtpy.partitioning.ilp import optimal as ilp
-    from prtpy.partitioning.ilp import optimal as integer_programming
+    from prtpy.partitioning.integer_programming import optimal as ilp
+    from prtpy.partitioning.integer_programming import optimal as integer_programming
 
     from prtpy.partitioning.greedy import greedy
     from prtpy.partitioning.greedy import greedy as lpt
