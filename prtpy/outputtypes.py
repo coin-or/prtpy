@@ -16,7 +16,7 @@ class OutputType(ABC):
         raise NotImplementedError("Choose a specific output type")
 
     @classmethod
-    def create_binner(cls, numbins: int, valueof: Callable) -> Binner:
+    def create_binner(cls, valueof: Callable) -> Binner:
         """
         Construct and return a Bins structure. Used at the initialization phase of an algorithm.
         """
@@ -49,8 +49,8 @@ class Sums(OutputType):
         return BinsKeepingSums(numbins, valueof)
 
     @classmethod
-    def create_binner(cls, numbins: int, valueof: Callable) -> List:
-        return BinnerKeepingSums(numbins, valueof)
+    def create_binner(cls, valueof: Callable) -> List:
+        return BinnerKeepingSums(valueof)
 
     @classmethod
     def extract_output_from_sums(cls, sums: List[float]) -> List:
@@ -121,8 +121,8 @@ class Partition(OutputType):
         return BinsKeepingContents(numbins, valueof)
 
     @classmethod
-    def create_binner(cls, numbins: int, valueof: Callable) -> List:
-        return BinnerKeepingContents(numbins, valueof)
+    def create_binner(cls, valueof: Callable) -> List:
+        return BinnerKeepingContents(valueof)
 
     @classmethod
     def extract_output_from_sums_and_lists(cls, sums: List[float], lists: List[List[Any]]) -> List:

@@ -42,14 +42,13 @@ class Binner(ABC):
      * valueof - a function that maps an item to its value.
     """
 
-    def __init__(self, numbins: int=0, valueof: Callable = lambda x:x):
-        self.numbins = numbins
+    def __init__(self, valueof: Callable = lambda x:x):
         self.valueof = valueof
 
     @abstractmethod
-    def new_bins(self, numbins=None)->BinsArray:
+    def new_bins(self, numbins)->BinsArray:
         '''
-        Create a new bins-array with numbins or self.numbins bins.
+        Create a new bins-array with numbins bins.
         '''
         return None
 
@@ -103,9 +102,16 @@ class Binner(ABC):
         # return bins
 
     @abstractmethod
-    def numitems(self, bins: BinsArray, bin_index:int) -> Tuple[float]:
+    def numitems(self, bins: BinsArray, bin_index:int) -> float:
         """
         Return the number of items in the given bin.
+        """
+        return None
+
+    @abstractmethod
+    def numofbins(self, bins: BinsArray) -> int:
+        """
+        Return the number of bins in the given bins-array.
         """
         return None
 
@@ -115,12 +121,6 @@ class Binner(ABC):
         Return only the current sums. 
         """
         return None
-
-    def sums_as_tuple(self, bins: BinsArray) -> Tuple[float]:
-        """
-        Return a tuple with only the current sums. Can be used as a key in a set or dict.
-        """
-        return tuple(self.sums(bins))
 
     @abstractmethod
     def combine_bins(self, bins1:BinsArray, ibin1:int, bins2:BinsArray, ibin2:int):
@@ -138,11 +138,6 @@ class Binner(ABC):
         '''
         pass
 
-    @abstractmethod
-    def clone_with_new_numbins(self,  new_numbins:int):
-        pass
-
-
     # @abstractmethod
     # def clear_bins(self, numbins):
     #     """
@@ -157,8 +152,8 @@ class BinnerKeepingSums(Binner):
     A binner that creates bin-arrays that keep track only of the total sum in each bin.
 
     >>> values = {"a":3, "b":4, "c":5, "d":5, "e":5}
-    >>> binner = BinnerKeepingSums(3, lambda x: values[x])
-    >>> bins = binner.new_bins()
+    >>> binner = BinnerKeepingSums(lambda x: values[x])
+    >>> bins = binner.new_bins(3)
     >>> printbins(binner.add_item_to_bin(bins, item="a", bin_index=0))
     Bin #0: sum=3.0
     Bin #1: sum=0.0
@@ -194,7 +189,7 @@ class BinnerKeepingSums(Binner):
     Bin #0: sum=0.0
     Bin #1: sum=3.0
     Bin #2: sum=9.0
-    >>> binner.sums_as_tuple(bins)
+    >>> tuple(binner.sums(bins))
     (0.0, 3.0, 9.0)
 
     >>> printbins(binner.add_empty_bins(bins, 1))
@@ -209,8 +204,7 @@ class BinnerKeepingSums(Binner):
 
     BinsArray = np.ndarray    # Here, the bins-array is simply an array of the sums.
 
-    def new_bins(self, numbins=None)->BinsArray:
-        if numbins is None: numbins = self.numbins
+    def new_bins(self, numbins)->BinsArray:
         bins = np.zeros(numbins)
         return bins
 
@@ -239,19 +233,24 @@ class BinnerKeepingSums(Binner):
     def numitems(self, bins: BinsArray, bin_index:int) -> Tuple[float]:
         raise NotImplementedError("Bins keeping sums do not keep track of the number of items.")
 
+    def numofbins(self, bins: BinsArray) -> int:
+        """
+        Return the number of bins in the given bins-array.
+        """
+        return len(bins)
+
     def sums(self, bins: BinsArray) -> Tuple[float]:
         return bins
 
     def sort_by_ascending_sum(self, bins:BinsArray)->BinsArray:
         bins.sort()
-        # return bins
 
     def combine_bins(self, bins1:BinsArray, ibin1:int, bins2:BinsArray, ibin2:int):
         bins1[ibin1] += bins2[ibin2]
 
     def all_combinations(self, bins1: BinsArray, bins2: BinsArray)->Iterator[BinsArray]:
         """
-        >>> binner = BinnerKeepingSums(3)
+        >>> binner = BinnerKeepingSums()
         >>> b1 = [1,2,3]
         >>> b2 = [4,5,6]
         >>> for perm in binner.all_combinations(b1, b2): perm
@@ -271,17 +270,15 @@ class BinnerKeepingSums(Binner):
         [70, 304, 601]
         """
         yielded = set()   # prevent duplicates
-        for perm in itertools.permutations(range(self.numbins)):
+        numbins = self.numofbins(bins1)
+        for perm in itertools.permutations(range(numbins)):
             # print("perm=",perm)
-            new_sums = [bins1[perm[i]] + bins2[i] for i in range(self.numbins)]
+            new_sums = [bins1[perm[i]] + bins2[i] for i in range(numbins)]
             new_sums.sort()   # to avoid duplicates
             new_sums_tuple = tuple(new_sums)
             if new_sums_tuple not in yielded:
                 yielded.add(new_sums_tuple)
                 yield new_sums
-
-    def clone_with_new_numbins(self,  new_numbins:int):
-        return BinnerKeepingSums(new_numbins, self.valueof)
 
 
 class BinnerKeepingContents(BinnerKeepingSums):
@@ -289,8 +286,8 @@ class BinnerKeepingContents(BinnerKeepingSums):
     A binner that creates bin-arrays that keep track of the entire contents of each bin.
 
     >>> values = {"a":3, "b":4, "c":5, "d":5, "e":5}
-    >>> binner = BinnerKeepingContents(3, lambda x: values[x])
-    >>> bins = binner.new_bins()
+    >>> binner = BinnerKeepingContents(lambda x: values[x])
+    >>> bins = binner.new_bins(3)
     >>> printbins(binner.add_item_to_bin(bins, item="a", bin_index=0))
     Bin #0: ['a'], sum=3.0
     Bin #1: [], sum=0.0
@@ -326,7 +323,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
     Bin #0: [], sum=0.0
     Bin #1: ['a'], sum=3.0
     Bin #2: ['b', 'c'], sum=9.0
-    >>> binner.sums_as_tuple(bins)
+    >>> tuple(binner.sums(bins))
     (0.0, 3.0, 9.0)
     >>> binner.numitems(bins, 0)
     0
@@ -348,8 +345,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
 
     BinsArray = Tuple[np.ndarray, List[List]]  # Here, each bins-array is a tuple: sums,lists. sums is an array of sums; lists is a list of lists of items.
 
-    def new_bins(self, numbins:int=None)->BinsArray:
-        if numbins is None: numbins = self.numbins
+    def new_bins(self, numbins:int)->BinsArray:
         sums  = np.zeros(numbins)
         lists = [[] for _ in range(numbins)]
         return (sums, lists)
@@ -397,9 +393,16 @@ class BinnerKeepingContents(BinnerKeepingSums):
         sums, lists = bins
         return len(lists[bin_index])
 
+    def numofbins(self, bins: BinsArray) -> int:
+        """
+        Return the number of bins in the given bins-array.
+        """
+        return len(bins[0])
+
     def sort_by_ascending_sum(self, bins: BinsArray) -> BinsArray:
         sums, lists = bins
-        sorted_indices = sorted(range(self.numbins), key=lambda i: sums[i])
+        numbins = self.numofbins(bins)
+        sorted_indices = sorted(range(numbins), key=lambda i: sums[i])
         sums[:] = list(map(sums.__getitem__, sorted_indices))
         lists[:] = list(map(lists.__getitem__, sorted_indices))
         # return bins
@@ -412,7 +415,7 @@ class BinnerKeepingContents(BinnerKeepingSums):
 
     def all_combinations(self, bins1: BinsArray, bins2: BinsArray)->Iterator[BinsArray]:
         """
-        >>> binner = BinnerKeepingContents(3)
+        >>> binner = BinnerKeepingContents()
         >>> b1 = ([1, 20, 300],  [[1], [20], [300]])
         >>> b2 = ([4, 50, 600],  [[1, 3], [4, 46], [600]])
         >>> for perm in binner.all_combinations(b1,b2): perm[1]
@@ -426,9 +429,12 @@ class BinnerKeepingContents(BinnerKeepingSums):
         yielded = set() # to avoid duplicates
         sums1, lists1 = bins1
         sums2, lists2 = bins2
-        for perm in itertools.permutations(range(self.numbins)):
-            new_sums =  [sums1[perm[i]] + sums2[i] for i in range(self.numbins)]
-            new_lists = [sorted(lists1[perm[i]] + lists2[i]) for i in range(self.numbins)]  # sorting to avoid duplicates
+        numbins = len(sums1)
+        if len(sums2)!=numbins:
+            raise ValueError(f"Inputs should have the same number of bins, but they have {numbins} and {len(sums2)} bins.")
+        for perm in itertools.permutations(range(numbins)):
+            new_sums =  [sums1[perm[i]] + sums2[i] for i in range(numbins)]
+            new_lists = [sorted(lists1[perm[i]] + lists2[i]) for i in range(numbins)]  # sorting to avoid duplicates
             new_bins = (new_sums, new_lists)
             self.sort_by_ascending_sum(new_bins)
             new_lists_tuple = tuple(map(tuple,new_bins[1]))
@@ -436,13 +442,10 @@ class BinnerKeepingContents(BinnerKeepingSums):
                 yielded.add(new_lists_tuple)
                 yield new_bins
 
-    def clone_with_new_numbins(self,  new_numbins:int):
-        return BinnerKeepingContents(new_numbins, self.valueof)
-
 
 if __name__ == "__main__":
     import doctest, sys
-    (failures, tests) = doctest.testmod(report=True)
+    (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
     print("{} failures, {} tests".format(failures, tests))
     if failures>0:
         sys.exit(1)

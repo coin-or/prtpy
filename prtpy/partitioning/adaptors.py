@@ -77,7 +77,7 @@ def partition(
         if valueof is None:
             valueof = lambda item: item
     # bins = outputtype.create_empty_bins(numbins, valueof)
-    binner = outputtype.create_binner(numbins, valueof)
+    binner = outputtype.create_binner(valueof)
     bins   = algorithm(binner, numbins, item_names, **kwargs)
 
     if isinstance(bins, Bins):

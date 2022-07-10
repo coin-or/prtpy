@@ -83,7 +83,7 @@ def _optimal_sums(
     num_of_processed_states = 1
 
     # Construct initial states:
-    current_states = {binner.sums_as_tuple(first_state)}
+    current_states = {tuple(binner.sums(first_state))}
     for item in items:
         value = valueof(item)
 
@@ -93,7 +93,7 @@ def _optimal_sums(
             for ibin in range(binner.numbins):
                 next_state = binner.add_item_to_bin(binner.clone(state), item, ibin)
                 binner.sort_by_ascending_sum(next_state)
-                next_states.add(binner.sums_as_tuple(next_state))
+                next_states.add(tuple(binner.sums(next_state)))
         states_added = len(next_states)
         logger.info("  Processed item %s and added %d states.", item, states_added)
         num_of_processed_states += states_added
