@@ -23,27 +23,24 @@ from prtpy.binners import BinnerKeepingContents
 
 
 def cbldm(
-        bins: Bins,
-        items: List[float],
-        valueof: Callable[[Any], float] = lambda x: x,
-        time_limit: float = np.inf,
-        partition_difference: int = sys.maxsize
-) -> Bins:
+    binner: Binner, numbins: int, items: List[any],
+    time_limit: float = np.inf, 
+    partition_difference: int = sys.maxsize) -> Bins:
     """
     Balanced number partitioning into two bins.
     :param items - the items to partition. The length must be at most 900--1000 due to stack limitations; the exact maximum can vary between computers.
 
-    >>> from prtpy import BinsKeepingContents, BinsKeepingSums
-    >>> printbins(cbldm(BinsKeepingContents(2), items=[10], time_limit=1))
+    >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums
+    >>> printbins(cbldm(BinnerKeepingContents(), 2, items=[10], time_limit=1))
     Bin #0: [], sum=0.0
     Bin #1: [10], sum=10.0
-    >>> printbins(cbldm(BinsKeepingContents(2), items=[8,7,6,5,4], time_limit=1, partition_difference=1))
+    >>> printbins(cbldm(BinnerKeepingContents(), 2, items=[8,7,6,5,4], time_limit=1, partition_difference=1))
     Bin #0: [4, 6, 5], sum=15.0
     Bin #1: [8, 7], sum=15.0
-    >>> printbins(cbldm(BinsKeepingContents(2), items=[6,6,5,5,5], time_limit=1, partition_difference=1))
+    >>> printbins(cbldm(BinnerKeepingContents(), 2, items=[6,6,5,5,5], time_limit=1, partition_difference=1))
     Bin #0: [6, 6], sum=12.0
     Bin #1: [5, 5, 5], sum=15.0
-    >>> printbins(cbldm(BinsKeepingContents(2), items=[4,1,1,1,1], time_limit=1, partition_difference=1))
+    >>> printbins(cbldm(BinnerKeepingContents(), 2, items=[4,1,1,1,1], time_limit=1, partition_difference=1))
     Bin #0: [1, 1, 1], sum=3.0
     Bin #1: [4, 1], sum=5.0
     
@@ -64,30 +61,28 @@ def cbldm(
     >>> partition(algorithm=cbldm, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['g', 'd', 'c', 'a'], ['f', 'b', 'e']]
     """
-    binner = bins.get_binner()
-
     start = time.perf_counter()
-    if binner.numbins != 2:
+    if numbins != 2:
         raise ValueError("numbins must be 2")
     if time_limit <= 0:
         raise ValueError("time_limit must be positive")
     if partition_difference < 1 or not isinstance(partition_difference, int):
         raise ValueError("partition_difference must be a complete number and >= 1")
 
-    sorted_items = sorted(items, key=valueof, reverse=True) # Sort by descending value
-    if valueof(sorted_items[-1])<0:
+    sorted_items = sorted(items, key=binner.valueof, reverse=True) # Sort by descending value
+    if binner.valueof(sorted_items[-1])<0:
         raise ValueError("All items must be non-negative")
 
     numitems = len(items)
     if numitems == 0:  # empty items returns empty partition
-        return binner.new_bins(binner.numbins)
+        return binner.new_bins(numbins)
 
-    binner = BinnerKeepingContents(binner.numbins, binner.valueof)  # Must keep contents, because we need to count the number of items in each bin!
+    binner = BinnerKeepingContents(numbins, binner.valueof)  # Must keep contents, because we need to count the number of items in each bin!
 
     sub_partitions = []    # list of bin-arrays, each of which contains a possible sub-partition.
     for item in sorted_items:
         # b = BinsKeepingContents(2, valueof)
-        b = binner.new_bins(binner.numbins)
+        b = binner.new_bins(numbins)
         binner.add_item_to_bin(b, item=item, bin_index=1)
         sub_partitions.append(b)
     alg = CBLDM_algo(numitems=numitems, time_limit=time_limit, len_delta=partition_difference, start_time=start, binner=binner)
