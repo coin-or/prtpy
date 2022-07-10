@@ -13,7 +13,7 @@ Since: 2022-07
 import numpy as np
 
 import prtpy
-from prtpy import outputtypes as out, objectives as obj, Bins
+from prtpy import outputtypes as out, objectives as obj, Bins, Binner
 from typing import Callable, List, Any
 
 def partition(
@@ -76,8 +76,9 @@ def partition(
         item_names = items
         if valueof is None:
             valueof = lambda item: item
-    bins = outputtype.create_empty_bins(numbins, valueof)
-    bins = algorithm(bins, item_names, valueof, **kwargs)
+    # bins = outputtype.create_empty_bins(numbins, valueof)
+    binner = outputtype.create_binner(numbins, valueof)
+    bins   = algorithm(binner, numbins, item_names, **kwargs)
 
     if isinstance(bins, Bins):
         return outputtype.extract_output_from_bins(bins)

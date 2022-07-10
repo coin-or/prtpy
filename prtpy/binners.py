@@ -42,7 +42,7 @@ class Binner(ABC):
      * valueof - a function that maps an item to its value.
     """
 
-    def __init__(self, numbins: int, valueof: Callable = lambda x:x):
+    def __init__(self, numbins: int=0, valueof: Callable = lambda x:x):
         self.numbins = numbins
         self.valueof = valueof
 
