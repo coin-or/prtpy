@@ -9,8 +9,7 @@ from prtpy.bins import Bins, BinsKeepingContents, BinsKeepingSums
 from prtpy.binners import BinsArray, Binner, BinnerKeepingContents, BinnerKeepingSums, printbins
 
 from prtpy.packing import pack, pack_random_items
-from prtpy.partitioning import complete_karmarkar_karp_kg, partition, partition_random_items
-
+from prtpy.partitioning.adaptors import partition, partition_random_items
 
 
 class partitioning:
