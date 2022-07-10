@@ -21,7 +21,7 @@ import numpy as np
 from typing import Callable, List
 from itertools import count, permutations
 from prtpy import Bins, printbins
-from prtpy.partitioning.trivial import trivial_partition
+from prtpy.partitioning.alternatives.trivial import trivial_partition
 
 
 def optimal(bins: Bins, items: List[any], valueof: Callable = lambda x: x):

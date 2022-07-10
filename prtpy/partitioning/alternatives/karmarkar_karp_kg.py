@@ -21,7 +21,7 @@
 """
 from typing import Callable, List
 from prtpy import Bins, BinsKeepingContents
-from prtpy.partitioning.trivial import trivial_partition
+from prtpy.partitioning.alternatives.trivial import trivial_partition
 
 
 def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
