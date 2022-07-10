@@ -105,10 +105,11 @@ class CBLDM_algo:
         if time.perf_counter() - self.start_time >= self.time_limit or self.is_optimal:
             return
         if len(sub_partitions) == 1:  # possible partition
-            if abs(len(sub_partitions[0].bins[0]) - len(sub_partitions[0].bins[1])) <= self.len_delta and abs(
-                    sub_partitions[0].sums[0] - sub_partitions[0].sums[1]) < self.sum_delta:
-                self.best_partition_so_far = sub_partitions[0]
-                self.sum_delta = abs(sub_partitions[0].sums[0] - sub_partitions[0].sums[1])
+            potential_partition = sub_partitions[0]
+            if abs(len(potential_partition.bins[0]) - len(potential_partition.bins[1])) <= self.len_delta and \
+                abs(potential_partition.sums[0] - potential_partition.sums[1]) < self.sum_delta:
+                self.best_partition_so_far = potential_partition
+                self.sum_delta = abs(potential_partition.sums[0] - potential_partition.sums[1])
                 if self.sum_delta == 0:
                     self.is_optimal = True
                 return
@@ -133,7 +134,7 @@ class CBLDM_algo:
                 return
             if len(sub_partitions) <= math.ceil(self.numitems / 2):
                 sub_partitions.sort(key=lambda sub_partition: -abs(sub_partition.sums[0] - sub_partition.sums[1])) # Sort by descending difference.
-                
+
             # Split items to left branch and right branch according to partition type
             left_sub_partitions  = sub_partitions[2:]
             right_sub_partitions = sub_partitions[2:]
