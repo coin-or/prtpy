@@ -15,7 +15,7 @@ import itertools
 from typing import Callable, List
 from prtpy import Bins
 from prtpy.bins import BinsKeepingContents
-from prtpy.partitioning.recursive_number_partitioning_kg import rnp
+from prtpy.partitioning.alternatives.recursive_number_partitioning_kg import rnp
 from prtpy.utils import is_all_lists_are_different, all_in, get_best_best_k_combination, \
     get_sum_of_max_subset, get_largest_number
 from prtpy.partitioning.trivial import trivial_partition
@@ -67,6 +67,10 @@ def irnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
 
     >>> irnp(BinsKeepingContents(0), items=[number for number in range(10)]).bins
     []
+
+    The following test does not work (found by comparing the output of random inputs with integer programming)
+    >>> sorted(irnp(BinsKeepingContents(5), items=[3, 16, 22, 24, 24, 29]).sums)
+    [19.0, 22.0, 24.0, 24.0, 29.0]
 
     """
     if trivial_partition(bins, items):

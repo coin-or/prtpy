@@ -141,15 +141,7 @@ class TestRNP(unittest.TestCase):
                 numitems=8, bitsperitem=8, numbins=numbins, 
                 outputtype=out.Difference, 
                 algorithm1=prt.integer_programming, kwargs1={"objective": obj.MinimizeDifference}, 
-                algorithm2=prt.recursive_number_partitioning_sy, kwargs2={})
-
-            # assert prtpy.compare_algorithms_on_random_items(
-            #     numitems=6, bitsperitem=5, numbins=numbins, 
-            #     outputtype=out.SortedSums, 
-            #     algorithm1=prt.integer_programming, kwargs1={"objective": obj.MinimizeDifference}, 
-            #     algorithm2=prt.recursive_number_partitioning_kg, kwargs2={})
-            # Fails
-
+                algorithm2=prt.recursive_number_partitioning, kwargs2={})
 
 
 if __name__ == '__main__':

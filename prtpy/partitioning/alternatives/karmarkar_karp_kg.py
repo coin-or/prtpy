@@ -36,9 +36,6 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> kk(BinsKeepingContents(2), [1, 2, 3, 4, 5, 6]).bins
     [[6, 3, 2], [5, 4, 1]]
 
-    >>> list(kk(BinsKeepingContents(2), items=[4, 5, 6, 7, 8]).bins)   # According to Wikipedia, it should be: [[8,6],[4,7,5]]
-    [[8, 5, 4], [7, 6]]
-
     >>> list(kk(BinsKeepingContents(2), items=[18, 17, 12, 11, 8, 2]).sums)
     [37.0, 31.0]
 
@@ -54,6 +51,9 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> kk(BinsKeepingContents(0), items=[number for number in range(10)]).bins
     []
 
+    # The following test does not work. According to Wikipedia, it should be: [[8,6],[4,7,5]]
+    >>> list(kk(BinsKeepingContents(2), items=[4, 5, 6, 7, 8]).bins)
+    [[8, 6], [4, 7, 5]]
     """
     if trivial_partition(bins, items):
         return bins

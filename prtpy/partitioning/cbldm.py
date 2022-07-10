@@ -54,15 +54,6 @@ def cbldm(                  # max items length can be between 900 and 1000 due t
 
     >>> partition(algorithm=cbldm, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
     [['g', 'd', 'c', 'a'], ['f', 'b', 'e']]
-
-    >>> rng = np.random.default_rng(1)
-    >>> items = rng.integers(1, 1000, 100)
-    >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums)
-    [25390.0, 25390.0]
-
-    >>> items = rng.integers(1, 1000, 899)
-    >>> partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums, time_limit=10)
-    [225368.0, 225369.0]
     """
     start = time.perf_counter()
     if bins.num != 2:
@@ -165,7 +156,17 @@ class CBLDM_algo:
 
 
 if __name__ == "__main__":
-    import doctest
-
+    import doctest, sys
     (failures, tests) = doctest.testmod(report=True)
     print("{} failures, {} tests".format(failures, tests))
+    if failures>0:
+        sys.exit(1)
+
+    # Demonstrating the efficiency of the algorithm on large inputs
+    from prtpy import partition, out
+    rng = np.random.default_rng(1)
+    items = rng.integers(1, 1000, 100)
+    assert partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums) == [25390.0, 25390.0]
+
+    items = rng.integers(1, 1000, 899)
+    assert partition(algorithm=cbldm, numbins=2, items=items, outputtype=out.Sums, time_limit=10) == [225368.0, 225369.0]

@@ -71,6 +71,10 @@ def optimal(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
+
+    The following test does not work (found by comparing the output of random inputs with integer programming)
+    >>> list(optimal(BinsKeepingSums(3), [4, 15, 16, 17, 21, 22, 24, 25]).sort_by_ascending_sum().sums)
+    [47.0, 48.0, 49.0]
     """
     if trivial_partition(bins, items):
         return bins

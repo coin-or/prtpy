@@ -32,43 +32,39 @@ class partitioning:
     # Samuel & Jonathan modules
     from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp_sy  
     from prtpy.partitioning.karmarkar_karp_sy import kk as karmarkar_karp      # Default implementation
+    from prtpy.partitioning.karmarkar_karp_sy import kk as kk_sy
     from prtpy.partitioning.karmarkar_karp_sy import kk as kk
 
     from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as complete_karmarkar_karp_sy
     from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as complete_karmarkar_karp     # Default implementation
     from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as ckk_sy
+    from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as ckk
 
-    from prtpy.partitioning.sequential_number_partitioning import snp as sequential_number_partitioning
-    from prtpy.partitioning.sequential_number_partitioning import snp
+    from prtpy.partitioning.sequential_number_partitioning_sy import snp as sequential_number_partitioning_sy
+    from prtpy.partitioning.sequential_number_partitioning_sy import snp as sequential_number_partitioning
+    from prtpy.partitioning.sequential_number_partitioning_sy import snp_sy
+    from prtpy.partitioning.sequential_number_partitioning_sy import snp
 
     from prtpy.partitioning.recursive_number_partitioning_sy import rnp as recursive_number_partitioning_sy
     from prtpy.partitioning.recursive_number_partitioning_sy import rnp as rnp_sy
+    from prtpy.partitioning.recursive_number_partitioning_sy import rnp as recursive_number_partitioning # Default implementation
+    from prtpy.partitioning.recursive_number_partitioning_sy import rnp as rnp
 
     # Eli Belkind module
     from prtpy.partitioning.cbldm import cbldm
 
-    # Kfir Goldfarb modules
-    from prtpy.partitioning.complete_karmarkar_karp_kg import optimal as complete_karmarkar_karp_kg  #  Alternative implementation
-    from prtpy.partitioning.complete_karmarkar_karp_kg import optimal as ckk_kg
-
-    from prtpy.partitioning.recursive_number_partitioning_kg import rnp as recursive_number_partitioning_kg
-    from prtpy.partitioning.recursive_number_partitioning_kg import rnp as rnp_kg
     
-    from prtpy.partitioning.improved_recursive_number_partitioning import irnp as improved_recursive_number_partitioning
-    from prtpy.partitioning.improved_recursive_number_partitioning import irnp
-
 partitioning.complete_greedy.__name__ = "complete-greedy"
 partitioning.integer_programming.__name__ = "integer-programming"
 partitioning.dynamic_programming.__name__ = "dynamic-programming"
 partitioning.karmarkar_karp_sy.__name__ = "karmarkar-karp-sy"
 partitioning.karmarkar_karp.__name__ = "karmarkar-karp"
 partitioning.complete_karmarkar_karp_sy.__name__ = "complete-karmarkar-karp-sy"
-partitioning.complete_karmarkar_karp_kg.__name__ = "complete-karmarkar-karp-kg"
+partitioning.complete_karmarkar_karp.__name__ = "complete-karmarkar-karp"
 partitioning.recursive_number_partitioning_sy.__name__ = "recursive-number-partitioning-sy"
-partitioning.recursive_number_partitioning_kg.__name__ = "recursive-number-partitioning-kg"
+partitioning.recursive_number_partitioning.__name__ = "recursive-number-partitioning"
+partitioning.sequential_number_partitioning_sy.__name__ = "sequential-number-partitioning-sy"
 partitioning.sequential_number_partitioning.__name__ = "sequential-number-partitioning"
-partitioning.improved_recursive_number_partitioning.__name__ = "improved-recursive-number-partitioning"
-
 
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing

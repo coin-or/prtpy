@@ -19,7 +19,7 @@ import itertools
 from typing import Callable, List
 
 from prtpy import Bins, BinsKeepingContents
-from prtpy.partitioning.complete_karmarkar_karp_kg import optimal
+from prtpy.partitioning.alternatives.complete_karmarkar_karp_kg import optimal
 from prtpy.utils import all_in, is_all_lists_are_different, get_best_best_k_combination
 from prtpy.partitioning.trivial import trivial_partition
 
@@ -41,9 +41,6 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> list(rnp(BinsKeepingContents(3), items=[95, 15, 75, 25, 85, 5]).sums)
     [100.0, 100.0, 100.0]
 
-    >>> sorted(rnp(BinsKeepingContents(5), items=[3, 16, 22, 24, 24, 29]).sums)
-    [19.0, 22.0, 24.0, 24.0, 29.0]
-
     >>> rnp(BinsKeepingContents(4), items=[3, 6, 13, 20, 30, 40, 73]).bins
     [[73], [40], [30, 6], [20, 13, 3]]
 
@@ -59,6 +56,9 @@ def rnp(bins: Bins, items: List[any], valueof: Callable = lambda x: x):
     >>> rnp(BinsKeepingContents(0), items=[number for number in range(10)]).bins
     []
 
+    The following test does not work (found by comparing the output of random inputs with integer programming)
+    >>> sorted(rnp(BinsKeepingContents(5), items=[3, 16, 22, 24, 24, 29]).sums)
+    [19.0, 22.0, 24.0, 24.0, 29.0]
     """
     if trivial_partition(bins, items):
         return bins
