@@ -31,6 +31,8 @@ def online(binner: Binner, binsize: float, items: List[any])->BinsArray:
     numbins = 1
     for item in items:
         value = binner.valueof(item)
+        if isinstance(value,str):
+            raise ValueError(f"Value of {item} is {value}")
         if value > binsize:
             raise ValueError(f"Item {item} has size {value} which is larger than the bin size {binsize}.")
         ibin = 0

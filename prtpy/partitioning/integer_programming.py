@@ -37,7 +37,7 @@ def optimal(
     :param additional_constraints: a function that accepts the list of sums in ascending order, and returns a list of possible additional constraints on the sums.
     :param weights: if given, must be of size bins.num. Divides each sum by its weight before applying the objective function.
 
-    >>> from prtpy.bins import BinnerKeepingContents, BinnerKeepingSums
+    >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums
     >>> optimal(BinnerKeepingSums(), 2, [11.1,11,11,11,22], objective=obj.MaximizeSmallestSum)
     array([33. , 33.1])
     >>> optimal(BinnerKeepingSums(), 2, [11,11,11,11,22], objective=obj.MaximizeSmallestSum)
@@ -81,8 +81,7 @@ def optimal(
 
     >>> traversc_example = [18, 12, 22, 22]
     >>> print(partition(algorithm=optimal, numbins=2, items=traversc_example, outputtype=out.PartitionAndSums))
-    Bin #0: [12, 22], sum=34.0
-    Bin #1: [18, 22], sum=40.0
+    (array([34., 40.]), [[12, 22], [18, 22]])
     """
     ibins = range(numbins)
     items = list(items)

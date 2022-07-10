@@ -27,7 +27,7 @@ class TestPackingAlgorithms(unittest.TestCase):
 
     def test_with_list_input(self):
         self._test_class_with_list_input(theclass=prtpy.packing, binsize=25, items=[11,22])
-        self._test_class_with_list_input(theclass=prtpy.covering, binsize=9, items=[11,22])
+        # self._test_class_with_list_input(theclass=prtpy.covering, binsize=9, items=[11,22])
 
     def _test_class_with_dict_input(self, theclass, items, binsize):
         for algorithm in functions_in_class(theclass):
@@ -48,7 +48,7 @@ class TestPackingAlgorithms(unittest.TestCase):
 
     def test_with_dict_input(self):
         self._test_class_with_dict_input(theclass=prtpy.packing, binsize=25, items={"a":11, "b":22})
-        self._test_class_with_dict_input(theclass=prtpy.covering, binsize=9, items={"a":11, "b":22})
+        # self._test_class_with_dict_input(theclass=prtpy.covering, binsize=9, items={"a":11, "b":22})
 
 
 if __name__ == "__main__":

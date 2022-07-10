@@ -70,17 +70,17 @@ def bin_completion(binner: Binner, binsize: float, items: List[Any])->BinsArray:
     Bin #3: [93, 4], sum=97.0
     Bin #4: [8], sum=8.0
     """
-    # Test if there is an item which is not a number OR larger than binsize.
+    # Test if there is an item with a value larger than binsize.
     for item in items:
-        if not isinstance(item, int) or item > binsize:
-            raise ValueError(f"Item {item} is not valid.")
+        if binner.valueof(item) > binsize:
+            raise ValueError(f"Item {item} is not valid: its value is {binner.valueof(item)} while the bin size is {binsize}.")
 
     # Remove zeros from items as they are irrelevant.
-    items = list(filter((0).__ne__, items))
+    items = [item for item in items if binner.valueof(item)!=0]
 
     # Find the BFD solution and check if it's optimal using the lower bound calculation.
-    bfd_solution = best_fit.decreasing(BinnerKeepingContents(), binsize, items.copy())
-    lb = lower_bound(binsize, items)
+    bfd_solution = best_fit.decreasing(BinnerKeepingContents(binner.valueof), binsize, items)
+    lb = lower_bound(binsize, map(binner.valueof, items))
 
     # If the BFD solution is optimal - return it.
     if binner.numbins(bfd_solution) == lb:

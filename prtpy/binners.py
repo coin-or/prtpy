@@ -195,6 +195,9 @@ class BinnerKeepingSums(Binner):
     Bin #1: sum=3.0
     """
 
+    def __init__(self, valueof: Callable = lambda x:x):
+        super().__init__(valueof)
+
     BinsArray = np.ndarray    # Here, the bins-array is simply an array of the sums.
 
     def new_bins(self, numbins)->BinsArray:
@@ -335,6 +338,9 @@ class BinnerKeepingContents(BinnerKeepingSums):
     Bin #0: [], sum=0.0
     Bin #1: ['a'], sum=3.0
     """
+
+    def __init__(self, valueof: Callable = lambda x:x):
+        super().__init__(valueof)
 
     BinsArray = Tuple[np.ndarray, List[List]]  # Here, each bins-array is a tuple: sums,lists. sums is an array of sums; lists is a list of lists of items.
 

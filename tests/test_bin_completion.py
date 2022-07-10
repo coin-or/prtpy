@@ -45,14 +45,15 @@ def test_raise_big_numbers():
         algorithm(BinnerKeepingContents(), binsize=100, items=[200, 0])
         algorithm(BinnerKeepingContents(), binsize=200, items=[1, 2, 300, 0, 0])
 
-# In this test we will check that the algorithm function raises an error when the input includes items that are not
-# of number type:
-def test_raise_wrong_input():
-    with pytest.raises(ValueError):
-        algorithm(BinnerKeepingContents(), binsize=100, items=[1, 2, "aaa"])
-        algorithm(BinnerKeepingContents(), binsize=100, items=['c'])
-        algorithm(BinnerKeepingContents(), binsize=100, items=['1', '2', '3', '4'])
-        algorithm(BinnerKeepingContents(), binsize=100, items=["Avshalom", "Tehila"])
-        algorithm(BinnerKeepingContents(), binsize=100, items=["One Hundred"])
-        algorithm(BinnerKeepingContents(), binsize=100, items=[[1,2]])
-        algorithm(BinnerKeepingContents(), binsize=100, items=['@', '#', '$'])
+# # In this test we will check that the algorithm function raises an error when the input includes items that are not
+# # of number type:
+# def test_raise_wrong_input():
+#     with pytest.raises(ValueError):
+#         algorithm(BinnerKeepingContents(), binsize=100, items=[1, 2, "aaa"])
+#         algorithm(BinnerKeepingContents(), binsize=100, items=['c'])
+#         algorithm(BinnerKeepingContents(), binsize=100, items=['1', '2', '3', '4'])
+#         algorithm(BinnerKeepingContents(), binsize=100, items=["Avshalom", "Tehila"])
+#         algorithm(BinnerKeepingContents(), binsize=100, items=["One Hundred"])
+#         algorithm(BinnerKeepingContents(), binsize=100, items=[[1,2]])
+#         algorithm(BinnerKeepingContents(), binsize=100, items=['@', '#', '$'])
+
