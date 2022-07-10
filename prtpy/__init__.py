@@ -42,7 +42,7 @@ class partitioning:
 
     from prtpy.partitioning.sequential_number_partitioning_sy import snp as sequential_number_partitioning_sy
     from prtpy.partitioning.sequential_number_partitioning_sy import snp as sequential_number_partitioning
-    from prtpy.partitioning.sequential_number_partitioning_sy import snp_sy
+    from prtpy.partitioning.sequential_number_partitioning_sy import snp as snp_sy
     from prtpy.partitioning.sequential_number_partitioning_sy import snp
 
     from prtpy.partitioning.recursive_number_partitioning_sy import rnp as recursive_number_partitioning_sy
