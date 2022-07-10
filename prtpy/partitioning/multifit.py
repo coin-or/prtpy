@@ -64,8 +64,7 @@ def multifit(binner: Binner, numbins: int, items: List[any], iterations = 10):
         else:
             lower_bound = binsize
             
-    result_bins = binner.new_bins_structure(0)
-    return first_fit.online(result_bins, upper_bound, sorted_items, binner.valueof)
+    return first_fit.online(binner, binsize=upper_bound, items=sorted_items)
 
 
 if __name__ == "__main__":
