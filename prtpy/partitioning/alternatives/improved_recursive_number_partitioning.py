@@ -16,7 +16,7 @@ from typing import Callable, List
 from prtpy import Bins
 from prtpy.bins import BinsKeepingContents
 from prtpy.partitioning.alternatives.recursive_number_partitioning_kg import rnp
-from prtpy.utils import is_all_lists_are_different, all_in, get_best_best_k_combination, \
+from prtpy.partitioning.alternatives.utils import is_all_lists_are_different, all_in, get_best_best_k_combination, \
     get_sum_of_max_subset, get_largest_number
 from prtpy.partitioning.alternatives.trivial import trivial_partition
 

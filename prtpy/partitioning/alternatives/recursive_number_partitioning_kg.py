@@ -20,7 +20,7 @@ from typing import Callable, List
 
 from prtpy import Bins, BinsKeepingContents
 from prtpy.partitioning.alternatives.complete_karmarkar_karp_kg import optimal
-from prtpy.utils import all_in, is_all_lists_are_different, get_best_best_k_combination
+from prtpy.partitioning.alternatives.utils import all_in, is_all_lists_are_different, get_best_best_k_combination
 from prtpy.partitioning.alternatives.trivial import trivial_partition
 
 
