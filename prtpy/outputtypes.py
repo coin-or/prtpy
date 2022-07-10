@@ -62,7 +62,12 @@ class Sums(OutputType):
 
     @classmethod
     def extract_output_from_binsarray(cls, bins: BinsArray) -> List:
-        return cls.extract_output_from_sums(bins)
+        try:
+            bins[0][0]           # If it succeeds, it means that bins is a tuple (sums,lists).
+            sums = bins[0]
+        except:
+            sums = bins          # If it fails, it means that bins is a singleton: sums.
+        return cls.extract_output_from_sums(sums)
 
 
 class LargestSum(Sums):

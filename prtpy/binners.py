@@ -103,6 +103,13 @@ class Binner(ABC):
         # return bins
 
     @abstractmethod
+    def numitems(self, bins: BinsArray, bin_index:int) -> Tuple[float]:
+        """
+        Return the number of items in the given bin.
+        """
+        return None
+
+    @abstractmethod
     def sums(self, bins: BinsArray) -> Tuple[float]:
         """
         Return only the current sums. 
@@ -229,6 +236,9 @@ class BinnerKeepingSums(Binner):
         bins[bin_index] += self.valueof(item)
         return bins
 
+    def numitems(self, bins: BinsArray, bin_index:int) -> Tuple[float]:
+        raise NotImplementedError("Bins keeping sums do not keep track of the number of items.")
+
     def sums(self, bins: BinsArray) -> Tuple[float]:
         return bins
 
@@ -318,6 +328,12 @@ class BinnerKeepingContents(BinnerKeepingSums):
     Bin #2: ['b', 'c'], sum=9.0
     >>> binner.sums_as_tuple(bins)
     (0.0, 3.0, 9.0)
+    >>> binner.numitems(bins, 0)
+    0
+    >>> binner.numitems(bins, 1)
+    1
+    >>> binner.numitems(bins, 2)
+    2
 
 
     >>> printbins(binner.add_empty_bins(bins, 1))
@@ -373,6 +389,13 @@ class BinnerKeepingContents(BinnerKeepingSums):
 
     def sums(self, bins: BinsArray) -> Tuple[float]:
         return bins[0]
+
+    def numitems(self, bins: BinsArray, bin_index:int) -> Tuple[float]:
+        """
+        Return the number of items in the given bin.
+        """
+        sums, lists = bins
+        return len(lists[bin_index])
 
     def sort_by_ascending_sum(self, bins: BinsArray) -> BinsArray:
         sums, lists = bins
