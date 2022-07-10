@@ -60,34 +60,34 @@ class BinsSortedByMaxDiff:
 
 
 
-def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x, binner:Binner = None) -> BinsArray:
+def kk(binner: Binner, numbins: int, items: List[any]) -> BinsArray:
     """
     Karmarkar-Karp number partitioning algorithm, for any number of bins.
 
-    >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> printbins(kk(BinsKeepingContents(2), items=[1, 6, 2, 3, 7, 4, 5, 8]))
+    >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums
+    >>> printbins(kk(BinnerKeepingContents(), 2, items=[1, 6, 2, 3, 7, 4, 5, 8]))
     Bin #0: [7, 6, 4, 1], sum=18.0
     Bin #1: [8, 5, 3, 2], sum=18.0
 
-    >>> printbins(kk(BinsKeepingContents(2), [1, 2, 3, 4, 5, 6]))
+    >>> printbins(kk(BinnerKeepingContents(), 2, [1, 2, 3, 4, 5, 6]))
     Bin #0: [1, 6, 3], sum=10.0
     Bin #1: [2, 5, 4], sum=11.0
 
-    >>> printbins(kk(BinsKeepingContents(2), items=[4, 5, 6, 7, 8]))
+    >>> printbins(kk(BinnerKeepingContents(), 2, items=[4, 5, 6, 7, 8]))
     Bin #0: [8, 6], sum=14.0
     Bin #1: [4, 7, 5], sum=16.0
 
-    >>> printbins(kk(BinsKeepingSums(2), items=[18, 17, 12, 11, 8, 2]))
+    >>> printbins(kk(BinnerKeepingSums(), 2, items=[18, 17, 12, 11, 8, 2]))
     Bin #0: sum=32.0
     Bin #1: sum=36.0
 
-    >>> printbins(kk(BinsKeepingSums(4), items=[1,2,3,3,5,9,9]))
+    >>> printbins(kk(BinnerKeepingSums(), 4, items=[1,2,3,3,5,9,9]))
     Bin #0: sum=7.0
     Bin #1: sum=7.0
     Bin #2: sum=9.0
     Bin #3: sum=9.0
 
-    >>> printbins(kk(BinsKeepingContents(4), items=[1, 3, 3, 4, 4, 5, 5, 5]))
+    >>> printbins(kk(BinnerKeepingContents(), 4, items=[1, 3, 3, 4, 4, 5, 5, 5]))
     Bin #0: [1, 5], sum=6.0
     Bin #1: [3, 5], sum=8.0
     Bin #2: [3, 5], sum=8.0
@@ -99,11 +99,8 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x, binner:Bin
     >>> partition(algorithm=kk, numbins=4, items=[1,2,3,3,5,9,9])
     [[3, 3, 1], [5, 2], [9], [9]]
     """
-    if binner is None:
-        binner = bins.get_binner()
-    
     numitems = len(items)
-    logger.info("\nKarmarkar-Karp Partitioning of %d items into %d parts.", numitems, binner.numbins)
+    logger.info("\nKarmarkar-Karp Partitioning of %d items into %d parts.", numitems, numbins)
     items = sorted(items, reverse=True, key=binner.valueof)
 
     bins_heap = BinsSortedByMaxDiff(binner)
@@ -111,7 +108,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x, binner:Bin
     # Explanation from Wikipedia: https://en.wikipedia.org/wiki/Largest_differencing_method#Multi-way_partitioning
     # 1. "Initially, for each number i in S, construct a k-tuple of subsets, in which one subset is {i} and the other k-1 subsets are empty.
     for item in items:
-        new_bins = binner.add_item_to_bin(binner.new_bins(), item=item, bin_index=binner.numbins-1)
+        new_bins = binner.add_item_to_bin(binner.new_bins(numbins), item=item, bin_index=numbins-1)
         bins_heap.push(new_bins)
 
     # 2. "In each iteration, select two k-tuples A and B in which the difference between the maximum and minimum sum is largest, 
@@ -123,8 +120,8 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x, binner:Bin
         bins2 = bins_heap.pop()
 
         # "-- combine them in reverse order of sizes":
-        for i in range(binner.numbins):
-            binner.combine_bins(bins1, binner.numbins-i-1, bins2, i)
+        for i in range(numbins):
+            binner.combine_bins(bins1, numbins-i-1, bins2, i)
         bins_heap.push(bins1)
 
     return bins_heap.top()
@@ -132,7 +129,7 @@ def kk(bins: Bins, items: List[any], valueof: Callable = lambda x: x, binner:Bin
 
 if __name__ == '__main__':
     import doctest, sys
-    (failures, tests) = doctest.testmod(report=True)
+    (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
     print("{} failures, {} tests".format(failures, tests))
     if failures>0: 
         sys.exit()
@@ -140,8 +137,6 @@ if __name__ == '__main__':
     # DEMO
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
-    from prtpy import BinsKeepingContents, BinsKeepingSums
-    # kk(BinsKeepingSums(2), [4,5,6,7,8])
-    # kk(BinsKeepingContents(2), [4,5,6,7,8])
-    kk(BinsKeepingSums(4), [1,2,3,3,5,9,9])
-    kk(BinsKeepingContents(4), [1,2,3,3,5,9,9])
+    from prtpy import BinnerKeepingContents, BinnerKeepingSums
+    kk(BinnerKeepingSums(), 4, [1,2,3,3,5,9,9])
+    kk(BinnerKeepingContents(), 4, [1,2,3,3,5,9,9])
