@@ -5,7 +5,8 @@ Partition the numbers using the [MultiFit algorithm](https://en.wikipedia.org/wi
 """
 
 from typing import Callable, List, Any
-from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingSums, BinsKeepingContents
+import prtpy
+from prtpy import outputtypes as out, objectives as obj, Bins, BinsKeepingSums, BinsKeepingContents, printbins
 from prtpy.packing import first_fit
 
 import logging
@@ -19,20 +20,28 @@ def multifit(bins: Bins, items: List[any], valueof: Callable[[Any], float] = lam
                        The default is 10 iterations, which means a relative error of less than 1:1000.
 
     >>> from prtpy.bins import BinsKeepingContents, BinsKeepingSums
-    >>> multifit(BinsKeepingContents(2), items=[1,2,3,4]).bins
-    [[4, 1], [3, 2]]
-
+    >>> printbins(multifit(BinsKeepingContents(2), items=[1,2,3,4]))
+    Bin #0: [4, 1], sum=5.0
+    Bin #1: [3, 2], sum=5.0
+    
     Examples from Wikipedia:
     >>> example4 = [9,7,6,5,5, 4,4,4,4,4,4,4,4,4]
-    >>> multifit(BinsKeepingContents(4), items=example4).bins
-    [[9, 7, 4], [6, 5, 5, 4], [4, 4, 4, 4, 4], [4, 4]]
-    >>> multifit(BinsKeepingContents(5), items=example4).bins
-    [[9, 7], [6, 5, 5], [4, 4, 4, 4], [4, 4, 4, 4], [4]]
+    >>> printbins(multifit(BinsKeepingContents(4), items=example4))
+    Bin #0: [9, 7, 4], sum=20.0
+    Bin #1: [6, 5, 5, 4], sum=20.0
+    Bin #2: [4, 4, 4, 4, 4], sum=20.0
+    Bin #3: [4, 4], sum=8.0
+    >>> printbins(multifit(BinsKeepingContents(5), items=example4))
+    Bin #0: [9, 7], sum=16.0
+    Bin #1: [6, 5, 5], sum=16.0
+    Bin #2: [4, 4, 4, 4], sum=16.0
+    Bin #3: [4, 4, 4, 4], sum=16.0
+    Bin #4: [4], sum=4.0
 
     >>> example13 = 8*[40,13,13] + 3*[25,25,16] + 2*[25,24,17]
-    >>> list(multifit(BinsKeepingSums(13), items=example13).sums)
+    >>> list(multifit(BinsKeepingSums(13), items=example13))
     [78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0, 78.0]
-    >>> list(multifit(BinsKeepingSums(14), items=example13).sums)
+    >>> list(multifit(BinsKeepingSums(14), items=example13))
     [65.0, 65.0, 65.0, 65.0, 65.0, 65.0, 65.0, 65.0, 65.0, 65.0, 65.0, 65.0, 65.0, 13.0]
 
     >>> from prtpy import partition
@@ -50,9 +59,10 @@ def multifit(bins: Bins, items: List[any], valueof: Callable[[Any], float] = lam
     sorted_items = sorted(items, key=valueof, reverse=True)
     for _ in range(iterations):
         binsize = (lower_bound+upper_bound)/2
-        ffd_bins = BinsKeepingSums(0, binner.valueof)
-        ffd_bins = first_fit.online(ffd_bins, binsize, sorted_items, valueof)
-        ffd_num_of_bins = ffd_bins.num
+        # ffd_bins = BinsKeepingSums(0, binner.valueof)
+        # ffd_bins = first_fit.online(ffd_bins, binsize, sorted_items, valueof)
+        # ffd_num_of_bins = ffd_bins.num
+        ffd_num_of_bins = prtpy.pack(algorithm=prtpy.packing.first_fit, binsize=binsize, items=sorted_items, valueof=valueof, outputtype=out.BinCount)
         logger.info("FFD with bin size %f needs %d bins", binsize, ffd_num_of_bins)
         if ffd_num_of_bins <= binner.numbins:
             upper_bound = binsize
