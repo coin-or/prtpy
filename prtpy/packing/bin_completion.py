@@ -8,7 +8,7 @@
 
 from typing import Callable, Any
 from prtpy.packing import best_fit
-from prtpy.packing.bc_utilities import *
+from prtpy.packing.bin_completion_utils import *
 from functools import partial
 import copy
 from prtpy.bins import BinsKeepingContents
@@ -161,5 +161,4 @@ def bin_completion(
 
 if __name__ == "__main__":
     import doctest
-
     print(doctest.testmod())

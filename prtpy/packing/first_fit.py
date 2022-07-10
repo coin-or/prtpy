@@ -1,7 +1,10 @@
 """
-    Pack the numbers using the first-fit bin-packing algorithms:
-       https://en.wikipedia.org/wiki/First-fit_bin_packing
-       https://en.wikipedia.org/wiki/First-fit-decreasing_bin_packing
+Pack the numbers using the first-fit bin-packing algorithms:
+    https://en.wikipedia.org/wiki/First-fit_bin_packing
+    https://en.wikipedia.org/wiki/First-fit-decreasing_bin_packing
+
+Programmer: Erel Segal-Halevi.
+Date: 2022
 """
 
 from typing import Callable, List, Any

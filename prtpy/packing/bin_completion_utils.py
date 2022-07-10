@@ -369,5 +369,4 @@ def find_bin_completions(x: int, items: List, binsize: int):
 
 if __name__ == "__main__":
     import doctest
-
     print(doctest.testmod())
