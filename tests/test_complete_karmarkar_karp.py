@@ -15,7 +15,7 @@ class TestCKK(unittest.TestCase):
         for numbins in [2,3,4,5]:
             assert prtpy.compare_algorithms_on_random_items(numbins=numbins, 
                 numitems=8, bitsperitem=8, 
-                outputtype=out.Difference, 
+                outputtype=out.SortedSums, 
                 algorithm1=prt.integer_programming, kwargs1={"objective": obj.MinimizeDifference}, 
                 algorithm2=prt.complete_karmarkar_karp, kwargs2={})
 

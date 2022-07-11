@@ -4,7 +4,7 @@ Define the various available output formats for a partition algorithm.
 
 from abc import ABC
 from typing import Any, List, Callable
-from prtpy.binners import Binner, BinnerKeepingContents, BinnerKeepingSums, BinsArray, bins2str
+from prtpy.binners import Binner, BinnerKeepingContents, BinnerKeepingSums, BinsArray
 
 class OutputType(ABC):
     @classmethod

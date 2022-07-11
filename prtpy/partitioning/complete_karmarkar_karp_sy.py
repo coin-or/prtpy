@@ -65,6 +65,15 @@ def optimal(binner: Binner, numbins: int, items: List[any]) -> BinsArray:
     [['a', 'g'], ['c', 'd', 'e'], ['b', 'f']]
     >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     [16.0, 16.0]
+
+    Randomly-found example:
+    >>> example_2022_07_11 = [62,  93,  99, 129, 158, 187, 199, 212]
+    >>> partition(algorithm=optimal, numbins=5, items=example_2022_07_11, outputtype=out.PartitionAndSums)
+    Bin #0: [199], sum=199.0
+    Bin #1: [212], sum=212.0
+    Bin #2: [99, 129], sum=228.0
+    Bin #3: [62, 187], sum=249.0
+    Bin #4: [93, 158], sum=251.0
     """
     numitems = len(items)
     logger.info("\nComplete-Karmarkar-Karp Partitioning of %d items into %d parts.", numitems, numbins)

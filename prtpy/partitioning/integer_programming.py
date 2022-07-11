@@ -83,6 +83,15 @@ def optimal(
     >>> print(partition(algorithm=optimal, numbins=2, items=traversc_example, outputtype=out.PartitionAndSums))
     Bin #0: [12, 22], sum=34.0
     Bin #1: [18, 22], sum=40.0
+
+    Randomly-found example:
+    >>> example_2022_07_11 = [62,  93,  99, 129, 158, 187, 199, 212]
+    >>> partition(algorithm=optimal, numbins=5, items=example_2022_07_11, outputtype=out.PartitionAndSums)
+    Bin #0: [199], sum=199.0
+    Bin #1: [212], sum=212.0
+    Bin #2: [99, 129], sum=228.0
+    Bin #3: [62, 187], sum=249.0
+    Bin #4: [93, 158], sum=251.0
     """
     ibins = range(numbins)
     items = list(items)
