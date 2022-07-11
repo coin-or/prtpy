@@ -106,14 +106,30 @@ class Partition(OutputType):
         return cls.extract_output_from_sums_and_lists(bins[0], bins[1])
 
 
-class PartitionAndSums(Partition):
-    """ Output the set of all bins with their sums. """
+class PartitionAndSumsTuple(Partition):
+    """ 
+    Output a pair (tuple) with two vectors: (sums, lists). 
+    sums is a vector of bin sums; lists is a vector of lists of items in each bin. 
+    """
     @classmethod
     def extract_output_from_sums_and_lists(cls, sums: List[float], lists: List[List[Any]]) -> List:
-        # return bins2str((sums,lists))
         return (sums,lists)
 
+
+class PartitionAndSums(Partition):
+    """ 
+    Output a struct of all bins with their sums. 
+    The struct has two fields: sums and lists. 
+    sums is a vector of bin sums; lists is a vector of lists of items in each bin. 
+    """
+    class Struct:
+        def __init__(self, sums, lists):
+            self.sums = sums
+            self.lists = lists
+        def __repr__(self)->str:
+            bins_str = [f"Bin #{i}: {self.lists[i]}, sum={self.sums[i]}" for i in range(len(self.sums))]
+            return "\n".join(bins_str)
     @classmethod
-    def extract_output_from_binsarray(cls, bins: BinsArray) -> List:
-        # return bins2str(bins)
-        return bins
+    def extract_output_from_sums_and_lists(cls, sums: List[float], lists: List[List[Any]]) -> List:
+        return PartitionAndSums.Struct(sums,lists)
+

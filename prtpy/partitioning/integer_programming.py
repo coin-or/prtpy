@@ -81,7 +81,8 @@ def optimal(
 
     >>> traversc_example = [18, 12, 22, 22]
     >>> print(partition(algorithm=optimal, numbins=2, items=traversc_example, outputtype=out.PartitionAndSums))
-    (array([34., 40.]), [[12, 22], [18, 22]])
+    Bin #0: [12, 22], sum=34.0
+    Bin #1: [18, 22], sum=40.0
     """
     ibins = range(numbins)
     items = list(items)

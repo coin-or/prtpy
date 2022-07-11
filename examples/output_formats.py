@@ -16,5 +16,11 @@ print(prtpy.partition(algorithm=greedy, numbins=2, items=values, outputtype=prtp
 #' Return only the smallest sum:
 print(prtpy.partition(algorithm=greedy, numbins=2, items=values, outputtype=prtpy.out.SmallestSum))
 #' Return both the partition and the sum of each bin:
-prtpy.partition(algorithm=greedy, numbins=2, items=values, outputtype=prtpy.out.PartitionAndSums)
-
+sums, lists = prtpy.partition(algorithm=greedy, numbins=2, items=values, outputtype=prtpy.out.PartitionAndSumsTuple)
+print("sums: ",sums)
+print("lists: ",lists)
+#' Return both the partition and the sum of each bin, in a pretty-printable struct:
+result = prtpy.partition(algorithm=greedy, numbins=2, items=values, outputtype=prtpy.out.PartitionAndSums)
+print(result)
+print("sums: ",result.sums)
+print("lists: ",result.lists)

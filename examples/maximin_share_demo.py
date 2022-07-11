@@ -48,7 +48,7 @@ def maximin_share_partition(c:int, valuation:list, items:Collection[Any]=None, n
         items=items,
         valueof=lambda item: valuation[item],
         objective=prtpy.obj.MaximizeKSmallestSums(numerator),
-        outputtype=prtpy.out.PartitionAndSums,
+        outputtype=prtpy.out.PartitionAndSumsTuple,
         **kwargs
     )
     return (lists, list(sums), sum(sorted(sums)[:numerator]))

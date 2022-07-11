@@ -22,7 +22,7 @@ def weighted_maximin_share_partition(valuation:list, weights:list):
         numbins=len(weights),
         items=valuation,
         objective=prtpy.obj.MaximizeSmallestSum,
-        outputtype=prtpy.out.PartitionAndSums,
+        outputtype=prtpy.out.PartitionAndSumsTuple,
         weights = weights
     )
     min_weighted_sum = min([s/w for s,w in zip(sums,weights)])
