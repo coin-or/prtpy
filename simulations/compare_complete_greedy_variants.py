@@ -73,27 +73,27 @@ if __name__ == "__main__":
 
 
 """
-check_complete_greedy_variants_3: minimize largest sum objective; compare lower bound, heuristic 2, and heuristic 3. 
+complete_greedy_variants_3: minimize largest sum objective; compare lower bound, heuristic 2, and heuristic 3. 
   --  Heuristic 2 (use_fast_lower_bound) is the best, then lower bound; Heuristic 3 is not useful.
 
-check_complete_greedy_variants_4: maximize smallest sum objective; compare lower bound and heuristic 2. 
+complete_greedy_variants_4: maximize smallest sum objective; compare lower bound and heuristic 2. 
   -- Heuristic 2 (use_fast_lower_bound) is the best, then lower bound.
   -- But lower-bound is very useful for 16 bits.
 
-check_complete_greedy_variants_5: maximize smallest sum and minimize largest sum; stopping when an optimal solution is found.
+complete_greedy_variants_5: maximize smallest sum and minimize largest sum; stopping when an optimal solution is found.
   -- Both objectives have similar performance.
   -- Heuristic 3 harms performance.
 
-check_complete_greedy_variants_6: compare use_lower_bound to use_set_of_seen_states, when fast_lower_bound is used.
+complete_greedy_variants_6: compare use_lower_bound to use_set_of_seen_states, when fast_lower_bound is used.
   -- with 16 bits, both of them are not needed.
   -- with 32 bits, use_set_of_seen_states is slightly better.
   -- with 48 bits, use_lower_bound is slightly better.
 
-check_complete_greedy_variants_7: compare all lower bounds with dynamic programming.
+complete_greedy_variants_7: compare all lower bounds with dynamic programming.
   -- set_of_seen_states is useful only with 16 bits.
   -- fast_lower_bound is best.
 
-check_complete_greedy_variants_8: same as 7, but a different implementation, using a binner.
+complete_greedy_variants_8: same as 7, but a different implementation, using a binner.
   -- fast_lower_bound alone is best.
   -- dynamic programming is worst.
 
