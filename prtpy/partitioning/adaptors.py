@@ -118,21 +118,29 @@ def compare_algorithms(
     True
     >>> compare_algorithms(2, [4,5,6,7,8], out.Difference, algorithm1=prt.ilp, kwargs1={"objective":obj.MinimizeDifference}, algorithm2=prt.greedy, kwargs2={}) #doctest: +NORMALIZE_WHITESPACE
     Algorithms differ on input [4, 5, 6, 7, 8]:
-        integer-programming:   0.0
-        greedy:   4.0
+        integer-programming:   sums=[15.0, 15.0], Difference=0.0
+        greedy:   sums=[13.0, 17.0], Difference=4.0
     False
     >>> compare_algorithms(2, [4,5,6,7,8], out.SortedSums, algorithm1=prt.ilp, kwargs1={"objective":obj.MinimizeDifference}, algorithm2=prt.snp, kwargs2={})
     True
     >>> compare_algorithms(2, [4,5,6,7,8], out.SortedSums, algorithm1=prt.ilp, kwargs1={"objective":obj.MinimizeDifference}, algorithm2=prt.greedy, kwargs2={}) #doctest: +NORMALIZE_WHITESPACE
     Algorithms differ on input [4, 5, 6, 7, 8]:
-        integer-programming:   [15.0, 15.0]
-        greedy:   [13.0, 17.0]
+        integer-programming:   sums=[15.0, 15.0]
+        greedy:   sums=[13.0, 17.0]
     False
     """
-    output1 = partition(algorithm1, numbins, items, outputtype=outputtype, **kwargs1)
-    output2 = partition(algorithm2, numbins, items, outputtype=outputtype, **kwargs2)
+    sums1 = partition(algorithm1, numbins, items, outputtype=out.SortedSums, **kwargs1)
+    sums2 = partition(algorithm2, numbins, items, outputtype=out.SortedSums, **kwargs2)
+    output1 = outputtype.extract_output_from_sums(sums1)
+    output2 = outputtype.extract_output_from_sums(sums2)
     if output1 != output2:
-        print(f"Algorithms differ on input {items}:\n\t{algorithm1.__name__}:   {output1}\n\t{algorithm2.__name__}:   {output2}")
+        if outputtype!=out.SortedSums: 
+            explanation1 = f"sums={sums1}, {outputtype.__name__}={output1}"
+            explanation2 = f"sums={sums2}, {outputtype.__name__}={output2}"
+        else:
+            explanation1 = f"sums={sums1}"
+            explanation2 = f"sums={sums2}"
+        print(f"Algorithms differ on input {items}:\n\t{algorithm1.__name__}:   {explanation1}\n\t{algorithm2.__name__}:   {explanation2}")
         return False
     else:
         return True
