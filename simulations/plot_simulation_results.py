@@ -1,3 +1,7 @@
+# NOTE: to run this file, you need the optional module "experiments":
+#    pip install prtpy[simulations]
+
+
 from experiments_csv import single_plot_results, multi_plot_results
 from matplotlib import pyplot as plt
 
@@ -50,10 +54,16 @@ from matplotlib import pyplot as plt
 #      subplot_field = "bitsperitem", subplot_rows=1, subplot_cols=3, sharey=True, sharex=True,
 #      legend_properties={"size":6}, ylim=(0,30))
 
+# multi_plot_results(
+#      "results/rnp_variants_1.csv", save_to_file=True,
+#      filter={}, 
+#      x_field="numitems", y_field="runtime", z_field="algorithm", mean=True, 
+#      subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=3, sharey=True, sharex=True,
+#      legend_properties={"size":6}, ylim=(0,30), xlim=(0,30))
 
 multi_plot_results(
-     "results/rnp_variants_1.csv", save_to_file=True,
+     "results/two_way_partitioning_algorithms_1.csv", save_to_file=True,
      filter={}, 
      x_field="numitems", y_field="runtime", z_field="algorithm", mean=True, 
-     subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=3, sharey=True, sharex=True,
-     legend_properties={"size":6}, ylim=(0,30), xlim=(0,30))
+     subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=2, sharey=True, sharex=True,
+     legend_properties={"size":6}, ylim=(0,30), xlim=(0,40))

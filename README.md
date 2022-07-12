@@ -15,7 +15,7 @@ Basic installation:
 
 To run simulation experiments:
 
-    pip install prtpy[experiments]
+    pip install prtpy[simulations]
 
 To speed up the ILP code, you can install the GUROBI solver.
 See the [documentation of Python-MIP](https://www.python-mip.com/) for more information.
