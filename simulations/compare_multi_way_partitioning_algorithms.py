@@ -1,17 +1,15 @@
 """ 
-Compare the performance of two-way partitioning algorithms on uniformly-random integers
+Compare the performance of multi-way partitioning algorithms on uniformly-random integers
 Aims to reproduce the results of Korf, Moffitt and Schreiber (2018), JACM paper.
 
 Author: Erel Segal-Halevi
-Since:  2022-05
+Since:  2022-07
 """
 
-from typing import Callable
-import numpy as np, prtpy
-
+import prtpy
 
 def partition_random_items(
-    algorithm: Callable,
+    algorithm: callable,
     numbins: int,
     numitems: int,
     bitsperitem: int,
@@ -32,22 +30,22 @@ def partition_random_items(
 if __name__ == "__main__":
     import logging, experiments_csv
     experiments_csv.logger.setLevel(logging.INFO)
-    experiment = experiments_csv.Experiment("results/", "two_way_partitioning_algorithms.csv", backup_folder=None)
+    experiment = experiments_csv.Experiment("results/", "multi_way_partitioning_algorithms.csv", backup_folder=None)
 
     prt = prtpy.partitioning
     input_ranges = {
-        "algorithm": [prt.integer_programming, prt.complete_greedy, prt.complete_karmarkar_karp, prt.dynamic_programming],
-        "numbins": [2],
+        "algorithm": [prt.integer_programming, prt.complete_greedy, prt.sequential_number_partitioning, prt.recursive_number_partitioning],
+        "numbins": [3,4,5],
         "numitems": [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 45, 50, 60, 70, 80, 90, 100],
-        "bitsperitem": [16,24,32,48],
+        "bitsperitem": [8,10,12,16],
         "instance_id": range(10)
     }
     experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=30)
-
-
-"""
-Conclusions 2022-07-22: 
-* With 16 bits, both complete-greedy and integer-programming are great for up to 100 items.
-* With 24 bits or more, complete greedy is best and can solve up to 25-30 items. 
-* Dynamic programming is worst.
-"""
+    input_ranges = {
+        "algorithm": [prt.integer_programming, prt.complete_greedy, prt.sequential_number_partitioning],
+        "numbins": [6],
+        "numitems": [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 45, 50, 60, 70, 80, 90, 100],
+        "bitsperitem": [8,10,12,16],
+        "instance_id": range(10)
+    }
+    experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=30)

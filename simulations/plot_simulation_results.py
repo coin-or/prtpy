@@ -61,9 +61,17 @@ from matplotlib import pyplot as plt
 #      subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=3, sharey=True, sharex=True,
 #      legend_properties={"size":6}, ylim=(0,30), xlim=(0,30))
 
+# multi_plot_results(
+#      "results/two_way_partitioning_algorithms.csv", save_to_file=True,
+#      filter={}, 
+#      x_field="numitems", y_field="runtime", z_field="algorithm", mean=True, 
+#      subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=2, sharey=True, sharex=True,
+#      legend_properties={"size":6}, ylim=(0,30), xlim=(0,40))
+
+
 multi_plot_results(
-     "results/two_way_partitioning_algorithms_1.csv", save_to_file=True,
-     filter={}, 
+     "results/multi_way_partitioning_algorithms.csv", save_to_file=True,
+     filter={"numbins":6}, 
      x_field="numitems", y_field="runtime", z_field="algorithm", mean=True, 
      subplot_field = "bitsperitem", subplot_rows=2, subplot_cols=2, sharey=True, sharex=True,
      legend_properties={"size":6}, ylim=(0,30), xlim=(0,40))
