@@ -52,6 +52,9 @@ class partitioning:
     # Eli Belkind module
     from prtpy.partitioning.cbldm import cbldm
 
+    # Samuel Bismuth module
+    from prtpy.partitioning.ortools_ip import optimal as ortool
+
     
 partitioning.complete_greedy.__name__ = "complete-greedy"
 partitioning.integer_programming.__name__ = "integer-programming"
@@ -64,6 +67,7 @@ partitioning.recursive_number_partitioning_sy.__name__ = "recursive-number-parti
 partitioning.recursive_number_partitioning.__name__ = "recursive-number-partitioning"
 partitioning.sequential_number_partitioning_sy.__name__ = "sequential-number-partitioning-sy"
 partitioning.sequential_number_partitioning.__name__ = "sequential-number-partitioning"
+partitioning.ortool.__name__ = "ortool-ilp"
 
 class packing:
     from prtpy.packing.first_fit import online as first_fit, decreasing as first_fit_decreasing
