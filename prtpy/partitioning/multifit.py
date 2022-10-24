@@ -2,6 +2,8 @@
 Partition the numbers using the [MultiFit algorithm](https://en.wikipedia.org/wiki/Multifit_algorithm). Based on:
 
 [An Application of Bin-Packing to Multiprocessor Scheduling (Coffman et al, 1978)](https://epubs.siam.org/doi/abs/10.1137/0207001)
+
+Programmer: Erel Segal-Halevi
 """
 
 from typing import Callable, List, Any

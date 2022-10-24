@@ -8,6 +8,8 @@
     This stackoverflow question:
         https://stackoverflow.com/q/51635177/827927
     explains how to have a set with a custom key.
+
+    Programmer: Erel Segal-Halevi
 """
 
 from typing import List, Tuple, Callable, Iterator, Any
