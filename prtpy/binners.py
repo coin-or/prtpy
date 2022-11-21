@@ -15,24 +15,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np, itertools
 from typing import Any, Callable, List, Tuple, Iterator
-import prtpy
 
 BinsArray = Any
-
-def bins2str(bins: BinsArray)->str:
-    try:
-        # bins is a tuple (sums,lists):
-        sums, lists = bins
-        numbins = len(sums)
-        bins_str = [f"Bin #{i}: {lists[i]}, sum={sums[i]}" for i in range(numbins)]
-    except:
-        # bins is an array of sums:
-        numbins = len(bins)
-        bins_str = [f"Bin #{i}: sum={bins[i]}" for i in range(numbins)]
-    return "\n".join(bins_str)
-
-def printbins(bins:BinsArray):
-    print(bins2str(bins))
 
 class Binner(ABC):
     """
@@ -42,7 +26,6 @@ class Binner(ABC):
      * numbins - the total number of bins.
      * valueof - a function that maps an item to its value.
     """
-
     def __init__(self, valueof: Callable = lambda x:x):
         self.valueof = valueof
 
@@ -440,6 +423,22 @@ class BinnerKeepingContents(BinnerKeepingSums):
             if new_lists_tuple not in yielded:
                 yielded.add(new_lists_tuple)
                 yield new_bins
+
+
+def bins2str(bins: BinsArray)->str:
+    try:
+        # bins is a tuple (sums,lists):
+        sums, lists = bins
+        numbins = len(sums)
+        bins_str = [f"Bin #{i}: {lists[i]}, sum={sums[i]}" for i in range(numbins)]
+    except:
+        # bins is an array of sums:
+        numbins = len(bins)
+        bins_str = [f"Bin #{i}: sum={bins[i]}" for i in range(numbins)]
+    return "\n".join(bins_str)
+
+def printbins(bins:BinsArray):
+    print(bins2str(bins))
 
 
 if __name__ == "__main__":
