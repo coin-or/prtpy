@@ -34,5 +34,19 @@ def greedy(lst: list, t: int) -> list:
     return lst  # Empty implementation
 
 
+def dynamic_programming(lst: list, t: int):
+    """
+        Algorithm 2: get a list and a number, return a list that contain a subset that equal to the number t.
+        the complexity is improving
+
+        >>> dynamic_programming([1, 2, 3], 0)
+        []
+
+        >>> dynamic_programming([1, 2, 3], 6)
+        [1, 2, 3]
+    """
+    return lst  # empty implementation
+
+
 if __name__ == '__main__':
     doctest.testmod()
