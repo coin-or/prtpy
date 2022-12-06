@@ -30,9 +30,9 @@ def optimal(
         Walter (2013), 'Comparing the minimum completion times of two longest-first scheduling-heuristics'.
 
     >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums
-    >>> printbins(optimal(BinnerKeepingContents(), 2, [1,1,1,1,2], objective=obj.MaximizeSmallestSum))
-    Bin #0: [1, 1, 1], sum=3.0
-    Bin #1: [1, 2], sum=3.0
+    >>> printbins(optimal(BinnerKeepingSums(), 2, [1,1,1,1,2], objective=obj.MaximizeSmallestSum))
+    Bin #0: sum=3.0
+    Bin #1: sum=3.0
 
     >>> walter_numbers = [46, 39, 27, 26, 16, 13, 10]
     >>> printbins(optimal(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MinimizeDifference))
