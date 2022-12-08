@@ -10,7 +10,7 @@ def schroeppel_shamir(lst: list) -> list:
         >>> schroeppel_shamir([1, 2, 3])
         [[1,2], [1,3], [2,3]]
 
-        >>> horowitz_sahni([-1, -2, -3])
+        >>> schroeppel_shamir([-1, -2, -3])
         Traceback (most recent call last):
         ...
         Exception: Exception
