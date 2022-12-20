@@ -1,3 +1,15 @@
+"""
+An implementation of full branch and bound search for number partitioning, with minmax objective
+(i.e. minimize largest sum). A recursive implementation.
+Based on "Search Strategies for Optimal Multi-Way Number Partitioning", Michael D. Moffitt, 2013
+https://www.ijcai.org/Proceedings/13/Papers/099.pdf
+
+note: As this is a full search algorithm, and the running time is exponential,
+it may not be used with large amount of items to partition.
+
+Author: nir son
+"""
+
 import doctest
 import math
 import operator
@@ -101,7 +113,7 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
     if current_bin == binner.numbins(bins) or len(items) == 0:
         return bins, best_sum, best_partition
 
-    # sort item - save 1/2 of the checks
+    # sort item - save checks
     items = sorted(items, key=binner.valueof, reverse=True)
 
     resulting_partition = bins
@@ -129,7 +141,8 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
         # partition the rest of the items to the rst of the bins
         resulting_partition, best_sum, best_partition = _rnp_recursive(bins_copy, binner, rest_of_items,
                                                                        current_bin + 1,
-                                                                       current_group_sum, best_sum, best_partition)
+                                                                       max((current_group_sum, min_sum)), best_sum,
+                                                                       best_partition)
 
         # update, if needed, the best partition and best sum so far
         current_sum = max(binner.sums(resulting_partition))
