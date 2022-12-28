@@ -83,7 +83,8 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
                    best_sum: Number, best_partition: BinsArray) -> (BinsArray, Number, BinsArray):
     """
     The main recursive function for rnp. uses some help arguments.
-    The second value returned is the best partition of the items.
+    The third value returned is the best partition of the items.
+    The second is the maximum sum in the best partition.
     The first value returned is a temporary value for the recursive calculations.
     """
 
