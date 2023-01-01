@@ -1,6 +1,7 @@
 import doctest
 from numpy import number
 
+
 # credit: https://sites.cs.queensu.ca/courses/cisc365/Labs/Week%204/2019%20Week%204%20+%205%20Lab.pdf
 
 # help functions:
@@ -9,10 +10,9 @@ from numpy import number
 def Pair_Sum(v1, v2, k):
     """
     divide to pair
-
     """
     pair1 = 0
-    pair2 = (len(v2)-1)
+    pair2 = (len(v2) - 1)
 
     while pair1 <= (len(v1) - 1) and (pair2 >= 0):
         ans = v1[pair1] + v2[pair2]
@@ -90,7 +90,7 @@ def horowitz_sahni(s, k):
     # left side
     for i in list_of_left_sum:
         if sum(i) == k:
-            return i   # equal to the target
+            return i  # equal to the target
 
     # if the sums don't over than target value, sort lists to pair_sum function:
 
