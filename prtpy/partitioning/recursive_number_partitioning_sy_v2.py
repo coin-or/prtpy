@@ -9,7 +9,7 @@ it may not be used with large amount of items to partition.
 
 Author: nir son
 """
-
+import concurrent.futures
 import doctest
 import math
 import operator
@@ -77,7 +77,8 @@ def rnp(binner: Binner, numbins: int, items: List[any]) -> BinsArray:
     # call the recursive function to calculate the best partitions
     _, _, best_partition = _rnp_recursive(binner.new_bins(numbins), binner,
                                           sorted(items, key=binner.valueof, reverse=True), 0,
-                                          max((max(map(binner.valueof, items)), math.ceil(sum(map(binner.valueof, items)) / numbins))),
+                                          max((max(map(binner.valueof, items)),
+                                               math.ceil(sum(map(binner.valueof, items)) / numbins))),
                                           max(binner.sums(initial_partition)), initial_partition)
     return best_partition
 
@@ -101,6 +102,39 @@ def _all_sub_groups(items):
         rest_of_items = [item for label, item in zip(binary_partition, items[1:]) if label == '0']
 
         yield current_group, rest_of_items
+
+
+def _handel_group(current_group, rest_of_items, best_sum, best_partition, binner, bins, current_bin, min_sum):
+    # pruning
+    current_group_sum = sum(map(binner.valueof, current_group))
+    rest_of_items_sum = sum(map(binner.valueof, rest_of_items))
+    if current_group_sum >= best_sum or \
+            rest_of_items_sum > best_sum * (binner.numbins(bins) - current_bin - 1) or \
+            any([current_group_sum + binner.valueof(item) <= min_sum for item in rest_of_items]):
+        return None
+
+    # add items to the current group based on the binary partition
+    bins_copy = binner.copy_bins(bins)
+    for item in current_group:
+        binner.add_item_to_bin(bins_copy, item, current_bin)
+
+    # partition the rest of the items to the rst of the bins
+    resulting_partition, best_sum, best_partition = _rnp_recursive(bins_copy, binner, rest_of_items,
+                                                                   current_bin + 1,
+                                                                   max((current_group_sum, min_sum)), best_sum,
+                                                                   best_partition)
+
+    # update, if needed, the best partition and best sum so far
+    current_sum = max(binner.sums(resulting_partition))
+    if current_sum < best_sum:
+        best_sum = current_sum
+        best_partition = binner.copy_bins(resulting_partition)
+
+    # if current partition is better or equal optimistic bound, return it immediately
+    if current_sum <= min_sum:
+        return resulting_partition, best_sum, best_partition, True
+
+    return resulting_partition, best_sum, best_partition, False
 
 
 def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bin: int, min_sum: Number,
@@ -139,36 +173,14 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
         return bins, best_sum, best_partition
 
     resulting_partition = bins
+
     # iterate all options of what numbers to put in the current group
     for current_group, rest_of_items in _all_sub_groups(items):
-
-        # pruning
-        current_group_sum = sum(map(binner.valueof, current_group))
-        rest_of_items_sum = sum(map(binner.valueof, rest_of_items))
-        if current_group_sum >= best_sum or \
-                rest_of_items_sum > best_sum * (binner.numbins(bins) - current_bin - 1) or \
-                any([current_group_sum + binner.valueof(item) <= min_sum for item in rest_of_items]):
+        group_result = _handel_group(current_group, rest_of_items, best_sum, best_partition, binner, bins, current_bin, min_sum)
+        if group_result is None:
             continue
-
-        # add items to the current group based on the binary partition
-        bins_copy = binner.copy_bins(bins)
-        for item in current_group:
-            binner.add_item_to_bin(bins_copy, item, current_bin)
-
-        # partition the rest of the items to the rst of the bins
-        resulting_partition, best_sum, best_partition = _rnp_recursive(bins_copy, binner, rest_of_items,
-                                                                       current_bin + 1,
-                                                                       max((current_group_sum, min_sum)), best_sum,
-                                                                       best_partition)
-
-        # update, if needed, the best partition and best sum so far
-        current_sum = max(binner.sums(resulting_partition))
-        if current_sum < best_sum:
-            best_sum = current_sum
-            best_partition = binner.copy_bins(resulting_partition)
-
-        # if current partition is better or equal optimistic bound, return it
-        if current_sum <= min_sum:
+        resulting_partition, best_sum, best_partition, finish = group_result
+        if finish:
             break
 
     # return the found partition
