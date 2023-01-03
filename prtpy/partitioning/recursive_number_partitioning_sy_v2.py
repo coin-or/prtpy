@@ -13,8 +13,10 @@ Author: nir son
 import doctest
 import math
 import operator
+import random
 import time
 from numbers import Number
+from timeit import timeit
 from typing import List
 from prtpy import partition, Binner, BinnerKeepingContents, BinsArray, printbins
 from prtpy.partitioning.greedy import greedy
@@ -73,10 +75,32 @@ def rnp(binner: Binner, numbins: int, items: List[any]) -> BinsArray:
     initial_partition = greedy(binner, numbins, items)
 
     # call the recursive function to calculate the best partitions
-    _, _, best_partition = _rnp_recursive(binner.new_bins(numbins), binner, items, 0,
-                                          max(map(binner.valueof, items)),
+    _, _, best_partition = _rnp_recursive(binner.new_bins(numbins), binner,
+                                          sorted(items, key=binner.valueof, reverse=True), 0,
+                                          max((max(map(binner.valueof, items)), math.ceil(sum(map(binner.valueof, items)) / numbins))),
                                           max(binner.sums(initial_partition)), initial_partition)
     return best_partition
+
+
+def _all_sub_groups(items):
+    """
+    A generator for all subgroups of the given items group, but the first item is always in.
+    The current subgroup and its complement is returned at each step
+
+    >>> sorted(list(_all_sub_groups(range(3))))
+    [([0], [1, 2]), ([0, 1], [2]), ([0, 1, 2], []), ([0, 2], [1])]
+
+    >>> sorted(list(_all_sub_groups(['a', 7])))
+    [(['a'], [7]), (['a', 7], [])]
+    """
+    for binary_partition_number in range(2 ** (len(items) - 1) - 1, -1, -1):
+        binary_partition = f'{binary_partition_number:0{len(items) - 1}b}'
+
+        # add items to the current group based on the binary partition
+        current_group = [items[0]] + [item for label, item in zip(binary_partition, items[1:]) if label == '1']
+        rest_of_items = [item for label, item in zip(binary_partition, items[1:]) if label == '0']
+
+        yield current_group, rest_of_items
 
 
 def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bin: int, min_sum: Number,
@@ -115,28 +139,23 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
         return bins, best_sum, best_partition
 
     # sort item - save checks
-    items = sorted(items, key=binner.valueof, reverse=True)
+    # items = sorted(items, key=binner.valueof, reverse=True)
 
     resulting_partition = bins
     # iterate all options of what numbers to put in the current group
-    for binary_partition_number in range(2 ** (len(items) - 1) - 1, -1, -1):
-        binary_partition = f'{binary_partition_number:0{len(items) - 1}b}'
-
-        # add items to the current group based on the binary partition
-        current_group = [item for label, item in zip(binary_partition, items[1:]) if label == '1'] + [items[0]]
-        rest_of_items = [item for label, item in zip(binary_partition, items[1:]) if label == '0']
+    for current_group, rest_of_items in _all_sub_groups(items):
 
         # pruning
         current_group_sum = sum([binner.valueof(item) for item in current_group])
         rest_of_items_sum = sum([binner.valueof(item) for item in rest_of_items])
-        if current_group_sum > best_sum or \
+        if current_group_sum >= best_sum or \
                 rest_of_items_sum > best_sum * (binner.numbins(bins) - current_bin - 1) or \
                 any([current_group_sum + binner.valueof(item) <= min_sum for item in rest_of_items]):
             continue
 
         # add items to the current group based on the binary partition
         bins_copy = binner.copy_bins(bins)
-        for item in sorted(current_group, key=binner.valueof, reverse=True):
+        for item in current_group:
             binner.add_item_to_bin(bins_copy, item, current_bin)
 
         # partition the rest of the items to the rst of the bins
@@ -151,9 +170,16 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
             best_sum = current_sum
             best_partition = binner.copy_bins(resulting_partition)
 
+        if current_sum <= min_sum:
+            break
+
     # return the found partition
     return resulting_partition, best_sum, best_partition
 
 
 if __name__ == '__main__':
-    doctest.testmod()
+    # doctest.testmod()
+    st = time.time()
+    # print(partition(algorithm=rnp, numbins=3, items=[3,3,3,3]))
+    rnp(BinnerKeepingContents(), 3, [random.randint(1, 100) for _ in range(26)])
+    print(time.time() - st)
