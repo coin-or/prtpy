@@ -138,16 +138,13 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
     if current_bin == binner.numbins(bins) or len(items) == 0:
         return bins, best_sum, best_partition
 
-    # sort item - save checks
-    # items = sorted(items, key=binner.valueof, reverse=True)
-
     resulting_partition = bins
     # iterate all options of what numbers to put in the current group
     for current_group, rest_of_items in _all_sub_groups(items):
 
         # pruning
-        current_group_sum = sum([binner.valueof(item) for item in current_group])
-        rest_of_items_sum = sum([binner.valueof(item) for item in rest_of_items])
+        current_group_sum = sum(map(binner.valueof, current_group))
+        rest_of_items_sum = sum(map(binner.valueof, rest_of_items))
         if current_group_sum >= best_sum or \
                 rest_of_items_sum > best_sum * (binner.numbins(bins) - current_bin - 1) or \
                 any([current_group_sum + binner.valueof(item) <= min_sum for item in rest_of_items]):
@@ -170,6 +167,7 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
             best_sum = current_sum
             best_partition = binner.copy_bins(resulting_partition)
 
+        # if current partition is better or equal optimistic bound, return it
         if current_sum <= min_sum:
             break
 
@@ -178,8 +176,4 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
 
 
 if __name__ == '__main__':
-    # doctest.testmod()
-    st = time.time()
-    # print(partition(algorithm=rnp, numbins=3, items=[3,3,3,3]))
-    rnp(BinnerKeepingContents(), 3, [random.randint(1, 100) for _ in range(26)])
-    print(time.time() - st)
+    doctest.testmod()
