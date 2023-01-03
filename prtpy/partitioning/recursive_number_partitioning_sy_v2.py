@@ -9,14 +9,11 @@ it may not be used with large amount of items to partition.
 
 Author: nir son
 """
-import concurrent.futures
 import doctest
 import math
-import operator
 import random
 import time
 from numbers import Number
-from timeit import timeit
 from typing import List
 from prtpy import partition, Binner, BinnerKeepingContents, BinsArray, printbins
 from prtpy.partitioning.greedy import greedy
@@ -109,7 +106,7 @@ def _handel_group(current_group, rest_of_items, best_sum, best_partition, binner
     current_group_sum = sum(map(binner.valueof, current_group))
     rest_of_items_sum = sum(map(binner.valueof, rest_of_items))
     if current_group_sum >= best_sum or \
-            rest_of_items_sum > best_sum * (binner.numbins(bins) - current_bin - 1) or \
+            rest_of_items_sum >= best_sum * (binner.numbins(bins) - current_bin - 1) or \
             any([current_group_sum + binner.valueof(item) <= min_sum for item in rest_of_items]):
         return None
 
