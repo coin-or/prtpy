@@ -1,11 +1,9 @@
 import doctest
 from numpy import number
-
-
 # credit: https://sites.cs.queensu.ca/courses/cisc365/Labs/Week%204/2019%20Week%204%20+%205%20Lab.pdf
 
-# help functions:
 
+# help functions:
 
 def Pair_Sum(v1, v2, k):
     """
