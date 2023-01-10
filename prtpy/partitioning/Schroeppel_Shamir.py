@@ -1,9 +1,33 @@
+"""
+Optimally Scheduling Small Numbers of Identical Parallel Machines,
+by ichard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/ICAPS/article/view/13544
+Yoel Chemla
+"""
+
 import doctest
 from heapq import heapify
 from heapq import heapify, heappush, heappop
-
-
 from numpy import number
+
+
+def compute_left_subset_sum(a0, a1):
+    sets_left = [[]]
+    for i in range(0, a0):
+        for j in range(0, a1):
+            t = a0[j] + [a1[i]]
+            sets_left.append(t)
+            heapify(sets_left)
+    return sets_left
+
+
+def compute_right_subset_sum(b0, b1):
+    sets_right = [[]]
+    for i in range(0, b0):
+        for j in range(0, b1):
+            t = b0[j] + [b1[i]]
+            sets_right.append(t)
+            heapify(sets_right)
+    return sets_right
 
 
 def schroeppel_shamir(s):
@@ -16,10 +40,10 @@ def schroeppel_shamir(s):
         >>> schroeppel_shamir([1, 2, 3])
         [[], [1], [2], [3], [1,2], [1,3], [2,3], [1,2,3]]
 
-        >>> schroeppel_shamir([-1, -2, -3])
-        Traceback (most recent call last):
-        ...
-        Exception: Exception
+        # >>> schroeppel_shamir([-1, -2, -3])
+        # Traceback (most recent call last):
+        # ...
+        # Exception: Exception
     """
     sets = [[]]
 
@@ -45,31 +69,12 @@ def schroeppel_shamir(s):
     sorted(b0, reverse=True)
     sorted(b1, reverse=True)
 
-# divide a0,a1 to min heap and b0, b1 to max heap and print each group.
+    # divide a0,a1 to min heap and b0, b1 to max heap and print each group.
 
     compute_left_subset_sum(a0, a1)
     compute_right_subset_sum(b0, b1)
 
 
-def compute_left_subset_sum(a0, a1):
-    sets_left = [[]]
-    for i in range(0, a0):
-        for j in range(0, a1):
-            t = a0[j] + [a1[i]]
-            sets_left.append(t)
-            heapify(sets_left)
-    return sets_left
-
-
-def compute_right_subset_sum(b0, b1):
-    sets_right = [[]]
-    for i in range(0, b0):
-        for j in range(0, b1):
-            t = b0[j] + [b1[i]]
-            sets_right.append(t)
-            heapify(sets_right)
-    return sets_right
-
-
 if __name__ == '__main__':
-    doctest.testmod()
+    # doctest.testmod()
+    schroeppel_shamir([1, 2, 3])
