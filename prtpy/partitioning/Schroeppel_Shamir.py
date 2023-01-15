@@ -1,3 +1,9 @@
+"""
+Optimally Scheduling Small Numbers of Identical Parallel Machines,
+by ichard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/ICAPS/article/view/13544
+Yoel Chemla
+"""
+
 import doctest
 from Horowitz_And_Sahni import generate_subset_sum
 
