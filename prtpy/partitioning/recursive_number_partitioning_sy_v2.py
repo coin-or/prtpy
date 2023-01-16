@@ -122,14 +122,15 @@ def _handel_group(current_group, rest_of_items, best_sum, best_partition, binner
                                                                    best_partition)
 
     # update, if needed, the best partition and best sum so far
-    current_sum = max(binner.sums(resulting_partition))
-    if current_sum < best_sum:
-        best_sum = current_sum
-        best_partition = binner.copy_bins(resulting_partition)
+    if resulting_partition is not None:
+        current_sum = max(binner.sums(resulting_partition))
+        if current_sum < best_sum:
+            best_sum = current_sum
+            best_partition = binner.copy_bins(resulting_partition)
 
-    # if current partition is better or equal optimistic bound, return it immediately
-    if current_sum <= min_sum:
-        return resulting_partition, best_sum, best_partition, True
+        # if current partition is better or equal optimistic bound, return it immediately
+        if current_sum <= min_sum:
+            return resulting_partition, best_sum, best_partition, True
 
     return resulting_partition, best_sum, best_partition, False
 
@@ -169,7 +170,7 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
     if current_bin == binner.numbins(bins) or len(items) == 0:
         return bins, best_sum, best_partition
 
-    resulting_partition = bins
+    resulting_partition = None
 
     # iterate all options of what numbers to put in the current group
     for current_group, rest_of_items in _all_sub_groups(items):
@@ -179,6 +180,7 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
         resulting_partition, best_sum, best_partition, finish = group_result
         if finish:
             break
+
 
     # return the found partition
     return resulting_partition, best_sum, best_partition
