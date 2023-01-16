@@ -22,7 +22,8 @@ def optimal(
     time_limit=inf,
     additional_constraints:Callable=lambda sums:[],
     weights:List[float]=None,
-    verbose=0
+    verbose=0,
+    solver_name = mip.CBC # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
 ):
     """
     Produce a partition that minimizes the given objective, by solving an integer linear program (ILP).
@@ -101,7 +102,7 @@ def optimal(
     if weights is None:
         weights = numbins*[1]
 
-    model = mip.Model("partition")
+    model = mip.Model(name = '', solver_name=solver_name)
     counts: dict = {
         iitem: [model.add_var(var_type=mip.INTEGER) for ibin in ibins] 
         for iitem in iitems
