@@ -3,16 +3,15 @@ Optimally Scheduling Small Numbers of Identical Parallel Machines,
 by ichard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/ICAPS/article/view/13544
 Yoel Chemla
 """
-
 import doctest
 from Horowitz_And_Sahni import generate_subset_sum
 
 
 def schroeppel_shamir(s):
     """
-        Algorithm 2: get a list, return list that contain all the pair from the groups partitoins.
+        Algorithm 2: get a list, return list that contain all the pair from the groups partiroins.
         This algorithm help to algorithm1 with the partition.
-        
+
         >>> schroeppel_shamir([1, 2, 3, 4, 5])
         ([[], [0, 0], [0, 2], [1, 0], [1, 2]], [[], [3, 9], [3, 5], [3, 4], [3, 0], [0, 9], [0, 5], [0, 4], [0, 0]])
 
@@ -95,25 +94,27 @@ def schroeppel_shamir(s):
     # print()
 
     # merge
-    ans1 = [[]]
+    min_heap = [[]]
     for i in range(len(list_of_sum_a0)):
         for j in range(len(list_of_sum_a1)):
             pair = [list_of_sum_a0[i], list_of_sum_a1[j]]
-            ans1.append(pair)
-    # print("ans1 is: ", ans1)
+            min_heap.append(pair)
+    # print("min_heap is: ", min_heap)
 
-    ans2 = [[]]
+    max_heap = [[]]
     for i in range(len(list_of_sum_b0)):
         for j in range(len(list_of_sum_b1)):
             pair = [list_of_sum_b0[i], list_of_sum_b1[j]]
-            ans2.append(pair)
-    # print("ans2 is: ", ans2)
+            max_heap.append(pair)
+    # print("max_heap is: ", max_heap)
 
-    return ans1, ans2
+    return min_heap, max_heap
 
 
 if __name__ == '__main__':
     # doctest.testmod()
     # print(schroeppel_shamir([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-    print(schroeppel_shamir([1, 2, 3, 4, 5]))
-
+    # print(schroeppel_shamir([1, 2, 3, 4, 5]))
+    # print(schroeppel_shamir([100, 200, 100, 500]))
+    # print(schroeppel_shamir([0, 0, 0, 0]))
+    print(schroeppel_shamir([1, 2]))
