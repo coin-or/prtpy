@@ -74,7 +74,7 @@ The [Binner](prtpy/binner.py) class contains methods for handling bins in a gene
 
 ## Related libraries
 
-* [numberpartitioning](https://github.com/fuglede/numberpartitioning) by Søren Fuglede Jørgensen - the code for [complete_greedy](prtpy/partitioning/complete_greedy.py) and [complete_karmarkar_karp](prtpy/partitioning/complete_karmarkar_karp_sy.py)  was originally adapted from there.
+* [numberpartitioning](https://github.com/fuglede/numberpartitioning) by Søren Fuglede Jørgensen - the code for [complete_greedy](prtpy/partitioning/complete_greedy.py) and [complete_karmarkar_karp](prtpy/partitioning/complete_karmarkar_karp.py)  was originally adapted from there.
 * [binpacking](https://github.com/benmaier/binpacking) by Ben Maier.
 
 ## Limitations

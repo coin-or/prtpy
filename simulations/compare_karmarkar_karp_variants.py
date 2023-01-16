@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # input_ranges = {
     #     "numitems": [10, 12, 14, 16, 18, 20, 22, 24, 26, 30, 35, 40, 45, 50, 60, 80, 100, 150, 200],
     #     "bitsperitem": [4, 8, 12, 16, 20],
-    #     "algorithm": [prt.karmarkar_karp_kg, prt.karmarkar_karp_sy, prt.complete_karmarkar_karp_kg, prt.complete_karmarkar_karp_sy],
+    #     "algorithm": [prt.karmarkar_karp_kg, prt.karmarkar_karp, prt.complete_karmarkar_karp_kg, prt.complete_karmarkar_karp],
     #     "instance_id": range(10),
     # }
     # experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=TIME_LIMIT)
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     input_ranges = {
         "numitems": [10, 12, 14, 16, 18, 20],
         "bitsperitem": [32],
-        "algorithm": [prt.complete_karmarkar_karp_kg, prt.complete_karmarkar_karp_sy],
+        "algorithm": [prt.complete_karmarkar_karp_kg, prt.complete_karmarkar_karp],
         "instance_id": range(10),
     }
     experiment.run_with_time_limit(partition_random_items, input_ranges, time_limit=TIME_LIMIT)
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
 """
 RESULTS: 
-  * karmarkar_karp_sy is much faster than karmarkar_karp_kg; its runtime is approximately linear in the number of items.
+  * karmarkar_karp is much faster than karmarkar_karp_kg; its runtime is approximately linear in the number of items.
     The runtime of karmarkar_karp_kg increases super-linearly with the number of items.
-  * complete_karmarkar_karp_sy is slightly faster than complete_karmarkar_kg for at most 16 bits, but slightly slower for 20-32 bits.
+  * complete_karmarkar_karp is slightly faster than complete_karmarkar_kg for at most 16 bits, but slightly slower for 20-32 bits.
 """

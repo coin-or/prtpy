@@ -10,7 +10,7 @@ Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
 import unittest
 
 import prtpy
-from prtpy.partitioning.recursive_number_partitioning_sy import rnp
+from prtpy.partitioning.recursive_number_partitioning_korf import rnp
 prt = prtpy.partitioning
 out = prtpy.outputtypes
 obj = prtpy.objectives

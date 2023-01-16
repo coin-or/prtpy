@@ -21,10 +21,10 @@ Date:    03-2022
 
 from typing import Callable, List
 from prtpy import outputtypes as out, objectives as obj, Binner, BinnerKeepingContents, BinsArray, printbins
-from prtpy.partitioning.karmarkar_karp_sy import kk
+from prtpy.partitioning.karmarkar_karp import kk
 import numpy as np, logging
 from prtpy import partition
-from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as ckk_optimal, generator as ckk_generator
+from prtpy.partitioning.complete_karmarkar_karp import optimal as ckk_optimal, generator as ckk_generator
 from prtpy.inclusion_exclusion_tree import InExclusionBinTree
 
 logger = logging.getLogger(__name__)

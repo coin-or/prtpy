@@ -19,8 +19,8 @@ Since: 03-2022
 
 from typing import Callable, List
 from prtpy import outputtypes as out, objectives as obj, Binner, BinsArray, printbins
-from prtpy.partitioning.karmarkar_karp_sy import kk
-from prtpy.partitioning.complete_karmarkar_karp_sy import optimal as ckk_optimal
+from prtpy.partitioning.karmarkar_karp import kk
+from prtpy.partitioning.complete_karmarkar_karp import optimal as ckk_optimal
 import numpy as np, logging
 from prtpy import partition
 from prtpy.inclusion_exclusion_tree import InExclusionBinTree
