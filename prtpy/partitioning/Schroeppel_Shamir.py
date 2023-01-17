@@ -4,7 +4,7 @@ by ichard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/IC
 Yoel Chemla
 """
 import doctest
-from Horowitz_And_Sahni import generate_subset_sum
+from prtpy.partitioning.Horowitz_And_Sahni import generate_subset_sum
 
 
 def schroeppel_shamir(s):
@@ -112,9 +112,8 @@ def schroeppel_shamir(s):
 
 
 if __name__ == '__main__':
-    # doctest.testmod()
+    doctest.testmod()
     # print(schroeppel_shamir([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
     # print(schroeppel_shamir([1, 2, 3, 4, 5]))
     # print(schroeppel_shamir([100, 200, 100, 500]))
     # print(schroeppel_shamir([0, 0, 0, 0]))
-    print(schroeppel_shamir([1, 2]))
