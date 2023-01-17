@@ -39,7 +39,7 @@ if __name__ == "__main__":
     input_ranges = {
         "numitems": [10, 12, 14, 16, 18, 20, 22, 24, 26, 30],
         "bitsperitem": [8, 12, 16, 20, 24, 32],
-        "algorithm": [prt.recursive_number_partitioning_kg, prt.recursive_number_partitioning_sy],
+        "algorithm": [prt.recursive_number_partitioning, prt.recursive_number_partitioning_moffitt],
         "numbins": [2, 3, 4],
         "instance_id": range(10),
     }
@@ -47,5 +47,5 @@ if __name__ == "__main__":
 
 
 """
-RESULTS: rnp_kg is faster than rnp_sy.
+RESULTS: ?.
 """

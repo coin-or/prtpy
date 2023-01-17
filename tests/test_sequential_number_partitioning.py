@@ -10,7 +10,7 @@ Link to the article : https://www.ijcai.org/Proceedings/09/Papers/096.pdf
 import unittest
 
 import prtpy
-from prtpy.partitioning.sequential_number_partitioning_sy import snp
+from prtpy.partitioning.sequential_number_partitioning import snp
 prt = prtpy.partitioning
 out = prtpy.outputtypes
 obj = prtpy.objectives

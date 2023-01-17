@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     prt = prtpy.partitioning
     # input_ranges = {
-    #     "algorithm": [prt.integer_programming, prt.complete_greedy, prt.dynamic_programming, prt.ckk, prt.ckk_sy,],
+    #     "algorithm": [prt.integer_programming, prt.complete_greedy, prt.dynamic_programming, prt.ckk],
     #     "numbins": [2],
     #     "numitems": [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 35, 40, 50, 60, 70, 80, 90, 100],
     #     "bitsperitem": [16,32,48],

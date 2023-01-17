@@ -12,7 +12,7 @@ from typing import Iterator, List, Tuple, Callable, List, Any
 from prtpy import outputtypes as out, objectives as obj, Binner, BinsArray
 import logging, numpy as np
 
-from prtpy.partitioning.karmarkar_karp_sy import BinsSortedByMaxDiff
+from prtpy.partitioning.karmarkar_karp import BinsSortedByMaxDiff
 
 
 logger = logging.getLogger(__name__)
