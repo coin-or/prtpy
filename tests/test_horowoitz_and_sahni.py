@@ -4,7 +4,6 @@ by ichard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/IC
 Yoel Chemla
 """
 import unittest
-
 from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni
 
 
@@ -12,7 +11,7 @@ class TestMain(unittest.TestCase):
     def test_hs(self):
         # default case
         arr0 = []
-        self.assertEqual(Horowitz_Sahni([], 0), [], "good")
+        self.assertEqual(Horowitz_Sahni(arr0, 0), [], "good")
 
         arr0_1 = [1, 2, 3, 4, 5]
         self.assertEqual(Horowitz_Sahni(arr0_1, 5), [5], "good")
@@ -86,3 +85,4 @@ class TestMain(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+    
