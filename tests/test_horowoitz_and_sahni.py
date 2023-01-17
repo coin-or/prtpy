@@ -9,6 +9,7 @@ from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni
 
 class TestMain(unittest.TestCase):
     def test_hs(self):
+        
         # default case
         arr0 = []
         self.assertEqual(Horowitz_Sahni(arr0, 0), [], "good")
