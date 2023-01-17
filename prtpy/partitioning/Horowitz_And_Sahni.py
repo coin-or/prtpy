@@ -125,7 +125,7 @@ def Horowitz_Sahni(s, k):
     left_sum = s[:len(s) // 2]
     right_sum = s[len(s) // 2:]
 
-    # send to help function and create list of the left and right sum
+    # send  to help function and create list of the left and right sum
     list_of_right_sum = generate_subset_sum(right_sum)
     list_of_left_sum = generate_subset_sum(left_sum)
 
