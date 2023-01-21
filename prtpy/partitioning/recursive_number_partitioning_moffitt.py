@@ -8,6 +8,7 @@ note: As this is a full search algorithm, and the running time is exponential,
 it may not be used with large amount of items to partition.
 
 Author: nir son
+Date: 01/2023
 """
 import doctest
 import math
@@ -19,8 +20,6 @@ from prtpy import partition, Binner, BinnerKeepingContents, BinsArray, printbins
 from prtpy.partitioning.greedy import greedy
 import logging
 
-LOG_FORMAT = "%(levelname)s, time: %(asctime)s ,in: %(funcName)s , line: %(lineno)d: %(message)s "
-logging.basicConfig(format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
 
 
@@ -187,4 +186,6 @@ def _rnp_recursive(bins: BinsArray, binner: Binner, items: List[any], current_bi
 
 
 if __name__ == '__main__':
+    LOG_FORMAT = "%(levelname)s, time: %(asctime)s ,in: %(funcName)s , line: %(lineno)d: %(message)s "
+    logging.basicConfig(format=LOG_FORMAT)
     doctest.testmod()

@@ -1,7 +1,24 @@
+"""
+Tests for the implementation of full branch and bound search for number partitioning, with minmax objective
+(i.e. minimize largest sum). A recursive implementation.
+Based on "Search Strategies for Optimal Multi-Way Number Partitioning", Michael D. Moffitt, 2013
+https://www.ijcai.org/Proceedings/13/Papers/099.pdf
+
+note: As this is a full search algorithm, and the running time is exponential,
+it may not be used with large amount of items to partition.
+
+Author: nir son
+Date: 01/2023
+"""
+
+
 import time
 import random
 import string
-from prtpy.partitioning.recursive_number_partitioning_sy_v2 import rnp
+
+import pytest
+
+from prtpy.partitioning.recursive_number_partitioning_moffitt import rnp
 from prtpy.partitioning.integer_programming import optimal as integer_programming
 from prtpy import compare_algorithms_on_random_items, outputtypes as out, objectives as obj
 from prtpy import partition, BinsArray
@@ -65,7 +82,7 @@ def test_zero():
 def test_on_random_inputs():
     # compare to integer programming (optimal solution)
     for numbins in [2, 3, 4]:
-        items = [random.randint(1, 256) for _ in range(5)]
+        items = [random.randint(1, 256) for _ in range(10)]
         ip = partition(algorithm=integer_programming, numbins=numbins, items=items)
         my = partition(algorithm=rnp, numbins=numbins, items=items)
 
@@ -80,3 +97,7 @@ def test_run_time():
     end_time = time.time()
     # partitioning 10 numbers should take less than a minute
     assert (end_time - start_time) < 60
+
+
+if __name__ == '__main__':
+    pytest.main()
