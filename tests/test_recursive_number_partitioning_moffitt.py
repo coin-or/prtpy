@@ -27,8 +27,11 @@ from prtpy import partition, BinsArray
 def _compare_partitions(par1, par2, valueof=lambda x:x) -> bool:
     par1_sums = map(lambda l: sum([valueof(i) for i in l]), par1)
     par2_sums = map(lambda l: sum([valueof(i) for i in l]), par2)
-
-    return max(par1_sums) == max(par2_sums)
+    if max(par1_sums) == max(par2_sums):
+        return True
+    else:
+        print(f"Partitions are different: partition 1 sums = {par1_sums}, partition 2 sums = {par2_sums}")
+        return False
 
 
 def test_2way_partitioning():
