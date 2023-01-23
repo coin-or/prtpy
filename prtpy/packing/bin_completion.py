@@ -69,6 +69,12 @@ def bin_completion(binner: Binner, binsize: float, items: List[Any])->BinsArray:
     Bin #2: [94, 5], sum=99.0
     Bin #3: [93, 4], sum=97.0
     Bin #4: [8], sum=8.0
+    
+    Example 7: Suggested here: https://github.com/erelsgl/prtpy/issues/15
+    >>> printbins(bin_completion(BinnerKeepingContents(), binsize=60, items=[44, 6, 24, 6, 24, 8, 22, 8, 17, 21]))
+    Bin #0: [44, 8, 8], sum=60.0
+    Bin #1: [24, 24, 6, 6], sum=60.0
+    Bin #2: [22, 21, 17], sum=60.0
     """
     # Test if there is an item with a value larger than binsize.
     for item in items:
@@ -102,7 +108,9 @@ def bin_completion(binner: Binner, binsize: float, items: List[Any])->BinsArray:
         # cb = current branch
         cb = branches.pop(0)
 
-        for x in cb.items:
+        # for x in cb.items:
+        while cb.items:
+            x = cb.items[0]
             # Add a new bin and add x to that bin
             cb.bins = binner.add_empty_bins(cb.bins, 1)
             binner.add_item_to_bin(cb.bins, x, cb.bin_index)
