@@ -3,9 +3,13 @@ Optimally Scheduling Small Numbers of Identical Parallel Machines,
 by ichard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/ICAPS/article/view/13544
 Yoel Chemla
 """
-import doctest
-import numpy as np
 # credit: https://sites.cs.queensu.ca/courses/cisc365/Labs/Week%204/2019%20Week%204%20+%205%20Lab.pdf
+
+import doctest
+import math
+import sys
+
+import numpy as np
 
 
 # help functions:
@@ -14,91 +18,64 @@ def Pair_Sum(v1, v2, k):
     divide to pair
     >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 3)
     (1, 1)
+    >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 14)
+    (1, 4)
+    >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 34)
+    (7, 7)
+
+    >>> Pair_Sum([[], [1], [1, 4]], [[], [9, 2], [13],  [13, 2], [9, 13], [9, 13, 2]], 20)#lengths of list are not equal
+    (2, 3)
     """
+    v1.sort(key=sum)
+    v2.sort(key=sum)
+
     pair1 = 0
     pair2 = (len(v2) - 1)
+    diff_min = math.inf
+    diff_pair = 0, 0
 
     while pair1 <= (len(v1) - 1) and (pair2 >= 0):
         ans = v1[pair1] + v2[pair2]
         t = sum(ans)
         if t < k:
+            if k - t < diff_min:
+                diff_min = abs(t - k)
+                diff_pair = pair1, pair2
             pair1 = pair1 + 1
+
         elif t == k:
             return pair1, pair2
-        else:
+        else:  # t > k
+            if t - k < diff_min:
+                diff_min = abs(t - k)
+                diff_pair = pair1, pair2
             pair2 = pair2 - 1
-    return None
+    return diff_pair
 
 
-def generate_subset_sum(s):
+    #  use power set by python
+def poewer_set(s):  # generator
     """
     create all the subset sum
-    >>> generate_subset_sum([1, 2])
+    >>> poewer_set([1, 2])
     [[], [1], [2], [1, 2]]
 
-    >>> generate_subset_sum([])
+    >>> poewer_set([])
     [[]]
 
-    >>> generate_subset_sum([1, 2, 3])
+    >>> poewer_set([1, 2, 3])
     [[], [1], [2], [1, 2], [3], [1, 3], [2, 3], [1, 2, 3]]
-
     """
-    sets = [[]]
-    for i in range(0, len(s)):
-        length_sets = len(sets)
-        for j in range(0, length_sets):
-            t = sets[j] + [s[i]]
-            sets.append(t)  # add t in the set
-    return sets
+    x = len(s)
+    arr = [1 << i for i in range(x)]
 
+    def help_function(s):
+        for i in range(1 << x):
+            yield [ss for res, ss in zip(arr, s) if i & res]
 
-def compute_each_subset_sum(s, k):
-    """
-    compute the sum of each subset sum
-    >>> compute_each_subset_sum([1, 2, 3, 4 ,5, 6], 80)
-    [1, 2, 3, 4, 5, 6]
-
-    # near (use by closest_value function)
-    >>> compute_each_subset_sum([1, 2, 7, 36], 40)
-    [1, 2, 36]
-
-    # correct
-    >>> compute_each_subset_sum([1, 2, 7, 36], 39)
-    [1, 2, 36]
-    """
-    ans = generate_subset_sum(s)
-    arr_sum = []
-    # print(ans)
-    sets = [[]]
-    for i in range(0, len(s)):  # create a new set for each one
-        for j in range(0, len(sets)):
-            t = sets[j] + [s[i]]
-            sets.append(t)
-            arr_sum.append(sum(t))
-            if sum(t) == k:  # compare the sum to the target k
-                # print("the res is: ", t)
-                return t
-
-    closest = closest_value(arr_sum, k)  # call to func that compute the nearest value
-    i = 0
-    for i in range(len(sets)):
-        if sum(sets[i]) == closest:
-            # print(sets[i])
-            return sets[i]
-    # return None  # no found
-
-
-def closest_value(input_list, input_value):
-    """
-     find the nearest value in the list
-    >>> closest_value([1, 2, 3, 4], 10)
-    4
-    >>> closest_value([1, 100, 1000], 999)
-    1000
-    """
-    arr = np.asarray(input_list)
-    i = (np.abs(arr - input_value)).argmin()
-    return arr[i]
+    temp = help_function(s)
+    y = [i for i in temp]
+    return y
 
 
 def Horowitz_Sahni(s, k):
@@ -121,13 +98,16 @@ def Horowitz_Sahni(s, k):
     >>> Horowitz_Sahni([1, 2, 3, 4], 11)
     [1, 2, 3, 4]
 
+    >>> Horowitz_Sahni([1, 2, 3, 97], 98)
+    [1, 97]
+
     """
     left_sum = s[:len(s) // 2]
     right_sum = s[len(s) // 2:]
 
-    # send  to help function and create list of the left and right sum
-    list_of_right_sum = generate_subset_sum(right_sum)
-    list_of_left_sum = generate_subset_sum(left_sum)
+    # send to help function and create list of the left and right sum
+    list_of_right_sum = poewer_set(right_sum)
+    list_of_left_sum = poewer_set(left_sum)
 
     # Checks the sums if over than target value:
 
@@ -142,42 +122,18 @@ def Horowitz_Sahni(s, k):
             return i  # equal to the target
 
     # if the sums don't over than target value, sort lists to pair_sum function:
-
-    # right side
-    list_of_right_sum.sort()
-
-    # left side
-    list_of_left_sum.sort()
     ans_pair = Pair_Sum(list_of_left_sum, list_of_right_sum, k)
-    # call the help function
-    if ans_pair is not None:
-        # print(Pair_Sum(list_of_right_sum, list_of_left_sum, k))
-        ans_arr = [list_of_left_sum[ans_pair[0]], list_of_right_sum[ans_pair[1]]]
 
-        # convert from list of list -> list
-        arr = []
-        for m in range(len(ans_arr)):
-            for n in range(len(ans_arr[m])):
-                arr.append(ans_arr[m][n])
-        return arr
+    left_side_list = list_of_left_sum[ans_pair[0]]
+    right_side_list = list_of_right_sum[ans_pair[1]]
 
-    # if we didn't found a set that equal to target
-    else:
-        # print(compute_each_subset_sum(s, k))
-        return compute_each_subset_sum(s, k)
+    ans_arr = [left_side_list, right_side_list]
+
+    # convert from list of list -> list
+    arr = [ans_arr[m][n] for m in range(len(ans_arr)) for n in range(len(ans_arr[m]))]
+    return arr
 
 
 if __name__ == '__main__':
     doctest.testmod()
-    # arr = [3, 5, 3, 9, 18, 4, 5, 6]
-    # n = 11
-    # print(Horowitz_Sahni(arr, n))  # [3, 5, 3]
-    # print(compute_each_subset_sum([1, 4, 5, 100], 1000))
-
-    # print(Horowitz_Sahni([1, 2, 100, 3000], 3001))
-    # print(Horowitz_Sahni([1, 2, 3, 4, 5], 6))
-    # print(closest_value([1, 2, 3, 4], 7))
-    # print(Horowitz_Sahni([1, 4, 5, 9, 13, 2], 3))
-    # s = [1, 2, 3, 4, 5, 6]
-    # print(generate_subset_sum(s))
-    # print(len(generate_subset_sum(s)))
+    
