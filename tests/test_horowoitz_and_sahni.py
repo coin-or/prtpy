@@ -4,12 +4,15 @@ by ichard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/IC
 Yoel Chemla
 """
 import unittest
-from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni
+
+from prtpy import BinnerKeepingContents
+from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni, poewer_set
+from prtpy.partitioning.roundrobin import roundrobin
+import random
 
 
 class TestMain(unittest.TestCase):
     def test_hs(self):
-        
         # default case
         arr0 = []
         self.assertEqual(Horowitz_Sahni(arr0, 0), [], "good")
@@ -66,6 +69,9 @@ class TestMain(unittest.TestCase):
         arr2_4 = [0.5, 0.4, 0.3]
         self.assertEqual(Horowitz_Sahni(arr2_4, 1.2), [0.5, 0.4, 0.3], "good")
 
+        arr2 = [1, -2, 3, 4, 5, 5.5]
+        self.assertEqual(Horowitz_Sahni(arr2, 3.5), [-2, 5.5], "good")
+
         #   a large numbers
         arr3 = [1000, 2000, 30000, 2000, 65000, 100000]
         self.assertEqual(Horowitz_Sahni(arr3, 67000), [2000, 65000], "good")
@@ -80,10 +86,8 @@ class TestMain(unittest.TestCase):
                                                         12, 13, 14, 15, 16, 17, 18, 19, 20], "good")
 
         arr3_3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-        self.assertNotEqual(Horowitz_Sahni(arr3_2, 100), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+        self.assertNotEqual(Horowitz_Sahni(arr3_3, 100), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
                                                           12, 13, 14, 15, 16, 17, 18, 19, 20], "Exception")
-
 
 if __name__ == '__main__':
     unittest.main()
-    
