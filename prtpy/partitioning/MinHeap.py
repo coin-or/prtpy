@@ -54,15 +54,3 @@ class MinHeap:
         if smallest != index:
             self.heap[index], self.heap[smallest] = self.heap[smallest], self.heap[index]
             self._bubble_down(smallest, end)
-
-
-if __name__ == '__main__':
-    print('The minHeap is ')
-    minHeap = MinHeap()
-
-    list_sorted1 = [[0, 0], [0, 2], [1, 0], [1, 2]]
-    for i in list_sorted1:
-         minHeap.push(i)
-
-    print(minHeap.heap)
-
