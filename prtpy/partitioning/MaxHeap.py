@@ -54,21 +54,4 @@ class MaxHeap:
         if largest != index:
             self.heap[index], self.heap[largest] = self.heap[largest], self.heap[index]
             self._bubble_down(largest, end)
-
-
-if __name__ == '__main__':
-    # [[3, 9], [3, 5], [3, 4], [3, 0], [0, 9], [0, 5], [0, 4], [0, 0]]
-    print('The maxHeap is ')
-    maxHeap = MaxHeap()
-
-    list_sorted2 = [[3, 9], [3, 5], [3, 4], [3, 0], [0, 9], [0, 5], [0, 4], [0, 0]]
-    for i in list_sorted2:
-        maxHeap.push(i)
-
-    print(maxHeap.heap)
-
-    # maxHeap.pop()
-    # print(maxHeap.heap)
-    #
-    # maxHeap.pop()
-    # print(maxHeap.heap)
+ 
