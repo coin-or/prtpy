@@ -121,7 +121,6 @@ def Horowitz_Sahni(s, k):
         if sum(i) == k:
             return i  # equal to the target
 
-    # if the sums don't over than target value, sort lists to pair_sum function:
     ans_pair = Pair_Sum(list_of_left_sum, list_of_right_sum, k)
 
     left_side_list = list_of_left_sum[ans_pair[0]]
