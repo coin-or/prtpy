@@ -19,6 +19,11 @@ print(prtpy.pack(algorithm=prtpy.packing.bin_completion, binsize=61, items=items
 
 #' More FFD examples from a recent paper:
 itemsA = [51, 28, 27, 27, 27, 26, 12, 12, 11, 11, 11, 11, 11, 11, 10]
-print("A: ",prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=75, items=itemsA, outputtype=prtpy.out.PartitionAndSums))
+print("\nA, 75: ",prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=75, items=itemsA, outputtype=prtpy.out.PartitionAndSums))
+print("A, 76: ",prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=76, items=itemsA, outputtype=prtpy.out.PartitionAndSums))
 itemsB = [51, 28, 27, 27, 27, 24, 21, 20, 10, 10, 10, 9, 9, 9, 9]
-print("B: ",prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=75, items=itemsB, outputtype=prtpy.out.PartitionAndSums))
+print("B, 75: ",prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=75, items=itemsB, outputtype=prtpy.out.PartitionAndSums))
+itemsW = [51, 28, 28, 28, 27, 25, 12, 12, 10, 10, 10, 10, 10, 10, 10, 10]
+print("\nW, 75: ",prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=75, items=itemsW, outputtype=prtpy.out.PartitionAndSums))
+print("W, 76: ",prtpy.pack(algorithm=prtpy.packing.first_fit_decreasing, binsize=76, items=itemsW, outputtype=prtpy.out.PartitionAndSums))
+
