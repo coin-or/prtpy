@@ -6,11 +6,9 @@ Yoel Chemla
 import unittest
 from prtpy.partitioning.Schroeppel_Shamir import schroeppel_shamir
 from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni
-from prtpy.partitioning.MaxHeap import MaxHeap
-from prtpy.partitioning.MinHeap import MinHeap
 
 
-class TestCase(unittest.TestCase):
+class Test(unittest.TestCase):
     def test_schroeppel_shamir(self):
 
         self.assertEqual(schroeppel_shamir([1, 2]), ([[0, 0], [0, 1]], [[0, 2], [0, 0]]), "good")
