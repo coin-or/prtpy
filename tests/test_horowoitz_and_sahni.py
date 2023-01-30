@@ -7,8 +7,8 @@ import unittest
 
 from prtpy import BinnerKeepingContents
 from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni, poewer_set
-from prtpy.partitioning.roundrobin import roundrobin
 import random
+from prtpy.partitioning.greedy import greedy
 
 
 class TestMain(unittest.TestCase):
@@ -88,6 +88,24 @@ class TestMain(unittest.TestCase):
         arr3_3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
         self.assertNotEqual(Horowitz_Sahni(arr3_3, 100), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
                                                           12, 13, 14, 15, 16, 17, 18, 19, 20], "Exception")
+
+        #   check with other function from this library
+        # Note: I check the sum and not the element of array cause both return the other element, but the sum must be
+        # the same
+
+        x = greedy(BinnerKeepingContents(), 2, [4, 5, 6, 7, 8])  # [4, 5, 8] = 17,  [6, 7] = 13
+        sum_x1 = x[0][0]  # 17
+        res_my = Horowitz_Sahni([4, 5, 6, 7, 8], sum_x1)  # res_my = [4, 6, 7], sum = 17
+        self.assertEqual(sum(res_my), int(sum_x1))
+
+        #   check a random input with other function from this library
+        array_size = 5
+        array_random = [random.randint(1, 100) for i in range(array_size)]
+        y = greedy(BinnerKeepingContents(), 2, array_random)
+        sum_y1 = y[0][0]
+        res_ranndom = Horowitz_Sahni(array_random, sum_y1)
+        self.assertEqual(sum(res_ranndom), int(sum_y1))
+
 
 if __name__ == '__main__':
     unittest.main()
