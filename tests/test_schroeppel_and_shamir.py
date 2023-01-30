@@ -6,11 +6,8 @@ Yoel Chemla
 import unittest
 from prtpy.partitioning.Schroeppel_Shamir import schroeppel_shamir
 from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni
-from prtpy.partitioning.MaxHeap import MaxHeap
-from prtpy.partitioning.MinHeap import MinHeap
 
-
-class MyTestCase(unittest.TestCase):
+class TestCase(unittest.TestCase):
     def test_something(self):
 
         self.assertEqual(schroeppel_shamir([1, 2]), ( [[0, 0], [0, 1]], [[0, 2], [0, 0]]), "good")
@@ -23,7 +20,7 @@ class MyTestCase(unittest.TestCase):
 
 
 
-        # #     negative number
+        #     negative number
         arr1 = [-1, -2, -3]
         self.assertEqual(schroeppel_shamir(arr1), ([[0, -1], [0, 0]], [[0, 0], [0, -3], [-2, 0], [-2, -3]]),
                          "good")
@@ -80,6 +77,7 @@ class MyTestCase(unittest.TestCase):
                                                      [[1000000000000000000000, 0],
                                                       [1000000000000000000000, -22222222334], [0, 0],
                                                       [0, -22222222334]]))
+      
         #   catch exception
         self.assertNotEqual(schroeppel_shamir(arr2_3), ([[0, -3], [0, 0], [1.2, -3], [1.2, 0]], [[0, 6], [0, 0], [-4.7, 6]]),
                             "Exception")
