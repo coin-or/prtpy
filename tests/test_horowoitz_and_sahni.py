@@ -99,13 +99,13 @@ class TestMain(unittest.TestCase):
         self.assertEqual(sum(res_my), int(sum_x1))
 
         #   check a random input with other function from this library
-        array_size = 5
-        array_random = [random.randint(1, 100) for i in range(array_size)]
+        array_size = random.randint(1, 40)
+        array_random = [random.randint(1, 10000000) for i in range(array_size)]
         y = greedy(BinnerKeepingContents(), 2, array_random)
         sum_y1 = y[0][0]
-        res_ranndom = Horowitz_Sahni(array_random, sum_y1)
-        self.assertEqual(sum(res_ranndom), int(sum_y1))
-
-
+        res_random = Horowitz_Sahni(array_random, sum_y1)
+        self.assertEqual(sum(res_random), int(sum_y1))
+        
+        
 if __name__ == '__main__':
     unittest.main()
