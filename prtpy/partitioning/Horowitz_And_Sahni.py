@@ -15,11 +15,17 @@ import numpy as np
 # help functions:
 def Pair_Sum(v1, v2, k):
     """
-    divide to pair
+    This function sort the 2 lists by sum and check by 2 points(from the start on the first list and from the end on
+    the second list) if the sum of the 2 lists equal to target and each run update the nearest if the correct sum didn't found
+    - if the correct sum found, return the index of the lists.
+    else: return the nearest.
+
     >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 3)
     (1, 1)
+   
     >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 14)
     (1, 4)
+    
     >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 34)
     (7, 7)
 
