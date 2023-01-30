@@ -10,7 +10,7 @@ from prtpy.partitioning.Horowitz_And_Sahni import poewer_set
 
 def schroeppel_shamir(s):
     """
-        Algorithm 2: get a list, return list that contain all the pair from the groups partiroins.
+        Algorithm 2: get a list, return tuple that contain min heap and max heap by pair from the groups partiroins.
         This algorithm help to algorithm1 with the partition.
 
         >>> schroeppel_shamir([1, 2, 3])
