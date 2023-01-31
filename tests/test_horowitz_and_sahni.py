@@ -13,7 +13,7 @@ from prtpy import objectives as obj
 
 
 class TestCase(unittest.TestCase):
-    def test_hs(self):
+    def test_horowitz_and_sahni(self):
         # default case
         arr0 = []
         self.assertEqual(Horowitz_Sahni(arr0, 0), [], "good")
