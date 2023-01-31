@@ -9,6 +9,8 @@ from prtpy import BinnerKeepingContents
 from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni, poewer_set
 import random
 from prtpy.partitioning.greedy import greedy
+from prtpy.partitioning.complete_greedy import anytime
+from prtpy import objectives as obj, Binner, BinsArray
 
 
 class TestMain(unittest.TestCase):
@@ -89,7 +91,7 @@ class TestMain(unittest.TestCase):
         self.assertNotEqual(Horowitz_Sahni(arr3_3, 100), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
                                                           12, 13, 14, 15, 16, 17, 18, 19, 20], "Exception")
 
-        #   check with other function from this library
+        #   check the sum with greedy algorithm from this library
         # Note: I check the sum and not the element of array cause both return the other element, but the sum must be
         # the same
 
@@ -98,14 +100,38 @@ class TestMain(unittest.TestCase):
         res_my = Horowitz_Sahni([4, 5, 6, 7, 8], sum_x1)  # res_my = [4, 6, 7], sum = 17
         self.assertEqual(sum(res_my), int(sum_x1))
 
-        #   check a random input with other function from this library
+        #   check arrays with complete greedy algorithm from this library
+        z = anytime(BinnerKeepingContents(), 2, [4, 5, 6, 7, 8], objective=obj.MinimizeDifference)
+        arr_z1 = z[1][1]  # [8,7]
+        my_res = Horowitz_Sahni([4, 5, 6, 7, 8], sum(arr_z1))  # [7, 8]
+
+        # sort the arr increase
+        arr_z1.sort()
+        my_res.sort()
+
+        self.assertEqual(my_res, arr_z1, "both algorithm give the same answer ")
+
+        #   check the sum with a random input with greedy algorithm from this library
         array_size = random.randint(1, 40)
         array_random = [random.randint(1, 10000000) for i in range(array_size)]
         y = greedy(BinnerKeepingContents(), 2, array_random)
         sum_y1 = y[0][0]
         res_random = Horowitz_Sahni(array_random, sum_y1)
         self.assertEqual(sum(res_random), int(sum_y1))
-        
-        
+
+        #   check array with a random input with complete greedy algorithm from this library
+        arr_size = random.randint(1, 30)
+        arr_random = [random.randint(1, 10000000) for i in range(arr_size)]
+        q = anytime(BinnerKeepingContents(), 2, arr_random, objective=obj.MinimizeDifference)
+        arr_q1 = q[1][1]
+        ans_random = Horowitz_Sahni(arr_random, sum(arr_q1))
+
+        # sort the arr increase
+        arr_q1.sort()
+        ans_random.sort()
+
+        self.assertEqual(ans_random, arr_q1)
+
+
 if __name__ == '__main__':
     unittest.main()
