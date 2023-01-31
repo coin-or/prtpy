@@ -8,7 +8,7 @@ from prtpy.partitioning.Schroeppel_Shamir import schroeppel_shamir
 from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni
 
 
-class Test(unittest.TestCase):
+class TestCase(unittest.TestCase):
     def test_schroeppel_shamir(self):
 
         self.assertEqual(schroeppel_shamir([1, 2]), ([[0, 0], [0, 1]], [[0, 2], [0, 0]]), "good")
