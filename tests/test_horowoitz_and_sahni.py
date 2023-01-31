@@ -92,7 +92,7 @@ class TestMain(unittest.TestCase):
                                                           12, 13, 14, 15, 16, 17, 18, 19, 20], "Exception")
 
         #   check the sum with greedy algorithm from this library
-        # Note: I check the sum and not the element of array in greedy algorithms cause both return the other element, but the sum must be
+        # Note: I check the sum and not the element of array in greedy algorithm, cause both return the other element, but the sum must be
         # the same
 
         x = greedy(BinnerKeepingContents(), 2, [4, 5, 6, 7, 8])  # [4, 5, 8] = 17,  [6, 7] = 13
