@@ -15,23 +15,24 @@ import numpy as np
 # help functions:
 def Pair_Sum(v1, v2, k):
     """
-    This function sort the 2 lists by sum and check by 2 points(from the start on the first list and from the end on
-    the second list) if the sum of the 2 lists equal to target and each run update the nearest if the correct sum didn't found
-    - if the correct sum found, return the index of the lists.
-    else: return the nearest.
+        This function sort the two lists by sum and check by 2 points(from the start on the first list, and from the end on
+        the second list) if the sum of the 2 lists equal to target and each run update the nearest if the correct sum didn't found
+        - if the correct sum found, return the index of the lists.
+        else: return the nearest.
 
-    >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 3)
-    (1, 1)
-   
-    >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 14)
-    (1, 4)
-    
-    >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 34)
-    (7, 7)
+        >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 3)
+        (1, 1)
 
-    >>> Pair_Sum([[], [1], [1, 4]], [[], [9, 2], [13],  [13, 2], [9, 13], [9, 13, 2]], 20)#lengths of list are not equal
-    (2, 3)
-    """
+        >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 14)
+        (1, 4)
+
+        >>> Pair_Sum([[], [1], [1, 4], [1, 4, 5], [1, 5], [4], [4, 5], [5]], [[], [2], [9], [9, 2], [9, 13], [9, 13, 2], [13], [13, 2]], 34)
+        (7, 7)
+
+        >>> Pair_Sum([[], [1], [1, 4]], [[], [9, 2], [13],  [13, 2], [9, 13], [9, 13, 2]], 20)#lengths of list are not equal
+        (2, 3)
+        """
+
     v1.sort(key=sum)
     v2.sort(key=sum)
 
@@ -60,9 +61,10 @@ def Pair_Sum(v1, v2, k):
 
 
     #  use power set by python
-def poewer_set(s):  # generator
+def poewer_set(s):
     """
     create all the subset sum
+    
     >>> poewer_set([1, 2])
     [[], [1], [2], [1, 2]]
 
@@ -115,8 +117,6 @@ def Horowitz_Sahni(s, k):
     list_of_right_sum = poewer_set(right_sum)
     list_of_left_sum = poewer_set(left_sum)
 
-    # Checks the sums if over than target value:
-
     #     right side
     for i in list_of_right_sum:
         if sum(i) == k:
@@ -127,6 +127,7 @@ def Horowitz_Sahni(s, k):
         if sum(i) == k:
             return i  # equal to the target
 
+    # if the sums don't over than target value, sort lists to pair_sum function:
     ans_pair = Pair_Sum(list_of_left_sum, list_of_right_sum, k)
 
     left_side_list = list_of_left_sum[ans_pair[0]]
