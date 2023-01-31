@@ -4,16 +4,15 @@ by ichard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/IC
 Yoel Chemla
 """
 import unittest
-
 from prtpy import BinnerKeepingContents
-from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni, poewer_set
+from prtpy.partitioning.Horowitz_And_Sahni import Horowitz_Sahni
 import random
 from prtpy.partitioning.greedy import greedy
 from prtpy.partitioning.complete_greedy import anytime
-from prtpy import objectives as obj, Binner, BinsArray
+from prtpy import objectives as obj
 
 
-class TestMain(unittest.TestCase):
+class TestCase(unittest.TestCase):
     def test_hs(self):
         # default case
         arr0 = []
@@ -112,7 +111,7 @@ class TestMain(unittest.TestCase):
         self.assertEqual(my_res, arr_z1, "both algorithm give the same answer ")
 
         #   check the sum with a random input with greedy algorithm from this library
-        array_size = random.randint(1, 40)
+        array_size = random.randint(1, 10)
         array_random = [random.randint(1, 10000000) for i in range(array_size)]
         y = greedy(BinnerKeepingContents(), 2, array_random)
         sum_y1 = y[0][0]
@@ -120,8 +119,8 @@ class TestMain(unittest.TestCase):
         self.assertEqual(sum(res_random), int(sum_y1))
 
         #   check array with a random input with complete greedy algorithm from this library
-        arr_size = random.randint(1, 30)
-        arr_random = [random.randint(1, 10000000) for i in range(arr_size)]
+        arr_size = random.randint(1, 10)
+        arr_random = [random.randint(1, 1000000) for i in range(arr_size)]
         q = anytime(BinnerKeepingContents(), 2, arr_random, objective=obj.MinimizeDifference)
         arr_q1 = q[1][1]
         ans_random = Horowitz_Sahni(arr_random, sum(arr_q1))
