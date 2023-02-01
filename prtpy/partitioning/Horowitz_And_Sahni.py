@@ -1,6 +1,6 @@
 """
 Optimally Scheduling Small Numbers of Identical Parallel Machines,
-by ichard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/ICAPS/article/view/13544
+by Richard E.Korf and Ethan L. Schreiber (2013) https://ojs.aaai.org/index.php/ICAPS/article/view/13544
 Yoel Chemla
 """
 # credit: https://sites.cs.queensu.ca/courses/cisc365/Labs/Week%204/2019%20Week%204%20+%205%20Lab.pdf
