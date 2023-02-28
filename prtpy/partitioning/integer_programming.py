@@ -112,7 +112,7 @@ def optimal(
 
     model = mip.Model(name = '', solver_name=solver_name)
     counts: dict = {
-        iitem: [model.add_var(var_type=mip.INTEGER, name=f'item{binner.valueof(items[iitem]):05d}_in_bin{ibin}') for ibin in ibins] 
+        iitem: [model.add_var(var_type=mip.INTEGER, name=f'item{iitem}_in_bin{ibin}') for ibin in ibins] 
         for iitem in iitems
     }  # counts[i][j] is a variable that represents how many times item i appears in bin j.
     bin_sums = [
@@ -158,7 +158,8 @@ def optimal(
             for ibin in ibins:
                 for iitem in iitems:
                     count_item_in_bin = int(counts[iitem][ibin].x)
-                    solution_file.write(f'item{binner.valueof(items[iitem]):05d}_in_bin{ibin} = {count_item_in_bin}\n')
+                    # solution_file.write(f'item{binner.valueof(items[iitem]):05d}_in_bin{ibin} = {count_item_in_bin}\n')
+                    solution_file.write(f'item{iitem}_in_bin{ibin} = {count_item_in_bin}\n')
     return output
 
 
