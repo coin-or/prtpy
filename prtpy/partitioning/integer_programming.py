@@ -11,6 +11,9 @@ from typing import List, Callable, Any
 from numbers import Number
 from prtpy import objectives as obj, outputtypes as out, Binner, printbins
 from math import inf
+import logging
+
+logger = logging.getLogger(__name__)
 
 import mip
 
@@ -23,7 +26,9 @@ def optimal(
     additional_constraints:Callable=lambda sums:[],
     weights:List[float]=None,
     verbose=0,
-    solver_name = mip.CBC # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
+    solver_name = mip.CBC, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
+    model_filename = None,  
+    solution_filename = None,  
 ):
     """
     Produce a partition that minimizes the given objective, by solving an integer linear program (ILP).
@@ -37,6 +42,9 @@ def optimal(
     :param time_limit: stop the computation after this number of seconds have passed.
     :param additional_constraints: a function that accepts the list of sums in ascending order, and returns a list of possible additional constraints on the sums.
     :param weights: if given, must be of size bins.num. Divides each sum by its weight before applying the objective function.
+    :param solver_name: passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
+    :param model_filename: if not None, the MIP model will be written into this file, for debugging. NOTE: The extension should be either ".lp" or ".mps" (it indicates the output format)
+    :param solution_filename: if not None, the solution will be written into this file, for debugging.
 
     >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums
     >>> optimal(BinnerKeepingSums(), 2, [11.1,11,11,11,22], objective=obj.MaximizeSmallestSum)
@@ -104,7 +112,7 @@ def optimal(
 
     model = mip.Model(name = '', solver_name=solver_name)
     counts: dict = {
-        iitem: [model.add_var(var_type=mip.INTEGER) for ibin in ibins] 
+        iitem: [model.add_var(var_type=mip.INTEGER, name=f'item{binner.valueof(items[iitem]):05d}_in_bin{ibin}') for ibin in ibins] 
         for iitem in iitems
     }  # counts[i][j] is a variable that represents how many times item i appears in bin j.
     bin_sums = [
@@ -129,6 +137,9 @@ def optimal(
 
     # Solve the ILP:
     model.verbose = verbose
+    if  model_filename is not None:
+        model.write(model_filename)
+    # logger.info("MIP model: %s", model)
     status = model.optimize(max_seconds=time_limit)
     if status != mip.OptimizationStatus.OPTIMAL:
         raise ValueError(f"Problem status is not optimal - it is {status}.")
@@ -141,10 +152,19 @@ def optimal(
             for _ in range(count_item_in_bin):
                 binner.add_item_to_bin(output, items[iitem], ibin)
     binner.sort_by_ascending_sum(output)
+
+    if solution_filename is not None:
+        with open(solution_filename,"w") as solution_file:
+            for ibin in ibins:
+                for iitem in iitems:
+                    count_item_in_bin = int(counts[iitem][ibin].x)
+                    solution_file.write(f'item{binner.valueof(items[iitem]):05d}_in_bin{ibin} = {count_item_in_bin}\n')
     return output
 
 
 if __name__ == "__main__":
     import doctest, logging
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
     (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
     print("{} failures, {} tests".format(failures, tests))
