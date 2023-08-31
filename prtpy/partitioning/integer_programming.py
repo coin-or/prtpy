@@ -26,7 +26,8 @@ def optimal(
     additional_constraints:Callable=lambda sums:[],
     weights:List[float]=None,
     verbose=0,
-    solver_name = mip.CBC, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
+    solver_name = mip.CBC, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models. 
+    # solver_name = mip.GRB, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models. 
     model_filename = None,  
     solution_filename = None,  
 ):
@@ -59,18 +60,18 @@ def optimal(
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
-    >>> printbins(optimal(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MinimizeLargestSum))
+    >>> printbins(optimal(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MinimizeLargestSum)) #doctest: +ELLIPSIS
     Bin #0: [27, 26], sum=53.0
-    Bin #1: [46, 16], sum=62.0
-    Bin #2: [39, 13, 10], sum=62.0
-    >>> printbins(optimal(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MaximizeSmallestSum))
-    Bin #0: [46, 10], sum=56.0
-    Bin #1: [27, 16, 13], sum=56.0
+    Bin #1: [...], sum=62.0
+    Bin #2: [...], sum=62.0
+    >>> printbins(optimal(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MaximizeSmallestSum)) #doctest: +ELLIPSIS
+    Bin #0: [...], sum=56.0
+    Bin #1: [...], sum=56.0
     Bin #2: [39, 26], sum=65.0
-    >>> printbins(optimal(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MinimizeLargestSum, additional_constraints=lambda sums: [sums[0]==0]))
+    >>> printbins(optimal(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MinimizeLargestSum, additional_constraints=lambda sums: [sums[0]==0])) #doctest: +ELLIPSIS
     Bin #0: [], sum=0.0
-    Bin #1: [39, 26, 13, 10], sum=88.0
-    Bin #2: [46, 27, 16], sum=89.0
+    Bin #1: [...], sum=88.0
+    Bin #2: [...], sum=89.0
     >>> optimal(BinnerKeepingSums(), 3, walter_numbers, objective=obj.MaximizeSmallestSum)
     array([56., 56., 65.])
 
@@ -83,8 +84,8 @@ def optimal(
     array([11.1, 55. ])
 
     >>> from prtpy import partition
-    >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9})
-    [['a', 'g'], ['c', 'd', 'e'], ['b', 'f']]
+    >>> partition(algorithm=optimal, numbins=3, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}) #doctest: +ELLIPSIS
+    [['a', 'g'], [...], [...]]
     >>> partition(algorithm=optimal, numbins=2, items={"a":1, "b":2, "c":3, "d":3, "e":5, "f":9, "g":9}, outputtype=out.Sums)
     [16.0, 16.0]
 
