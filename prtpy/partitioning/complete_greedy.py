@@ -309,3 +309,22 @@ if __name__ == "__main__":
 
     (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
     print("{} failures, {} tests".format(failures, tests))
+    if failures > 0:
+        sys.exit()
+        DEMO
+
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
+
+    from prtpy import BinnerKeepingContents, BinnerKeepingSums
+
+    anytime(BinnerKeepingContents(), 2, [4, 5, 6, 7, 8], objective=obj.MinimizeLargestSum)
+
+    walter_numbers = [46, 39, 27, 26, 16, 13, 10]
+    anytime(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MaximizeSmallestSum)
+    anytime(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MinimizeLargestSum)
+
+    random_numbers = np.random.randint(1, 2 ** 16 - 1, 15, dtype=np.int64)
+    anytime(BinnerKeepingSums(), 3, random_numbers, objective=obj.MaximizeSmallestSum)
+    anytime(BinnerKeepingSums(), 3, random_numbers, objective=obj.MinimizeLargestSum)
+    anytime(BinnerKeepingSums(), 3, random_numbers, objective=obj.MinimizeDifference)
