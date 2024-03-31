@@ -17,10 +17,7 @@ from typing import List, Tuple, Callable, Iterator, Any
 import numpy as np
 import logging, time
 
-from cvxpy.utilities.key_utils import to_int
 from prtpy import objectives as obj, Binner, BinsArray
-
-from karmarkar_karp_sy import kk
 
 logger = logging.getLogger(__name__)
 
