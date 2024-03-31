@@ -144,7 +144,6 @@ class MinimizeTheDifference(Objective):
         25.0
         >>> MinimizeDifference.lower_bound([10,20,30,40,50], sum_of_remaining_items=45)
         15.0
-
         >>> MinimizeDifference.lower_bound([10,20,30,40,50], sum_of_remaining_items=200)
         0.0
         >>> MinimizeDifference.lower_bound([0,0,0,0,0], sum_of_remaining_items=54)
