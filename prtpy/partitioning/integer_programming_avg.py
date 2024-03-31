@@ -19,7 +19,10 @@ def optimal(
     copies=1,
     time_limit=inf,
     verbose=0,
-    solver_name = mip.GRB,  # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
+    solver_name=mip.CBC, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
+    # solver_name = mip.GRB, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
+    model_filename=None,
+    solution_filename=None,
 ):
     """
      Produce a partition that minimizes the sum of the positive differences from the avg, by solving an integer linear program (ILP).
