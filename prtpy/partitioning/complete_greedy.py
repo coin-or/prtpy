@@ -26,16 +26,16 @@ logger = logging.getLogger(__name__)
 
 
 def anytime(
-        binner: Binner, numbins: int, items: List[any], relative_value: List[any] = None,
-        objective: obj.Objective = obj.MinimizeDifference,
-        use_lower_bound: bool = True,
-        # Prune branches whose lower bound (= optimistic value) is at least as large as the current minimum.
-        use_fast_lower_bound: bool = True,
-        # A faster lower bound, that does not create the branch at all. Useful for min-max max-min and min-dist-avg objectives.
-        use_heuristic_3: bool = False,
-        # An improved stopping condition, applicable for min-max only. Not very useful in experiments.
-        use_set_of_seen_states: bool = True,
-        time_limit: float = np.inf,
+    binner: Binner, numbins: int, items: List[any], relative_value: List[any] = None,
+    objective: obj.Objective = obj.MinimizeDifference,
+    use_lower_bound: bool = True,
+    # Prune branches whose lower bound (= optimistic value) is at least as large as the current minimum.
+    use_fast_lower_bound: bool = True,
+    # A faster lower bound, that does not create the branch at all. Useful for min-max max-min and min-dist-avg objectives.
+    use_heuristic_3: bool = False,
+    # An improved stopping condition, applicable for min-max only. Not very useful in experiments.
+    use_set_of_seen_states: bool = True,
+    time_limit: float = np.inf,
 ) -> Iterator:
     """
     Finds a partition in which the largest sum is minimal, using the Complete Greedy algorithm.
