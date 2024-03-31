@@ -156,6 +156,44 @@ MinimizeDifference = MinimizeTheDifference()
 
 
 
+class MinimizeTheDistanceFromAvg(Objective):
+    def value_to_minimize(self, sums:list, are_sums_in_ascending_order:bool=False)->float:
+        avg = sum(sums) / len(sums)
+        diff_from_avg = 0
+        for s in sums:
+            if (s > avg):
+                diff_from_avg = diff_from_avg + (s - avg)
+        return diff_from_avg
+    def __str__(self) -> str:
+        return "minimize-the-distance-from-avg"
+    def lower_bound(self, sums:list, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
+        """
+        >>> MinimizeDistAvg.lower_bound([10,20,30,40,50], sum_of_remaining_items=5)
+        28.0
+        >>> MinimizeDistAvg.lower_bound([10,20,30,40,50], sum_of_remaining_items=20)
+        22.0
+        >>> MinimizeDistAvg.lower_bound([10,20,30,40,50], sum_of_remaining_items=45)
+        12.0
+
+        >>> MinimizeDistAvg.lower_bound([10,20,30,40,50], sum_of_remaining_items=200)
+        0.0
+        >>> MinimizeDistAvg.lower_bound([0,0,0,0,0], sum_of_remaining_items=54)
+        0.8
+        """
+        remaining = sum_of_remaining_items
+        avg = (sum(sums) + remaining) / len(sums)
+        diff_from_avg = 0
+        for s in sums:
+            if (s < avg and remaining > 0):
+                remaining = remaining - min(remaining, int(avg - s))
+            if(s > avg):
+                diff_from_avg = diff_from_avg + (s - avg)
+        return diff_from_avg + ((remaining % len(sums)) / len(sums))
+
+MinimizeDistAvg = MinimizeTheDistanceFromAvg()
+
+
+
 if __name__ == "__main__":
     import doctest
 
