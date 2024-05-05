@@ -167,6 +167,12 @@ class MinimizeTheDistanceFromAvg(Objective):
         return "minimize-the-distance-from-avg"
     def lower_bound(self, sums:list, sum_of_remaining_items:float, are_sums_in_ascending_order:bool=False)->float:
         """
+        First we calculate the final avg including the remaining items.
+        We try to add values from the remaining sum to the bins that haven't reached the avg yet
+        (they don't contribute to our final difference because we only take the bins that are more than avg).
+        If at any point all bins are equal to avg then we just need to divide the remaining sum amongst all bins
+        and the residue will be given out to random bins (one each).
+        We calculate and return the difference.
         >>> MinimizeDistAvg.lower_bound([10,20,30,40,50], sum_of_remaining_items=5)
         28.0
         >>> MinimizeDistAvg.lower_bound([10,20,30,40,50], sum_of_remaining_items=20)
