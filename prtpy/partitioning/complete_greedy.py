@@ -253,6 +253,9 @@ def anytime(
                     if relative_value:
                         fast_lower_bound = 0
                         for i in range (numbins):
+                            # For each bin: we take off the sum that we added in the beginning of the algorithm (max(relative_value) * sum(items) - relative_value[i] * sum(items))
+                            # Then we check if the difference between the bin's sum and the relative AVG for bin i: (sum(items)*relative_value[i])
+                            # is positive and contributes to our final difference or negative and we will not add anything to our difference.
                             fast_lower_bound = fast_lower_bound + max((current_sums[i]-(max(relative_value) * sum(items) - relative_value[i] * sum(items)))-sum(items)*relative_value[i],0)
                     else:
                         fast_lower_bound = 0
