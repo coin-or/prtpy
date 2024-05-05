@@ -167,6 +167,9 @@ def anytime(
 
     # Create a stack whose elements are a partition and the current depth.
     # Initially, it contains a single tuple: an empty partition with depth 0.
+    # If the input has relative values for each bin -
+    # we add a sum to each bin in order to equal them out to the bin with the highest relative value
+    # (at the end of the algorithm we will remove these sums).
     first_bins = binner.new_bins(numbins)
     if (relative_value):
         for i in range(numbins):
