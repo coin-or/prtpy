@@ -21,6 +21,8 @@ def optimal(
     verbose=0,
     solver_name=mip.CBC, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
     # solver_name = mip.GRB, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
+    model_filename = None,  
+    solution_filename = None, 
 ):
     """
      Produce a partition that minimizes the sum of the positive differences from the avg, by solving an integer linear program (ILP).
@@ -32,7 +34,8 @@ def optimal(
     :param time_limit: stop the computation after this number of seconds have passed.
     :param valueof: a function that maps an item from the list `items` to a number representing its value.
     :param solver_name: passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
-    
+    :param model_filename: if not None, the MIP model will be written into this file, for debugging. NOTE: The extension should be either ".lp" or ".mps" (it indicates the output format)
+    :param solution_filename: if not None, the solution will be written into this file, for debugging.
 
     >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums
     >>> optimal(BinnerKeepingSums(), 2, [11.1,11,11,11,22],[0.1,0.9])
@@ -128,12 +131,15 @@ def optimal(
     constraints = each_item_in_one_bin + t_js_greater_than_z_js + t_js_greater_than_minus_z_js + counts_are_non_negative
     for constraint in constraints: model += constraint
 
-    # Solve the ILP:
-    model.lp_method = verbose
+# Solve the ILP:
+    model.verbose = verbose
+    if  model_filename is not None:
+        model.write(model_filename)
+    # logger.info("MIP model: %s", model)
     status = model.optimize(max_seconds=time_limit)
     if status != mip.OptimizationStatus.OPTIMAL:
         raise ValueError(f"Problem status is not optimal - it is {status}.")
-
+    
     # Construct the output:
     output = binner.new_bins(numbins)
     for ibin in ibins:
@@ -143,6 +149,15 @@ def optimal(
                 binner.add_item_to_bin(output, items[iitem], ibin)
     if not relative_values:
         binner.sort_by_ascending_sum(output)
+
+    if solution_filename is not None:
+        with open(solution_filename,"w") as solution_file:
+            for ibin in ibins:
+                for iitem in iitems:
+                    count_item_in_bin = int(counts[iitem][ibin].x)
+                    # solution_file.write(f'item{binner.valueof(items[iitem]):05d}_in_bin{ibin} = {count_item_in_bin}\n')
+                    solution_file.write(f'item{iitem}_in_bin{ibin} = {count_item_in_bin}\n')
+                    
     return output
 
 
