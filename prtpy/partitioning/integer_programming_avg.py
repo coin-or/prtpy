@@ -21,8 +21,6 @@ def optimal(
     verbose=0,
     solver_name=mip.CBC, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
     # solver_name = mip.GRB, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
-    model_filename=None,
-    solution_filename=None,
 ):
     """
      Produce a partition that minimizes the sum of the positive differences from the avg, by solving an integer linear program (ILP).
@@ -34,8 +32,6 @@ def optimal(
     :param time_limit: stop the computation after this number of seconds have passed.
     :param valueof: a function that maps an item from the list `items` to a number representing its value.
     :param solver_name: passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
-    :param model_filename: if not None, the MIP model will be written into this file, for debugging. NOTE: The extension should be either ".lp" or ".mps" (it indicates the output format)
-    :param solution_filename: if not None, the solution will be written into this file, for debugging.
     
 
     >>> from prtpy import BinnerKeepingContents, BinnerKeepingSums
