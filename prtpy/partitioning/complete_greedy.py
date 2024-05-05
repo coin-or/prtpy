@@ -299,6 +299,7 @@ def anytime(
 
 
     if (relative_value):
+        # For each bin we remove the value that we added in the beginning of the algorithm.
         for i in range(numbins):
             binner.remove_item_from_bin(best_bins, i, 0)
 
