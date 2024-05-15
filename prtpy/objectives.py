@@ -1,13 +1,14 @@
 """
 Define various optimization objectives for a partition algorithm.
 
->>> objectives = [MaximizeSmallestSum, MaximizeKSmallestSums(2), MinimizeLargestSum, MinimizeKLargestSums(2), MinimizeDifference]
+>>> objectives = [MaximizeSmallestSum, MaximizeKSmallestSums(2), MinimizeLargestSum, MinimizeKLargestSums(2), MinimizeDifference, MinimizeDistAvg]
 >>> for o in objectives: print(o.value_to_minimize(sums=[1,2,3,4,5], are_sums_in_ascending_order=True))
 -1
 -3
 5
 9
 4
+3.0
 >>> objectives.append(MaximizeSmallestWeightedSum([1, 1, 1, 3, 4]))
 >>> for o in objectives: print(o.value_to_minimize(sums=[2,4,1,5,3]))
 -1
@@ -15,6 +16,7 @@ Define various optimization objectives for a partition algorithm.
 5
 9
 4
+3.0
 -0.75
 """
 
@@ -201,6 +203,4 @@ MinimizeDistAvg = MinimizeTheDistanceFromAvg()
 
 if __name__ == "__main__":
     import doctest
-
-    (failures, tests) = doctest.testmod(report=True)
-    print("{} failures, {} tests".format(failures, tests))
+    print(doctest.testmod())

@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 def anytime(
-    binner: Binner, numbins: int, items: List[any], relative_value: List[any] = None,
+    binner: Binner, numbins: int, items: List[int], relative_value: List[int] = None,
     objective: obj.Objective = obj.MinimizeDifference,
     use_lower_bound: bool = True,
     # Prune branches whose lower bound (= optimistic value) is at least as large as the current minimum.
@@ -310,7 +310,6 @@ def anytime(
 
 if __name__ == "__main__":
     import doctest, sys
-
     (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
     print("{} failures, {} tests".format(failures, tests))
     if failures > 0:
