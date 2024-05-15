@@ -75,7 +75,13 @@ class Binner(ABC):
         Return the bins after the addition.
         """
         return bins
-
+        
+    def remove_item_from_bin(self, bins:BinsArray, bin_index: int, item_index: int)->BinsArray:
+        sums, lists = bins
+        value = lists[bin_index][item_index]
+        sums[bin_index] -= value
+        del lists[bin_index][item_index]
+        return bins
 
     @abstractmethod
     def sort_by_ascending_sum(self, bins:BinsArray):
@@ -99,6 +105,8 @@ class Binner(ABC):
         """
         return None
 
+
+    
     @abstractmethod
     def sums(self, bins: BinsArray) -> Tuple[float]:
         """
