@@ -25,9 +25,11 @@ class Binner(ABC):
     All arrays created by the same binner share the following two variables:
      * numbins - the total number of bins.
      * valueof - a function that maps an item to its value.
+     * copiesof - a function that maps an item to the number of copies.
     """
-    def __init__(self, valueof: Callable = lambda x:x):
+    def __init__(self, valueof: Callable = lambda x:x, copiesof: Callable=lambda x:1):
         self.valueof = valueof
+        self.copiesof = copiesof
 
     @abstractmethod
     def new_bins(self, numbins:int)->BinsArray:
@@ -186,8 +188,8 @@ class BinnerKeepingSums(Binner):
     Bin #1: sum=3.0
     """
 
-    def __init__(self, valueof: Callable = lambda x:x):
-        super().__init__(valueof)
+    def __init__(self, valueof: Callable = lambda x:x, copiesof: Callable=lambda x:1):
+        super().__init__(valueof,copiesof)
 
     BinsArray = np.ndarray    # Here, the bins-array is simply an array of the sums.
 
@@ -330,8 +332,8 @@ class BinnerKeepingContents(BinnerKeepingSums):
     Bin #1: ['a'], sum=3.0
     """
 
-    def __init__(self, valueof: Callable = lambda x:x):
-        super().__init__(valueof)
+    def __init__(self, valueof: Callable = lambda x:x, copiesof: Callable=lambda x:1):
+        super().__init__(valueof, copiesof)
 
     BinsArray = Tuple[np.ndarray, List[List]]  # Here, each bins-array is a tuple: sums,lists. sums is an array of sums; lists is a list of lists of items.
 
@@ -451,7 +453,4 @@ def printbins(bins:BinsArray):
 
 if __name__ == "__main__":
     import doctest, sys
-    (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
-    print("{} failures, {} tests".format(failures, tests))
-    if failures>0:
-        sys.exit(1)
+    print(doctest.testmod(report=True, optionflags=doctest.FAIL_FAST))

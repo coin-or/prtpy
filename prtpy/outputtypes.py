@@ -8,7 +8,7 @@ from prtpy.binners import Binner, BinnerKeepingContents, BinnerKeepingSums, Bins
 
 class OutputType(ABC):
     @classmethod
-    def create_binner(cls, valueof: Callable) -> Binner:
+    def create_binner(cls, valueof: Callable, copiesof: Callable=None) -> Binner:
         """
         Construct and return a Bins structure. Used at the initialization phase of an algorithm.
         """
@@ -30,8 +30,8 @@ class OutputType(ABC):
 class Sums(OutputType):
     """ Output the list of sums of all bins (but not the bins' contents).  """
     @classmethod
-    def create_binner(cls, valueof: Callable) -> List:
-        return BinnerKeepingSums(valueof)
+    def create_binner(cls, valueof: Callable, copiesof: Callable=None) -> List:
+        return BinnerKeepingSums(valueof,copiesof)
 
     @classmethod
     def extract_output_from_sums(cls, sums: List[float]) -> List:
@@ -94,8 +94,8 @@ class Partition(OutputType):
     """ Output the set of all bins. """
 
     @classmethod
-    def create_binner(cls, valueof: Callable) -> List:
-        return BinnerKeepingContents(valueof)
+    def create_binner(cls, valueof: Callable, copiesof: Callable=None) -> List:
+        return BinnerKeepingContents(valueof,copiesof)
 
     @classmethod
     def extract_output_from_sums_and_lists(cls, sums: List[float], lists: List[List[Any]]) -> List:

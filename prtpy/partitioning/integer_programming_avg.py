@@ -16,7 +16,6 @@ import mip
 
 def optimal(
     binner: Binner, numbins: int, items: List[any], entitlements: List[any] = None,
-    copies=1,
     time_limit=inf,  # time limit in seconds
     verbose=0,
     solver_name=mip.CBC, # [or mip.GRB] passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
@@ -29,7 +28,6 @@ def optimal(
     :param numbins: number of bins.
     :param items: list of items.
     :param entitlements: list of relative values that sum up to 1 for the bins if there are any.
-    :param copies: how many copies there are of each item. Default: 1.
     :param time_limit: stop the computation after this number of seconds have passed.
     :param valueof: a function that maps an item from the list `items` to a number representing its value.
     :param solver_name: passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
@@ -75,34 +73,27 @@ def optimal(
     >>> from prtpy import partition
     >>> partition(algorithm=optimal, numbins=3, items=[1, 2, 3], copies=[2, 1, 4])
     [[2, 3], [1, 1, 3], [3, 3]]
-
+    >>> partition(algorithm=optimal, numbins=3, items={"a": 11, "b": 22, "c": 33}, copies={"a": 2, "b": 1, "c": 4})
+    [['a', 'a', 'c'], ['b', 'c'], ['c', 'c']]
     """
     ibins = range(numbins)
     items = list(items)
-    iitems = range(len(items))
-    if isinstance(copies, Number):
-        copies = {iitem: copies for iitem in iitems}
     model = mip.Model(name='', sense='MIN', solver_name=solver_name)
     counts: dict = {
         iitem: [model.add_var(var_type=mip.INTEGER) for ibin in ibins]
-        for iitem in iitems
+        for iitem,item in enumerate(items)
     }  # counts[i][j] is a variable that represents how many times item i appears in bin j.
 
     bin_sums = [
-        sum([counts[iitem][ibin] * binner.valueof(items[iitem]) for iitem in iitems])
+        sum([counts[iitem][ibin] * binner.valueof(items[iitem]) for iitem,item in enumerate(items)])
         for ibin in ibins
     ]
 
-    sum_items = 0
-    if not copies:
-        sum_items = sum(items)
-    else:
-        for i in range (len(items)):
-            sum_items = sum_items + items[i] * copies[i]
+    sum_values = sum([binner.valueof(item)*binner.copiesof(item) for item in items])
 
     effective_entitlements = entitlements or [1. / numbins for ibin in ibins]
     z_js = [
-        bin_sums[ibin] - sum_items * effective_entitlements[ibin]
+        bin_sums[ibin] - sum_values * effective_entitlements[ibin]
         for ibin in ibins
     ]
 
@@ -118,9 +109,9 @@ def optimal(
     # Construct the list of constraints:
     t_js_greater_than_z_js = [t_js[ibin] >= z_js[ibin] for ibin in ibins]
     t_js_greater_than_minus_z_js = [t_js[ibin] >= -z_js[ibin] for ibin in ibins]
-    counts_are_non_negative = [counts[iitem][ibin] >= 0 for ibin in ibins for iitem in iitems]
+    counts_are_non_negative = [counts[iitem][ibin] >= 0 for ibin in ibins for iitem,item in enumerate(items)]
     each_item_in_one_bin = [
-        sum([counts[iitem][ibin] for ibin in ibins]) == copies[iitem] for iitem in iitems
+        sum([counts[iitem][ibin] for ibin in ibins]) == binner.copiesof(item) for iitem,item in enumerate(items)
     ]
     constraints = each_item_in_one_bin + t_js_greater_than_z_js + t_js_greater_than_minus_z_js + counts_are_non_negative
     for constraint in constraints: model += constraint
@@ -144,7 +135,7 @@ def optimal(
     # Construct the output:
     output = binner.new_bins(numbins)
     for ibin in ibins:
-        for iitem in iitems:
+        for iitem,item in enumerate(items):
             count_item_in_bin = int(counts[iitem][ibin].x)
             for _ in range(count_item_in_bin):
                 binner.add_item_to_bin(output, items[iitem], ibin)
@@ -154,7 +145,7 @@ def optimal(
     if solution_filename is not None:
         with open(solution_filename,"w") as solution_file:
             for ibin in ibins:
-                for iitem in iitems:
+                for iitem,item in enumerate(items):
                     count_item_in_bin = int(counts[iitem][ibin].x)
                     # solution_file.write(f'item{binner.valueof(items[iitem]):05d}_in_bin{ibin} = {count_item_in_bin}\n')
                     solution_file.write(f'item{iitem}_in_bin{ibin} = {count_item_in_bin}\n')

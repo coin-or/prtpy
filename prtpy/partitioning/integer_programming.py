@@ -21,7 +21,6 @@ import mip
 def optimal(
     binner: Binner, numbins: int, items: List[any],
     objective: obj.Objective = obj.MinimizeDifference,
-    copies=1,
     time_limit=inf,
     additional_constraints:Callable=lambda sums:[],
     entitlements:List[float]=None,
@@ -39,7 +38,6 @@ def optimal(
     :param valueof: a function that maps an item from the list `items` to a number representing its value.
     :param objective: whether to maximize the smallest sum, minimize the largest sum, etc.
     :param outputtype: whether to return the entire partition, or just the sums, etc.
-    :param copies: how many copies there are of each item. Default: 1.
     :param time_limit: stop the computation after this number of seconds have passed.
     :param additional_constraints: a function that accepts the list of sums in ascending order, and returns a list of possible additional constraints on the sums.
     :param entitlements: if given, must be of size bins.num. Divides each sum by its weight before applying the objective function.
@@ -102,37 +100,44 @@ def optimal(
     Bin #2: [99, 129], sum=228.0
     Bin #3: [62, 187], sum=249.0
     Bin #4: [93, 158], sum=251.0
+
+    # Example with copies
+    >>> partition(algorithm=optimal, numbins=3, items=[1, 2, 3], copies=[2, 1, 4])
+    [[2, 3], [1, 1, 3], [3, 3]]
+    >>> partition(algorithm=optimal, numbins=3, items={"a": 11, "b": 22, "c": 33}, copies={"a": 2, "b": 1, "c": 4})
+    [['b', 'c'], ['a', 'a', 'c'], ['c', 'c']]
     """
     if objective == obj.MinimizeDistAvg:
         from prtpy.partitioning.integer_programming_avg import optimal as optimal_avg
-        return optimal_avg(binner, numbins, items, entitlements=entitlements, copies=copies, time_limit=time_limit, verbose=verbose, solver_name=solver_name, model_filename=model_filename, solution_filename=solution_filename)
-    
+        return optimal_avg(binner, numbins, items, entitlements=entitlements, time_limit=time_limit, verbose=verbose, solver_name=solver_name, model_filename=model_filename, solution_filename=solution_filename)
+
     ibins = range(numbins)
     items = list(items)
-    iitems = range(len(items))
-    if isinstance(copies, Number):
-        copies = {iitem: copies for iitem in iitems}
+    # iitems = range(len(items))   # We need different indices for items with identical value
     if entitlements is None:
         entitlements = numbins*[1]
 
     model = mip.Model(name = '', solver_name=solver_name)
     counts: dict = {
         iitem: [model.add_var(var_type=mip.INTEGER, name=f'item{iitem}_in_bin{ibin}') for ibin in ibins] 
-        for iitem in iitems
+        for iitem,item in enumerate(items)
     }  # counts[i][j] is a variable that represents how many times item i appears in bin j.
+    logger.debug("counts: %s", counts)
     bin_sums = [
-        sum([counts[iitem][ibin] * binner.valueof(items[iitem]) for iitem in iitems])/entitlements[ibin] 
+        sum([counts[iitem][ibin] * binner.valueof(item) for iitem,item in enumerate(items)])/entitlements[ibin] 
         for ibin in ibins
     ]  # bin_sums[j] is a variable-expression that represents the sum of values in bin j.
+    logger.debug("bin_sums: %s", bin_sums)
 
     model.objective = mip.minimize(
         objective.value_to_minimize(bin_sums, are_sums_in_ascending_order=True)        
     )
+    logger.debug("Objective: %s", model.objective)
 
     # Construct the list of constraints:
-    counts_are_non_negative = [counts[iitem][ibin] >= 0 for ibin in ibins for iitem in iitems]
+    counts_are_non_negative = [counts[iitem][ibin] >= 0 for ibin in ibins for iitem,item in enumerate(items)]
     each_item_in_one_bin = [
-        sum([counts[iitem][ibin] for ibin in ibins]) == copies[iitem] for iitem in iitems
+        sum([counts[iitem][ibin] for ibin in ibins]) == binner.copiesof(item) for iitem,item in enumerate(items)
     ]
     bin_sums_in_ascending_order = [  # a symmetry-breaker
         bin_sums[ibin + 1] >= bin_sums[ibin] for ibin in range(numbins - 1)
@@ -152,16 +157,16 @@ def optimal(
     # Construct the output:
     output = binner.new_bins(numbins)
     for ibin in ibins:
-        for iitem in iitems:
+        for iitem,item in enumerate(items):
             count_item_in_bin = int(counts[iitem][ibin].x)
             for _ in range(count_item_in_bin):
-                binner.add_item_to_bin(output, items[iitem], ibin)
+                binner.add_item_to_bin(output, item, ibin)
     binner.sort_by_ascending_sum(output)
 
     if solution_filename is not None:
         with open(solution_filename,"w") as solution_file:
             for ibin in ibins:
-                for iitem in iitems:
+                for iitem,item in enumerate(items):
                     count_item_in_bin = int(counts[iitem][ibin].x)
                     # solution_file.write(f'item{binner.valueof(items[iitem]):05d}_in_bin{ibin} = {count_item_in_bin}\n')
                     solution_file.write(f'item{iitem}_in_bin{ibin} = {count_item_in_bin}\n')
@@ -170,7 +175,12 @@ def optimal(
 
 if __name__ == "__main__":
     import doctest, logging
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler())
-    (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
-    print("{} failures, {} tests".format(failures, tests))
+
+    print(doctest.testmod(report=True, optionflags=doctest.FAIL_FAST))
+
+    from prtpy import BinnerKeepingContents, BinnerKeepingSums, partition
+    # print(partition(algorithm=optimal, numbins=3, items={"a": 11, "b": 22, "c": 33}, copies={"a": 2, "b": 1, "c": 4}))
+    # print(partition(algorithm=optimal, numbins=2, items=[11,11,11,11,22], objective=obj.MaximizeSmallestSum))
+

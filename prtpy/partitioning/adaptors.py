@@ -16,12 +16,14 @@ import prtpy
 from prtpy import outputtypes as out, objectives as obj
 from prtpy.binners import Binner
 from typing import Callable, List, Any
+from numbers import Number
 
 def partition(
     algorithm: Callable,
     numbins: int,
     items: Any,
     valueof: Callable[[Any], float] = None,
+    copies: Any = 1,
     outputtype: out.OutputType = out.Partition,
     **kwargs
 ):
@@ -32,6 +34,7 @@ def partition(
         numbins (int), 
         items (list), 
         valueof (callable), 
+        copiesof (callable),
         outputtype (OutputType).
 
     :param numbins: int - how many parts should be in the partition?
@@ -42,6 +45,7 @@ def partition(
        * A list of strings (in this case, valueof should also be defined, and map each item name to its value);
 
     :param valueof: optional; required only if `items` is a list of item-names.
+    :param copiesof: optional; required only if `items` is a list of item-names.
 
     :param outputtype: what output to return. See `outputtypes.py'.
 
@@ -73,11 +77,31 @@ def partition(
         item_names = items.keys()
         if valueof is None:
             valueof = items.__getitem__
-    else:  # items is a list
+
+        # copiesof:
+        if isinstance(copies,dict):
+            copiesof = copies.__getitem__
+        elif isinstance(copies,Number):
+            copiesof = lambda item: copies
+        else:
+            raise TypeError(f"copies parameter {copies} is of wrong type {type(copies)}")
+    else:  # items is a list of values
         item_names = items
         if valueof is None:
             valueof = lambda item: item
-    binner = outputtype.create_binner(valueof)
+
+        # copiesof:
+        if isinstance(copies,list):
+            if len(set(items))==len(items):
+                copies_dict = dict(zip(items,copies))   # Works only when each item appears once
+                copiesof = copies_dict.__getitem__
+            else:
+                raise ValueError(f"copies argument can only be used when item names are unique, but they are not: {item_names}")
+        elif isinstance(copies,Number):
+            copiesof = lambda item: copies
+        else:
+            raise TypeError(f"copies parameter {copies} is of wrong type {type(copies)}")
+    binner = outputtype.create_binner(valueof,copiesof)
     bins   = algorithm(binner, numbins, item_names, **kwargs)
     return outputtype.extract_output_from_binsarray(bins)
 
