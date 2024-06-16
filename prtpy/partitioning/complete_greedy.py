@@ -23,7 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 def anytime(
-    binner: Binner, numbins: int, items: List[int], relative_value: List[int] = None,
+    binner: Binner, numbins: int, items: List[int], 
+    entitlements: List[int] = None,
     objective: obj.Objective = obj.MinimizeDifference,
     use_lower_bound: bool = True,
     # Prune branches whose lower bound (= optimistic value) is at least as large as the current minimum.
@@ -64,10 +65,14 @@ def anytime(
     Bin #0: [46, 10], sum=56.0
     Bin #1: [27, 16, 13], sum=56.0
     Bin #2: [39, 26], sum=65.0
+
+    # Minimize the distance to the average - equal rights:
     >>> printbins(anytime(BinnerKeepingContents(), 3, walter_numbers, objective=obj.MinimizeDistAvg))
     Bin #0: [39, 16], sum=55.0
     Bin #1: [46, 13], sum=59.0
     Bin #2: [27, 26, 10], sum=63.0
+
+    # Minimize the distance to the average - different rights:
     >>> printbins(anytime(BinnerKeepingContents(), 3, walter_numbers,[0.2,0.4,0.4], objective=obj.MinimizeDistAvg))
     Bin #0: [27, 10], sum=37.0
     Bin #1: [39, 16, 13], sum=68.0
@@ -171,9 +176,9 @@ def anytime(
     # we add a sum to each bin in order to equal them out to the bin with the highest relative value
     # (at the end of the algorithm we will remove these sums).
     first_bins = binner.new_bins(numbins)
-    if (relative_value):
+    if (entitlements):
         for i in range(numbins):
-            binner.add_item_to_bin(first_bins, (max(relative_value) * sum(items) - relative_value[i] * sum(items)), i)
+            binner.add_item_to_bin(first_bins, (max(entitlements) * sum(items) - entitlements[i] * sum(items)), i)
     first_vertex = (first_bins, 0)
     stack: List[Tuple[BinsArray, int]] = [first_vertex]
     if use_set_of_seen_states:
@@ -250,13 +255,13 @@ def anytime(
                         new_smallest_sum = current_sums[0]
                     fast_lower_bound = -(new_smallest_sum + sum_of_remaining_items)
                 elif objective == obj.MinimizeDistAvg:
-                    if relative_value:
+                    if entitlements:
                         fast_lower_bound = 0
                         for i in range (numbins):
-                            # For each bin: we take off the sum that we added in the beginning of the algorithm (max(relative_value) * sum(items) - relative_value[i] * sum(items))
-                            # Then we check if the difference between the bin's sum and the relative AVG for bin i: (sum(items)*relative_value[i])
+                            # For each bin: we take off the sum that we added in the beginning of the algorithm (max(entitlements) * sum(items) - entitlements[i] * sum(items))
+                            # Then we check if the difference between the bin's sum and the relative AVG for bin i: (sum(items)*entitlements[i])
                             # is positive and contributes to our final difference or negative and we will not add anything to our difference.
-                            fast_lower_bound = fast_lower_bound + max((current_sums[i]-(max(relative_value) * sum(items) - relative_value[i] * sum(items)))-sum(items)*relative_value[i],0)
+                            fast_lower_bound = fast_lower_bound + max((current_sums[i]-(max(entitlements) * sum(items) - entitlements[i] * sum(items)))-sum(items)*entitlements[i],0)
                     else:
                         fast_lower_bound = 0
                         avg = sum(items) / numbins
@@ -269,7 +274,7 @@ def anytime(
                     continue
 
             new_bins = binner.add_item_to_bin(binner.copy_bins(current_bins), next_item, bin_index)
-            if not relative_value:
+            if not entitlements:
                 binner.sort_by_ascending_sum(new_bins)
             new_sums = tuple(binner.sums(new_bins))
 
@@ -298,7 +303,7 @@ def anytime(
                 times_heuristic_3_activated)
 
 
-    if (relative_value):
+    if (entitlements):
         # For each bin we remove the value that we added in the beginning of the algorithm.
         for i in range(numbins):
             binner.remove_item_from_bin(best_bins, i, 0)

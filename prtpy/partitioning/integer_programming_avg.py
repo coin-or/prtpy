@@ -15,7 +15,7 @@ from math import inf
 import mip
 
 def optimal(
-    binner: Binner, numbins: int, items: List[any], relative_values: List[any] = None,
+    binner: Binner, numbins: int, items: List[any], entitlements: List[any] = None,
     copies=1,
     time_limit=inf,
     verbose=0,
@@ -29,7 +29,7 @@ def optimal(
 
     :param numbins: number of bins.
     :param items: list of items.
-    :param relative_values: list of relative values that sum up to 1 for the bins if there are any.
+    :param entitlements: list of relative values that sum up to 1 for the bins if there are any.
     :param copies: how many copies there are of each item. Default: 1.
     :param time_limit: stop the computation after this number of seconds have passed.
     :param valueof: a function that maps an item from the list `items` to a number representing its value.
@@ -101,16 +101,11 @@ def optimal(
         for i in range (len(items)):
             sum_items = sum_items + items[i] * copies[i]
 
-    if relative_values:
-        z_js = [
-            bin_sums[ibin] - sum_items * relative_values[ibin]
-            for ibin in ibins
-        ]
-    else:
-        z_js = [
-            bin_sums[ibin] - sum_items / len(ibins)
-            for ibin in ibins
-        ]
+    effective_entitlements = entitlements or [1. / numbins for ibin in ibins]
+    z_js = [
+        bin_sums[ibin] - sum_items * effective_entitlements[ibin]
+        for ibin in ibins
+    ]
 
     t_js = [
         model.add_var(var_type=mip.INTEGER) for ibin in ibins
@@ -147,7 +142,7 @@ def optimal(
             count_item_in_bin = int(counts[iitem][ibin].x)
             for _ in range(count_item_in_bin):
                 binner.add_item_to_bin(output, items[iitem], ibin)
-    if not relative_values:
+    if not entitlements:
         binner.sort_by_ascending_sum(output)
 
     if solution_filename is not None:
@@ -163,5 +158,4 @@ def optimal(
 
 if __name__ == "__main__":
     import doctest, logging
-    (failures, tests) = doctest.testmod(report=True, optionflags=doctest.FAIL_FAST)
-    print("{} failures, {} tests".format(failures, tests))
+    print(doctest.testmod(report=True, optionflags=doctest.FAIL_FAST))

@@ -24,7 +24,7 @@ def optimal(
     copies=1,
     time_limit=inf,
     additional_constraints:Callable=lambda sums:[],
-    weights:List[float]=None,
+    entitlements:List[float]=None,
     verbose=0,
     solver_name = mip.CBC, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models. 
     # solver_name = mip.GRB, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models. 
@@ -42,7 +42,7 @@ def optimal(
     :param copies: how many copies there are of each item. Default: 1.
     :param time_limit: stop the computation after this number of seconds have passed.
     :param additional_constraints: a function that accepts the list of sums in ascending order, and returns a list of possible additional constraints on the sums.
-    :param weights: if given, must be of size bins.num. Divides each sum by its weight before applying the objective function.
+    :param entitlements: if given, must be of size bins.num. Divides each sum by its weight before applying the objective function.
     :param solver_name: passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models
     :param model_filename: if not None, the MIP model will be written into this file, for debugging. NOTE: The extension should be either ".lp" or ".mps" (it indicates the output format)
     :param solution_filename: if not None, the solution will be written into this file, for debugging.
@@ -76,11 +76,11 @@ def optimal(
     array([56., 56., 65.])
 
     >>> items = [11.1, 11, 11, 11, 22]
-    >>> optimal(BinnerKeepingSums(), 2, items, objective=obj.MaximizeSmallestSum, weights=[1,1])
+    >>> optimal(BinnerKeepingSums(), 2, items, objective=obj.MaximizeSmallestSum, entitlements=[1,1])
     array([33. , 33.1])
-    >>> optimal(BinnerKeepingSums(), 2, items, objective=obj.MaximizeSmallestSum, weights=[1,2])
+    >>> optimal(BinnerKeepingSums(), 2, items, objective=obj.MaximizeSmallestSum, entitlements=[1,2])
     array([22. , 44.1])
-    >>> optimal(BinnerKeepingSums(), 2, items, objective=obj.MaximizeSmallestSum, weights=[10,2])
+    >>> optimal(BinnerKeepingSums(), 2, items, objective=obj.MaximizeSmallestSum, entitlements=[10,2])
     array([11.1, 55. ])
 
     >>> from prtpy import partition
@@ -103,13 +103,17 @@ def optimal(
     Bin #3: [62, 187], sum=249.0
     Bin #4: [93, 158], sum=251.0
     """
+    if objective == obj.MinimizeDistAvg:
+        from prtpy.partitioning.integer_programming_avg import optimal as optimal_avg
+        return optimal_avg(binner, numbins, items, entitlements=entitlements, copies=copies, time_limit=time_limit, verbose=verbose, solver_name=solver_name, model_filename=model_filename, solution_filename=solution_filename)
+    
     ibins = range(numbins)
     items = list(items)
     iitems = range(len(items))
     if isinstance(copies, Number):
         copies = {iitem: copies for iitem in iitems}
-    if weights is None:
-        weights = numbins*[1]
+    if entitlements is None:
+        entitlements = numbins*[1]
 
     model = mip.Model(name = '', solver_name=solver_name)
     counts: dict = {
@@ -117,7 +121,7 @@ def optimal(
         for iitem in iitems
     }  # counts[i][j] is a variable that represents how many times item i appears in bin j.
     bin_sums = [
-        sum([counts[iitem][ibin] * binner.valueof(items[iitem]) for iitem in iitems])/weights[ibin] 
+        sum([counts[iitem][ibin] * binner.valueof(items[iitem]) for iitem in iitems])/entitlements[ibin] 
         for ibin in ibins
     ]  # bin_sums[j] is a variable-expression that represents the sum of values in bin j.
 

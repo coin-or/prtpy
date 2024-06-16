@@ -20,6 +20,7 @@ class partitioning:
 
     from prtpy.partitioning.integer_programming import optimal as ilp
     from prtpy.partitioning.integer_programming import optimal as integer_programming
+    from prtpy.partitioning.integer_programming_avg import optimal as ilp_avg
 
     from prtpy.partitioning.greedy import greedy
     from prtpy.partitioning.greedy import greedy as lpt
