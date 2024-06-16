@@ -17,10 +17,9 @@ import mip
 def optimal(
     binner: Binner, numbins: int, items: List[any], entitlements: List[any] = None,
     copies=1,
-    time_limit=inf,
+    time_limit=inf,  # time limit in seconds
     verbose=0,
-    solver_name=mip.CBC, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
-    # solver_name = mip.GRB, # passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
+    solver_name=mip.CBC, # [or mip.GRB] passed to MIP. See https://docs.python-mip.com/en/latest/quickstart.html#creating-models.
     model_filename = None,  
     solution_filename = None, 
 ):
@@ -83,7 +82,7 @@ def optimal(
     iitems = range(len(items))
     if isinstance(copies, Number):
         copies = {iitem: copies for iitem in iitems}
-    model = mip.Model(name = '', solver_name=solver_name)
+    model = mip.Model(name='', sense='MIN', solver_name=solver_name)
     counts: dict = {
         iitem: [model.add_var(var_type=mip.INTEGER) for ibin in ibins]
         for iitem in iitems
@@ -132,8 +131,15 @@ def optimal(
         model.write(model_filename)
     # logger.info("MIP model: %s", model)
     status = model.optimize(max_seconds=time_limit)
-    if status != mip.OptimizationStatus.OPTIMAL:
-        raise ValueError(f"Problem status is not optimal - it is {status}.")
+
+    # Check problem status:
+    if time_limit == inf:
+        if status != mip.OptimizationStatus.OPTIMAL:
+            raise ValueError(f"Problem status is not optimal - it is {status}.")
+    else:
+        if status not in {mip.OptimizationStatus.OPTIMAL,mip.OptimizationStatus.FEASIBLE}:
+            raise ValueError(f"Problem status is neither optimal nor feasible - it is {status}.")
+
     
     # Construct the output:
     output = binner.new_bins(numbins)
