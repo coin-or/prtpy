@@ -19,9 +19,9 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[55605.0, 55604.0, 55604.0, 55604.0, 55604.0, 55604.0, 55604.0,
-55604.0, 55604.0]
-         0.23440219999999812 seconds
+[55505.0, 55504.0, 55504.0, 55504.0, 55504.0, 55504.0, 55504.0,
+55504.0, 55504.0]
+         0.2455579000088619 seconds
 ```
 
 
@@ -36,9 +36,9 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[5567.0, 5567.0, 5567.0, 5567.0, 5567.0, 5567.0, 5567.0, 5567.0,
-5520.0]
-         0.4883513999999991 seconds
+[5592.0, 5592.0, 5592.0, 5592.0, 5592.0, 5592.0, 5592.0, 5592.0,
+5547.0]
+         0.3740479999978561 seconds
 ```
 
 
@@ -55,8 +55,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[118.0, 119.0, 119.0, 119.0]
-         0.18726790000000193 seconds
+[129.0, 129.0, 130.0, 130.0]
+         0.3462842000008095 seconds
 ```
 
 
@@ -71,8 +71,8 @@ print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[35.0, 35.0, 34.0]
-         0.15508069999999918 seconds
+[34.0, 35.0, 34.0]
+         0.19563360000029206 seconds
 ```
 
 
@@ -81,40 +81,15 @@ The *complete greedy* algorithm (Korf, 1995) allows you to determine how much ti
 
 ```python
 start = perf_counter()
-values = np.random.randint(1,1000, 10000)
+values = np.random.randint(1,1000, 100)
 print(prtpy.partition(algorithm=prtpy.partitioning.complete_greedy, numbins=9, items=values, outputtype=prtpy.out.Sums, time_limit=1))
 print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
----------------------------------------------------------------------------TypeError
-Traceback (most recent call last)Input In [1], in <module>
-      1 start = perf_counter()
-      2 values = np.random.randint(1,1000, 10000)
-----> 3
-print(prtpy.partition(algorithm=prtpy.partitioning.complete_greedy,
-numbins=9, items=values, outputtype=prtpy.out.Sums, time_limit=1))
-      4 print(f"\t {perf_counter()-start} seconds")
-File
-d:\dropbox\papers\electricitydivision__dinesh\code\prtpy\prtpy\partitioning\adaptors.py:82,
-in partition(algorithm, numbins, items, valueof, outputtype, **kwargs)
-     80 binner = outputtype.create_binner(valueof)
-     81 bins   = algorithm(binner, numbins, item_names, **kwargs)
----> 82 return outputtype.extract_output_from_binsarray(bins)
-File
-d:\dropbox\papers\electricitydivision__dinesh\code\prtpy\prtpy\outputtypes.py:47,
-in Sums.extract_output_from_binsarray(cls, bins)
-     45 except:
-     46     sums = bins          # If it fails, it means that bins is
-a singleton: sums.
----> 47 return cls.extract_output_from_sums(sums)
-File
-d:\dropbox\papers\electricitydivision__dinesh\code\prtpy\prtpy\outputtypes.py:38,
-in Sums.extract_output_from_sums(cls, sums)
-     36 @classmethod
-     37 def extract_output_from_sums(cls, sums: List[float]) -> List:
----> 38     return list(sums)
-TypeError: 'NoneType' object is not iterable
+[5819.0, 5822.0, 5827.0, 5833.0, 5843.0, 5852.0, 5871.0, 5875.0,
+5876.0]
+         1.002595799989649 seconds
 ```
 
 
@@ -123,16 +98,16 @@ The *sequential number partitioning* algorithm (Korf, 2009) is an advanced optim
 
 ```python
 start = perf_counter()
-values = np.random.randint(1,1000, 10)
+values = np.random.randint(1,100, 10)
 print(prtpy.partition(algorithm=prtpy.partitioning.sequential_number_partitioning, numbins=9, items=values, outputtype=prtpy.out.Sums))
 print(f"\t {perf_counter()-start} seconds")
 ```
 
 ```
-[254.0, 299.0, 403.0, 496.0, 553.0, 579.0, 828.0, 937.0, 943.0]
-         10.203577499999998 seconds
+[18.0, 19.0, 25.0, 33.0, 61.0, 65.0, 72.0, 90.0, 99.0]
+         50.17736359999981 seconds
 ```
 
 
 ---
-Markdown generated automatically from [partitioning_algorithms.py](partitioning_algorithms.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.
+Markdown generated automatically from [partitioning_algorithms.py](partitioning_algorithms.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2025-01-26.

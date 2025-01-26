@@ -161,7 +161,10 @@ def anytime(
     sums_of_remaining_items = [sum(map(binner.valueof, sorted_items[i:])) for i in range(numitems)] + [
         0]  # For Heuristic 3
     from prtpy import BinnerKeepingContents, BinnerKeepingSums, printbins
+
     best_bins, best_objective_value = None, np.inf
+        # best_bins represents the best solution found so far. 
+        # best_objective_value is the objective value for that solution (smaller is better).
 
 
     global_lower_bound = objective.lower_bound(np.zeros(numbins), sums_of_remaining_items[0],
@@ -302,6 +305,8 @@ def anytime(
                 times_fast_lower_bound_activated, times_lower_bound_activated, times_seen_state_skipped,
                 times_heuristic_3_activated)
 
+    if best_bins is None:
+        raise ValueError(f"No solution was found after {time_limit} seconds")
 
     if (entitlements):
         # For each bin we remove the value that we added in the beginning of the algorithm.

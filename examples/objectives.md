@@ -23,7 +23,9 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=Partition
 ```
 
 ```
-(array([62., 62., 53.]), [[46, 16], [39, 13, 10], [27, 26]])
+Bin #0: [46, 16], sum=62.0
+Bin #1: [39, 13, 10], sum=62.0
+Bin #2: [27, 26], sum=53.0
 ```
 
 
@@ -35,7 +37,9 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=Partition
 ```
 
 ```
-(array([56., 56., 65.]), [[46, 10], [27, 16, 13], [39, 26]])
+Bin #0: [46, 10], sum=56.0
+Bin #1: [27, 16, 13], sum=56.0
+Bin #2: [39, 26], sum=65.0
 ```
 
 
@@ -47,7 +51,9 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=Partition
 ```
 
 ```
-(array([55., 59., 63.]), [[39, 16], [46, 13], [27, 26, 10]])
+Bin #0: [39, 16], sum=55.0
+Bin #1: [46, 13], sum=59.0
+Bin #2: [27, 26, 10], sum=63.0
 ```
 
 
@@ -64,7 +70,9 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, outputtype=Partition
 ```
 
 ```
-(array([  0.,  49., 128.]), [[], [26, 13, 10], [46, 39, 27, 16]])
+Bin #0: [], sum=0.0
+Bin #1: [26, 13, 10], sum=49.0
+Bin #2: [46, 39, 27, 16], sum=128.0
 ```
 
 
@@ -84,7 +92,9 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, objective=MaximizeKS
 ```
 
 ```
-(array([62., 62., 53.]), [[46, 16], [39, 13, 10], [27, 26]])
+Bin #0: [46, 16], sum=62.0
+Bin #1: [39, 13, 10], sum=62.0
+Bin #2: [27, 26], sum=53.0
 ```
 
 
@@ -96,9 +106,11 @@ print(prtpy.partition(algorithm=dp, numbins=3, items=items, objective=MinimizeKL
 ```
 
 ```
-(array([56., 56., 65.]), [[46, 10], [27, 16, 13], [39, 26]])
+Bin #0: [46, 10], sum=56.0
+Bin #1: [27, 16, 13], sum=56.0
+Bin #2: [39, 26], sum=65.0
 ```
 
 
 ---
-Markdown generated automatically from [objectives.py](objectives.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.
+Markdown generated automatically from [objectives.py](objectives.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2025-01-26.

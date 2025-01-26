@@ -49,7 +49,7 @@ def maximin_share_partition(c:int, valuation:list, items:Collection[Any]=None, n
         items=items,
         valueof=lambda item: valuation[item],
         objective=prtpy.obj.MaximizeKSmallestSums(numerator),
-        outputtype=prtpy.out.PartitionAndSums,
+        outputtype=prtpy.out.PartitionAndSumsTuple,
         **kwargs
     )
     return (lists, list(sums), sum(sorted(sums)[:numerator]))
@@ -106,16 +106,16 @@ mms_demo(3, [29, 29, 28, 16, 2])
 Valuation:  [5, 5, 5, 7, 7, 7, 11, 17, 23, 23, 23, 31, 31, 31, 65]
 1-out-of-3 partition = [[11, 14], [2, 3, 4, 5, 7, 8, 12], [0, 1, 6, 9,
 10, 13]], values = [96.0, 97.0, 98.0], min-value = 96.0
-2-out-of-3 partition = [[11, 14], [0, 2, 3, 6, 8, 9, 10], [1, 4, 5, 7,
-12, 13]], values = [96.0, 97.0, 98.0], min-value = 193.0
+2-out-of-3 partition = [[12, 14], [2, 3, 8, 11, 13], [0, 1, 4, 5, 6,
+7, 9, 10]], values = [96.0, 97.0, 98.0], min-value = 193.0
 
 Valuation:  [29, 29, 28, 16, 2]
 1-out-of-3 partition = [[0], [2, 4], [1, 3]], values = [29.0, 30.0,
 45.0], min-value = 29.0
-2-out-of-3 partition = [[1], [0, 4], [2, 3]], values = [29.0, 31.0,
+2-out-of-3 partition = [[0], [1, 4], [2, 3]], values = [29.0, 31.0,
 44.0], min-value = 60.0
 ```
 
 
 ---
-Markdown generated automatically from [maximin_share_demo.py](maximin_share_demo.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.
+Markdown generated automatically from [maximin_share_demo.py](maximin_share_demo.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2025-01-26.

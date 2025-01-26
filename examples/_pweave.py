@@ -27,3 +27,6 @@ if __name__ == "__main__":
         if python_file != os.path.basename(__file__):
             output_file = python_file.replace(".py", ".md")
             publish_to_markdown(python_file, output_file)
+    else:
+        print(glob.glob("*.py"))
+        

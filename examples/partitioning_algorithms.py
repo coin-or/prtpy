@@ -38,12 +38,12 @@ print(f"\t {perf_counter()-start} seconds")
 
 #' The *complete greedy* algorithm (Korf, 1995) allows you to determine how much time you are willing to spend to find an optimal solution.
 start = perf_counter()
-values = np.random.randint(1,1000, 10000)
+values = np.random.randint(1,1000, 100)
 print(prtpy.partition(algorithm=prtpy.partitioning.complete_greedy, numbins=9, items=values, outputtype=prtpy.out.Sums, time_limit=1))
 print(f"\t {perf_counter()-start} seconds")
 
 #' The *sequential number partitioning* algorithm (Korf, 2009) is an advanced optimal partitioning algorithm. Programmed by Shmuel and Jonathan.
 start = perf_counter()
-values = np.random.randint(1,1000, 10)
+values = np.random.randint(1,100, 10)
 print(prtpy.partition(algorithm=prtpy.partitioning.sequential_number_partitioning, numbins=9, items=values, outputtype=prtpy.out.Sums))
 print(f"\t {perf_counter()-start} seconds")

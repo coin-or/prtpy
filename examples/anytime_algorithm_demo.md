@@ -27,23 +27,23 @@ for time_limit in [0.25,0.5,1,2,4,8]:
 ```
 
 ```
-Greedy:  (4667.990849194712, 5767.517683956478)
-         0.00033339999999970615 seconds
+Greedy:  (4822.668239457016, 5783.838801253794)
+         0.0010743999882834032 seconds
 Complete greedy:
-        0.25:  (4763.3417890516785, 5727.287117998592)
-         0.2506885999999997 seconds
-        0.5:  (4787.022525659784, 5500.643023962724)
-         0.5009939999999999 seconds
-        1:  (4808.442668794849, 5487.193441478978)
-         1.0018127000000003 seconds
-        2:  (4831.974064872426, 5421.068259104535)
-         2.0104259000000004 seconds
-        4:  (4831.974064872426, 5421.068259104535)
-         4.023130400000001 seconds
-        8:  (4841.696699437434, 5411.345624539528)
-         8.032873499999999 seconds
+        0.25:  (4960.0, 5635.0)
+         0.2506347000016831 seconds
+        0.5:  (5022.0, 5632.0)
+         0.5011180000001332 seconds
+        1:  (4975.0, 5505.0)
+         1.0044468000123743 seconds
+        2:  (4979.0, 5501.0)
+         2.007786900008796 seconds
+        4:  (5042.0, 5420.0)
+         4.018622699994012 seconds
+        8:  (5051.0, 5420.0)
+         8.044986099994276 seconds
 ```
 
 
 ---
-Markdown generated automatically from [anytime_algorithm_demo.py](anytime_algorithm_demo.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2022-07-11.
+Markdown generated automatically from [anytime_algorithm_demo.py](anytime_algorithm_demo.py) using [Pweave](http://mpastell.com/pweave) 0.30.3 on 2025-01-26.
