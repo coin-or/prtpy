@@ -107,8 +107,6 @@ class Binner(ABC):
         """
         return None
 
-
-    
     @abstractmethod
     def sums(self, bins: BinsArray) -> Tuple[float]:
         """
